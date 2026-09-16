@@ -28,7 +28,7 @@ export function getChainById(chainId: number): ChainConfig | undefined {
 
 export function getExplorerAddressUrl(chainId: number, address: string): string {
   const chain = getChainById(chainId);
-  if (!chain) return `https://www.okx.com/web3/explorer/xlayer/address/${address}`;
+  if (!chain) return `https://web3.okx.com/explorer/x-layer/evm/address/${address}`;
   return `${chain.explorerUrl}/address/${address}`;
 }
 

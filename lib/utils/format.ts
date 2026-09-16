@@ -6,6 +6,14 @@ export function formatNumber(num: number | null, prefix = "", suffix = ""): stri
   return `${prefix}${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${suffix}`;
 }
 
+export function formatLargeNumber(num: number | null, prefix = ""): string {
+  if (num == null) return "—";
+  if (num >= 1e9) return `${prefix}${(num / 1e9).toFixed(1)}B`;
+  if (num >= 1e6) return `${prefix}${(num / 1e6).toFixed(1)}M`;
+  if (num >= 1e3) return `${prefix}${(num / 1e3).toFixed(1)}K`;
+  return `${prefix}${num.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
 export function formatPrice(price: number | null): string {
   if (price == null) return "—";
   if (price < 0.01) return `$${price.toFixed(6)}`;

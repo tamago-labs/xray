@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, ChevronUp, ChevronDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { usePrices } from "@/app/contexts/PriceContext";
+import { formatLargeNumber } from "@/lib/utils/format";
 import listData from "@/lib/data/rwa-v1-list.json";
 
 interface TokenRow {
@@ -46,7 +47,7 @@ export default function Explore() {
   const router = useRouter();
   const { prices } = usePrices();
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("market_cap");
+  const [sortKey, setSortKey] = useState<SortKey>("volume_24h");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
   const pageSize = usePageSize();
@@ -247,12 +248,12 @@ export default function Explore() {
                   }`}>
                     {row.percent_30d != null ? `${row.percent_30d >= 0 ? "+" : ""}${row.percent_30d.toFixed(2)}%` : "—"}
                   </td>
-                  <td className="px-4 py-3 text-right text-white/40">
-                    {row.market_cap != null ? `$${(row.market_cap / 1_000_000).toFixed(1)}M` : "—"}
-                  </td>
-                  <td className="px-4 py-3 text-right text-white/40">
-                    {row.volume_24h != null ? `$${(row.volume_24h / 1_000_000).toFixed(1)}M` : "—"}
-                  </td>
+                   <td className="px-4 py-3 text-right text-white/40">
+                     {formatLargeNumber(row.market_cap, "$")}
+                   </td>
+                   <td className="px-4 py-3 text-right text-white/40">
+                     {formatLargeNumber(row.volume_24h, "$")}
+                   </td>
                 </tr>
               ))}
             </tbody>

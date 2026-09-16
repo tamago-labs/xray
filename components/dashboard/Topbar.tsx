@@ -152,7 +152,7 @@ export default function Topbar() {
           </div>
           {tokenMeta.contractAddress && (
             <a
-              href={`https://www.okx.com/web3/explorer/xlayer/address/${tokenMeta.contractAddress}`}
+              href={`https://web3.okx.com/explorer/x-layer/evm/address/${tokenMeta.contractAddress}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-white/[0.08] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04] transition-colors ml-3"
