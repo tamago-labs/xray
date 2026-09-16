@@ -29,9 +29,9 @@ export default function Sidebar() {
     <aside className="w-56 h-screen border-r border-border3/50 bg-surface flex flex-col fixed left-0 top-0">
       <Link href="/" className="px-5 h-14 flex items-center gap-2 border-b border-border3/50 hover:bg-white/[0.02] transition-colors">
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-zenblue to-zenpurple flex items-center justify-center">
-          <span className="text-[18px] font-brand">Z</span>
+          <span className="text-[18px] font-brand">X</span>
         </div>
-        <span className="font-display text-lg font-semibold tracking-tight">Zivic</span>
+        <span className="font-display text-lg font-semibold tracking-tight">Xray</span>
       </Link>
 
       <nav className="flex-1 py-4 px-3 space-y-1">

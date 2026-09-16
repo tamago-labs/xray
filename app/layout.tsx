@@ -23,8 +23,8 @@ const zenTokyoZen = Zen_Tokyo_Zoo({
 });
 
 export const metadata: Metadata = {
-  title: "Zivic — Your Gateway to Tokenized Stocks",
-  description: "Explore tokenized stocks with Zivic, a personalized AI dashboard powered by frontier AI and real-time market data backed by leading data providers. Discover stocks that fit your goals.",
+  title: "Xray — Your Gateway to Tokenized Stocks on X Layer",
+  description: "Explore tokenized stocks on X Layer with Xray, a personalized AI dashboard powered by frontier AI and real-time market data backed by leading data providers. Discover stocks that fit your goals.",
 };
 
 export default function RootLayout({
