@@ -222,7 +222,7 @@ function NewChatInner() {
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 max-w-3xl mx-auto">
         {/* Example prompt */}
         <p className="font-display text-2xl md:text-3xl font-semibold text-center text-white/70 mb-8">
-          &ldquo;Ask Zivic anything about the market&rdquo;
+          &ldquo;Ask Xray anything about the market&rdquo;
         </p>
 
         {/* Input with glow */}
@@ -231,7 +231,7 @@ function NewChatInner() {
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Zivic anything about the market…"
+            placeholder="Ask Xray anything about the market…"
             rows={1}
             className="w-full bg-transparent text-[14px] text-white placeholder:text-white/25 outline-none resize-none min-h-[60px] p-4"
           />
