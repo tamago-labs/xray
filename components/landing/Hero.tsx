@@ -23,7 +23,7 @@ export default function Hero() {
           <Section>
             <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
               Xray is a hyper-personalized AI dashboard for tokenized stocks on{' '}
-              <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell Xray your goals and risk appetite — it ranks, filters, and explains the{' '}
+              <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell the agent your goals and risk appetite — it ranks, filters, and explains the{' '}
               <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">xStocks</a>{' '}
               that matter most to you.
             </p>
@@ -33,7 +33,7 @@ export default function Hero() {
             <ul className="mt-6 space-y-2 text-[13px] text-white/35">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />
-                Trading-ready on <span className="text-accent font-semibold">X Layer</span>
+                Mainnet ready on <img src="https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png" alt="X Layer" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">X Layer</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />

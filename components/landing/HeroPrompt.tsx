@@ -59,7 +59,7 @@ export default function HeroPrompt() {
           <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
           <span className="w-3 h-3 rounded-full bg-green-400/70" />
         </div>
-        <span className="text-[12px] text-white/60 font-medium">Zivic AI</span>
+        <span className="text-[12px] text-white/60 font-medium">Xray AI</span>
       </div>
 
       <div className="p-5">
@@ -67,7 +67,7 @@ export default function HeroPrompt() {
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask Zivic anything about the market…"
+            placeholder="Ask Xray anything about the market…"
             className="w-full bg-transparent text-[14px] text-white placeholder:text-white/25 outline-none resize-none min-h-[80px]"
           />
         </div>
@@ -110,7 +110,7 @@ export default function HeroPrompt() {
             className="h-9 px-4 rounded-lg bg-accent flex items-center justify-center gap-2 hover:bg-accent/80 transition-colors shrink-0"
           >
             <Send className="w-4 h-4 text-white" />
-            <span className="text-[13px] font-medium text-white">Ask Zivic</span>
+            <span className="text-[13px] font-medium text-white">Ask Xray</span>
           </button>
         </div>
       </div>

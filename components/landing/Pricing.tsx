@@ -43,7 +43,7 @@ export default function Pricing() {
 
         <Section>
           <p className="text-[15px] text-white/50 leading-relaxed text-center max-w-2xl mx-auto mb-12">
-            Zivic is currently free. As we scale, we&apos;ll introduce usage-based AI credits so you only pay for the AI analysis you actually use.
+            Xray is currently free. As we scale, we&apos;ll introduce usage-based AI credits so you only pay for the AI analysis you actually use.
           </p>
         </Section>
 
@@ -84,7 +84,7 @@ export default function Pricing() {
 
         <Section>
           <p className="mt-8 text-[12px] text-white/30 text-center">
-            Priced in USD, payable in SOL. Credits never expire.
+            Priced in USD, payable in stablecoins. Credits never expire.
           </p>
         </Section>
       </div>

@@ -16,7 +16,7 @@ export default function CTA() {
                 Make the market yours
               </h2>
               <p className="mt-4 text-[15px] text-white/45">
-                Get AI-ranked tokenized stocks tailored to your goals, with the data and tools to trade them directly on Solana.
+                Get AI-ranked tokenized stocks tailored to your goals, with the data and tools to trade them directly on X Layer.
               </p>
               <Link
                 href="#"

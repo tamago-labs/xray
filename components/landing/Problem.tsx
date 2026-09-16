@@ -35,7 +35,7 @@ export default function Problem() {
 
             <Section>
               <p className="mt-6 text-[15px] text-white/50 leading-relaxed">
-                Zivic brings AI-powered market research, personalized recommendations, and onchain trading into one place — helping users go from <span className="text-accent font-semibold">what should I buy?</span> to <span className="text-accent font-semibold">let&apos;s trade it.</span>
+                Xray brings AI-powered market research, personalized recommendations, and onchain trading into one place — helping users go from <span className="text-accent font-semibold">what should I buy?</span> to <span className="text-accent font-semibold">let&apos;s trade it.</span>
               </p>
             </Section>
           </div>

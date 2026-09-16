@@ -5,7 +5,7 @@ import Section from './Section';
 const steps = [
   {
     num: '01',
-    title: 'Ask Zivic',
+    title: 'Ask Xray',
     description: (
       <>
         Ask anything about tokenized stocks. <span className="text-white/70 font-medium">What should I buy? Why is a stock moving? Which stocks fit my goals and risk appetite?</span>
@@ -18,7 +18,7 @@ const steps = [
     title: 'Get a personalized answer',
     description: (
       <>
-        Zivic combines your preferences with market data to <span className="text-white/70 font-medium">rank, compare, and explain</span> the tokenized stocks that matter to you.
+        Xray combines your preferences with market data to <span className="text-white/70 font-medium">rank, compare, and explain</span> the tokenized stocks that matter to you.
       </>
     ),
     example: null,
@@ -28,17 +28,17 @@ const steps = [
     title: 'Find the best trade',
     description: (
       <>
-        When you&apos;re ready, Zivic finds the <span className="text-white/70 font-medium">best available route</span> for your trade across Solana liquidity through <span className="text-white/70 font-medium">Jupiter & OKX Router</span>.
+        When you&apos;re ready, Xray finds the <span className="text-white/70 font-medium">best available route</span> for your trade across X Layer liquidity through <span className="text-white/70 font-medium">OKX DEX Router</span>.
       </>
     ),
     example: null,
   },
   {
     num: '04',
-    title: 'Trade on Solana',
+    title: 'Trade on X Layer',
     description: (
       <>
-        Review the details and execute on <span className="text-white/70 font-medium">Solana Mainnet</span>. No fully autonomous agents — you approve what you trade.
+        Review the details and execute on <span className="text-white/70 font-medium">X Layer</span>. No fully autonomous agents — you approve what you trade.
       </>
     ),
     example: null,
