@@ -32,9 +32,9 @@
           ],
           "date_added": "2026-08-11T16:22:02.000Z",
           "slug": "wrapped-circle-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xb11134f14d5b94db60d4599dfdc3bf1bba2150e8",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.circle.com",
@@ -74,9 +74,9 @@
           ],
           "date_added": "2026-08-11T16:25:40.000Z",
           "slug": "wrapped-spacex-tokenized-etf-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x8e2eed8b8b5e13ea7bf38e50d7821d2c57309072",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.spacex.com/",
@@ -116,9 +116,9 @@
           ],
           "date_added": "2025-07-06T11:20:44.000Z",
           "slug": "wrapped-microstrategy-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x30987adf0b11dc698438a99ba04ec3a1ab2c7eab",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.strategy.com",
@@ -158,9 +158,9 @@
           ],
           "date_added": "2025-07-08T05:35:15.000Z",
           "slug": "wrapped-nvidia-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xa8ddb5cd96b5222afe198316e9a57caa642850d5",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.nvidia.com",
@@ -200,9 +200,9 @@
           ],
           "date_added": "2026-08-11T16:25:58.000Z",
           "slug": "wrapped-micron-technology-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xe2047ee3bddb5c99ae428ab83df63f8730698e30",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.micron.com",
@@ -242,9 +242,9 @@
           ],
           "date_added": "2025-07-07T04:46:46.000Z",
           "slug": "wrapped-tesla-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xc3fdbe3a68ee5de461d30415a8165cf9aefe1171",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.tesla.com",
@@ -284,9 +284,9 @@
           ],
           "date_added": "2025-07-03T07:50:39.000Z",
           "slug": "wrapped-alphabet-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xf8c5308f80e459bb53d9ebe689854d9cbb2caa6f",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.abc.xyz",
@@ -326,9 +326,9 @@
           ],
           "date_added": "2026-08-11T16:24:24.000Z",
           "slug": "wrapped-sandisk-corporation-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x75e82e2884ea10f72fca777449b73377f4646219",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -368,9 +368,9 @@
           ],
           "date_added": "2025-07-06T08:33:12.000Z",
           "slug": "wrapped-intel-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x33aa35b0271fffe2048cc093ab7fe60931786719",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.intel.com",
@@ -410,9 +410,9 @@
           ],
           "date_added": "2025-07-06T03:29:02.000Z",
           "slug": "wrapped-coinbase-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x44c7ed7ffdf8465c9d27f60aec845eed3d49d56e",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.coinbase.com",
@@ -452,9 +452,9 @@
           ],
           "date_added": "2025-07-06T11:12:53.000Z",
           "slug": "wrapped-marvell-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xb4ee60b6b817ca7386422ef1a0f45eaddea13275",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.marvell.com",
@@ -494,9 +494,9 @@
           ],
           "date_added": "2025-07-08T05:30:21.000Z",
           "slug": "wrapped-apple-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x943bf64d566c32a2bcd41ac92fb63c111cc9de8f",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.apple.com",
@@ -536,9 +536,9 @@
           ],
           "date_added": "2026-08-11T16:24:42.000Z",
           "slug": "wrapped-sk-hynix-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x6215a58ed045d71f2561aaabe54f4c885c522998",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -578,9 +578,9 @@
           ],
           "date_added": "2025-07-06T11:04:35.000Z",
           "slug": "wrapped-meta-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xe840946ffebcd66b7c4e95095effafadfa0d0e56",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://about.meta.com",
@@ -620,9 +620,9 @@
           ],
           "date_added": "2025-07-06T04:52:56.000Z",
           "slug": "wrapped-robinhood-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x59801175a9b2248f9bf4ba7f82e17045c4672ec8",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.robinhood.com",
@@ -662,9 +662,9 @@
           ],
           "date_added": "2025-07-06T11:16:36.000Z",
           "slug": "wrapped-microsoft-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x166fbe68274b6a47e025f4ba17388c539f1fa1d0",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.microsoft.com",
@@ -704,9 +704,9 @@
           ],
           "date_added": "2025-07-03T08:42:00.000Z",
           "slug": "wrapped-broadcom-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xe89572bfe500ac7e8ecd8dc8119d274214e06f14",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.broadcom.com",
@@ -746,9 +746,9 @@
           ],
           "date_added": "2025-07-02T13:36:43.000Z",
           "slug": "wrapped-amazon-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x910cabde3eba7fc1ce64fd14bd680b9f60fa0f90",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.amazon.com",
@@ -788,9 +788,9 @@
           ],
           "date_added": "2026-08-11T16:20:22.000Z",
           "slug": "wrapped-amd-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xee7ccb0d37a12862e7f92f6c92a93d9c2d304266",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.amd.com",
@@ -830,9 +830,9 @@
           ],
           "date_added": "2026-08-11T16:26:33.000Z",
           "slug": "wrapped-tsmc-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x27d62249488fc66ecbb92c8da3f56f700b8e8501",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.tsmc.com",
@@ -872,9 +872,9 @@
           ],
           "date_added": "2025-07-06T11:37:20.000Z",
           "slug": "wrapped-oracle-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x1349456830ddc3d8599e4d6a63698883eca67ada",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.oracle.com",
@@ -914,9 +914,9 @@
           ],
           "date_added": "2025-07-03T07:45:20.000Z",
           "slug": "wrapped-gamestop-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x459d3ae62b86cc6125e06260dddfd3afed24a877",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.gamestop.com",
@@ -956,9 +956,9 @@
           ],
           "date_added": "2026-08-11T16:20:28.000Z",
           "slug": "wrapped-bitmine-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xdad5623b32c81aeaa75478fcfe934e9e97018c58",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.bitminetech.io",
@@ -998,9 +998,9 @@
           ],
           "date_added": "2025-07-06T11:44:43.000Z",
           "slug": "wrapped-palantir-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x4a2df09536f62341c9f946427d16414c04e21342",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.palantir.com",
@@ -1040,9 +1040,9 @@
           ],
           "date_added": "2026-08-11T16:20:59.000Z",
           "slug": "wrapped-asml-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x9147b03c16b18fc4f686f610f189f91ddf4347b4",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.asml.com",
@@ -1082,9 +1082,9 @@
           ],
           "date_added": "2026-08-11T16:24:17.000Z",
           "slug": "wrapped-nebius-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x43a7b7acfae969b0682e56142b52e63e07d59b7d",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -1124,9 +1124,9 @@
           ],
           "date_added": "2026-08-11T16:22:17.000Z",
           "slug": "wrapped-iren-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xb3a16db475a9cb321fc8956aa2cb01385a022e75",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://iren.com",
@@ -1166,9 +1166,9 @@
           ],
           "date_added": "2025-07-06T08:46:58.000Z",
           "slug": "wrapped-coca-cola-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xe4784b45415aac58b289f9373314261c788c91e8",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.coca-colacompany.com",
@@ -1208,9 +1208,9 @@
           ],
           "date_added": "2026-08-11T16:23:42.000Z",
           "slug": "wrapped-international-business-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xbf69d85055642a9c6450bdfde3c49baac50f8286",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.ibm.com",
@@ -1250,9 +1250,9 @@
           ],
           "date_added": "2025-07-06T10:54:48.000Z",
           "slug": "wrapped-mcdonald-s-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xc6639026a3a862cd4fcbae3f67cb2d25a2959d37",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://corporate.mcdonalds.com",
@@ -1292,9 +1292,9 @@
           ],
           "date_added": "2026-08-11T16:24:21.000Z",
           "slug": "wrapped-rocket-lab-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x5aa45cf9d8c8555c9a76cf0207519501c227a235",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -1334,9 +1334,9 @@
           ],
           "date_added": "2026-08-11T16:24:33.000Z",
           "slug": "wrapped-super-micro-computer-inc-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xd89556e08fdc04e5a2d9344eb06568a043001166",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.supermicro.com",
@@ -1376,9 +1376,9 @@
           ],
           "date_added": "2026-08-11T16:20:41.000Z",
           "slug": "wrapped-dell-technologies-inc-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x04db4384013664baa627c1a3fa4ff0c50f37cfd3",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -1418,9 +1418,9 @@
           ],
           "date_added": "2025-07-07T04:54:03.000Z",
           "slug": "wrapped-walmart-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x3b4336e3958913984c2e36b8ed0e7c87a5bdee33",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://stock.walmart.com",
@@ -1460,9 +1460,9 @@
           ],
           "date_added": "2026-08-11T16:25:21.000Z",
           "slug": "wrapped-reddit-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x9ed51b856159c7cf26c1ece673abd248f21bcc9e",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.redditinc.com",
@@ -1502,9 +1502,9 @@
           ],
           "date_added": "2025-07-06T03:11:36.000Z",
           "slug": "wrapped-berkshire-hathaway-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xc3a8d2e18d33e0800f84cb4ca6529d18fad225df",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -1544,9 +1544,9 @@
           ],
           "date_added": "2026-08-11T16:21:55.000Z",
           "slug": "wrapped-coreweave-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xadf63a79c9813a8e0c4d1d334ebdfaeef04bdf98",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,
@@ -1586,9 +1586,9 @@
           ],
           "date_added": "2026-08-11T16:24:18.000Z",
           "slug": "wrapped-moderna-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xce0fbc16e820ab7fd6d2936f1533c2654ad49ae9",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.modernatx.com",
@@ -1628,9 +1628,9 @@
           ],
           "date_added": "2026-08-11T16:25:16.000Z",
           "slug": "wrapped-nike-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x8cdd7983f4b0a0e8694f22479fec092d9244f4bb",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.nike.com",
@@ -1670,9 +1670,9 @@
           ],
           "date_added": "2025-07-06T11:09:13.000Z",
           "slug": "wrapped-merck-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0x7d218d8a2ab4c1f03fdd7b655b4e724d48200050",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": "https://www.merck.com",
@@ -1712,9 +1712,9 @@
           ],
           "date_added": "2026-08-11T16:23:58.000Z",
           "slug": "wrapped-intercontinental-exchange-tokenized-stock-xstock",
-          "contractAddress": null,
-          "decimals": null,
-          "verified": null
+          "contractAddress": "0xbdff6dd4cec5eeaff1e21d65863431e79755ea13",
+          "decimals": 18,
+          "verified": true
         }
       ],
       "website": null,

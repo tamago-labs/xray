@@ -56,6 +56,18 @@ export default function Topbar() {
     }
   }, [address]);
 
+  useEffect(() => {
+    if (!isConnected || !address) { setCredits(null); return; }
+    void (async () => {
+      try {
+        const { data: profiles } = await dataClient.models.UserProfile.list({
+          filter: { walletAddress: { eq: address } },
+        });
+        setCredits(profiles[0]?.credits ?? null);
+      } catch { setCredits(null); }
+    })();
+  }, [isConnected, address, creditsModalOpen]);
+
   const tokenMatch = pathname.match(/^\/dashboard\/token\/([^/]+)\/([^/]+)$/);
   const tokenSlug = tokenMatch?.[1];
   const tokenCryptoId = tokenMatch?.[2];
