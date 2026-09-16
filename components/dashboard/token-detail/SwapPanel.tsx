@@ -51,7 +51,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
             {tab === "Buy" ? (
               <>
                 <div className="w-4 h-4 rounded-full bg-purple-500/30" />
-                <span className="text-[12px] font-medium text-white/70">SOL</span>
+                <span className="text-[12px] font-medium text-white/70">OKB</span>
               </>
             ) : token.logo ? (
               <img src={token.logo} alt="" className="w-4 h-4 rounded-full" />
@@ -96,7 +96,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
             ) : (
               <>
                 <div className="w-4 h-4 rounded-full bg-purple-500/30" />
-                <span className="text-[12px] font-medium text-white/70">SOL</span>
+                <span className="text-[12px] font-medium text-white/70">OKB</span>
               </>
             )}
           </div>
@@ -106,7 +106,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
         <div className="flex items-center justify-between text-[11px] mb-3">
           <span className="text-white/30">Price</span>
           <span className="text-white/50">
-            1 SOL ≈ 0.0028 {token.symbol}
+            1 OKB ≈ 0.0028 {token.symbol}
           </span>
         </div>
         <button className="w-full py-2.5 rounded-xl bg-accent text-sm font-medium text-white hover:bg-accent/80 transition-colors flex items-center justify-center gap-2">

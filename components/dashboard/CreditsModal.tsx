@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
-import { X, Wallet, Sparkles } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
+import { useWallet } from "../app/WalletContext";
 
 const client = generateClient<Schema>();
 
@@ -25,8 +26,6 @@ const modal = {
   exit: { opacity: 0, scale: 0.95, y: 20 },
 };
 
-const MOCK_ADDRESS = "0xZ1v1c0000000000000000000000000000000000";
-
 export function CreditsModal({
   open,
   onClose,
@@ -34,27 +33,28 @@ export function CreditsModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const { isConnected, address } = useWallet();
   const [mounted, setMounted] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [requesting, setRequesting] = useState(false);
-  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (open && connected) {
+    if (open && isConnected && address) {
       void fetchCredits();
     }
-  }, [open, connected]);
+  }, [open, isConnected, address]);
 
   const fetchCredits = async () => {
+    if (!address) return;
     setLoading(true);
     try {
       const { data: profiles } = await client.models.UserProfile.list({
-        filter: { walletAddress: { eq: MOCK_ADDRESS } },
+        filter: { walletAddress: { eq: address } },
       });
       if (profiles.length > 0) {
         setCredits(profiles[0].credits ?? 0);
@@ -68,14 +68,15 @@ export function CreditsModal({
   };
 
   const handleRequest = async () => {
+    if (!address) return;
     setRequesting(true);
     try {
       const { data: profiles } = await client.models.UserProfile.list({
-        filter: { walletAddress: { eq: MOCK_ADDRESS } },
+        filter: { walletAddress: { eq: address } },
       });
       if (profiles.length === 0) {
         await client.models.UserProfile.create({
-          walletAddress: MOCK_ADDRESS,
+          walletAddress: address,
           credits: 1000,
         });
         setCredits(1000);
@@ -92,14 +93,7 @@ export function CreditsModal({
     setRequesting(false);
   };
 
-  const handleConnect = () => {
-    setConnected(true);
-    void fetchCredits();
-  };
-
   if (!mounted) return null;
-
-  const address = connected ? MOCK_ADDRESS : null;
 
   return createPortal(
     <AnimatePresence>
@@ -137,18 +131,11 @@ export function CreditsModal({
               </p>
             </div>
 
-            {!address ? (
+            {!isConnected || !address ? (
               <div className="text-center py-4">
-                <Wallet className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                <p className="text-[13px] text-white/40 mb-4">
-                  Connect your wallet to request credits
+                <p className="text-[13px] text-white/40">
+                  Connect your wallet from the top bar to request credits
                 </p>
-                <button
-                  onClick={handleConnect}
-                  className="rounded-xl bg-accent px-4 py-2.5 text-[13px] font-medium text-white hover:bg-accent/80 transition-colors"
-                >
-                  Connect Wallet
-                </button>
               </div>
             ) : loading ? (
               <div className="text-center py-4">

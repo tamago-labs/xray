@@ -31,7 +31,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:22:02.000Z",
-          "slug": "wrapped-circle-tokenized-stock-xstock"
+          "slug": "wrapped-circle-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.circle.com",
@@ -70,7 +73,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:25:40.000Z",
-          "slug": "wrapped-spacex-tokenized-etf-xstock"
+          "slug": "wrapped-spacex-tokenized-etf-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.spacex.com/",
@@ -109,7 +115,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:20:44.000Z",
-          "slug": "wrapped-microstrategy-tokenized-stock-xstock"
+          "slug": "wrapped-microstrategy-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.strategy.com",
@@ -148,7 +157,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-08T05:35:15.000Z",
-          "slug": "wrapped-nvidia-tokenized-stock-xstock"
+          "slug": "wrapped-nvidia-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.nvidia.com",
@@ -187,7 +199,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:25:58.000Z",
-          "slug": "wrapped-micron-technology-tokenized-stock-xstock"
+          "slug": "wrapped-micron-technology-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.micron.com",
@@ -226,7 +241,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-07T04:46:46.000Z",
-          "slug": "wrapped-tesla-tokenized-stock-xstock"
+          "slug": "wrapped-tesla-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.tesla.com",
@@ -265,7 +283,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-03T07:50:39.000Z",
-          "slug": "wrapped-alphabet-tokenized-stock-xstock"
+          "slug": "wrapped-alphabet-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.abc.xyz",
@@ -304,7 +325,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:24.000Z",
-          "slug": "wrapped-sandisk-corporation-tokenized-stock-xstock"
+          "slug": "wrapped-sandisk-corporation-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -343,7 +367,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T08:33:12.000Z",
-          "slug": "wrapped-intel-tokenized-stock-xstock"
+          "slug": "wrapped-intel-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.intel.com",
@@ -382,7 +409,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T03:29:02.000Z",
-          "slug": "wrapped-coinbase-tokenized-stock-xstock"
+          "slug": "wrapped-coinbase-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.coinbase.com",
@@ -421,7 +451,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:12:53.000Z",
-          "slug": "wrapped-marvell-tokenized-stock-xstock"
+          "slug": "wrapped-marvell-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.marvell.com",
@@ -460,7 +493,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-08T05:30:21.000Z",
-          "slug": "wrapped-apple-tokenized-stock-xstock"
+          "slug": "wrapped-apple-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.apple.com",
@@ -499,7 +535,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:42.000Z",
-          "slug": "wrapped-sk-hynix-tokenized-stock-xstock"
+          "slug": "wrapped-sk-hynix-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -538,7 +577,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:04:35.000Z",
-          "slug": "wrapped-meta-tokenized-stock-xstock"
+          "slug": "wrapped-meta-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://about.meta.com",
@@ -577,7 +619,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T04:52:56.000Z",
-          "slug": "wrapped-robinhood-tokenized-stock-xstock"
+          "slug": "wrapped-robinhood-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.robinhood.com",
@@ -616,7 +661,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:16:36.000Z",
-          "slug": "wrapped-microsoft-tokenized-stock-xstock"
+          "slug": "wrapped-microsoft-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.microsoft.com",
@@ -655,7 +703,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-03T08:42:00.000Z",
-          "slug": "wrapped-broadcom-tokenized-stock-xstock"
+          "slug": "wrapped-broadcom-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.broadcom.com",
@@ -694,7 +745,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-02T13:36:43.000Z",
-          "slug": "wrapped-amazon-tokenized-stock-xstock"
+          "slug": "wrapped-amazon-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.amazon.com",
@@ -733,7 +787,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:20:22.000Z",
-          "slug": "wrapped-amd-tokenized-stock-xstock"
+          "slug": "wrapped-amd-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.amd.com",
@@ -772,7 +829,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:26:33.000Z",
-          "slug": "wrapped-tsmc-tokenized-stock-xstock"
+          "slug": "wrapped-tsmc-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.tsmc.com",
@@ -811,7 +871,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:37:20.000Z",
-          "slug": "wrapped-oracle-tokenized-stock-xstock"
+          "slug": "wrapped-oracle-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.oracle.com",
@@ -850,7 +913,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-03T07:45:20.000Z",
-          "slug": "wrapped-gamestop-tokenized-stock-xstock"
+          "slug": "wrapped-gamestop-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.gamestop.com",
@@ -889,7 +955,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:20:28.000Z",
-          "slug": "wrapped-bitmine-tokenized-stock-xstock"
+          "slug": "wrapped-bitmine-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.bitminetech.io",
@@ -928,7 +997,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:44:43.000Z",
-          "slug": "wrapped-palantir-tokenized-stock-xstock"
+          "slug": "wrapped-palantir-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.palantir.com",
@@ -967,7 +1039,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:20:59.000Z",
-          "slug": "wrapped-asml-tokenized-stock-xstock"
+          "slug": "wrapped-asml-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.asml.com",
@@ -1006,7 +1081,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:17.000Z",
-          "slug": "wrapped-nebius-tokenized-stock-xstock"
+          "slug": "wrapped-nebius-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -1045,7 +1123,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:22:17.000Z",
-          "slug": "wrapped-iren-tokenized-stock-xstock"
+          "slug": "wrapped-iren-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://iren.com",
@@ -1084,7 +1165,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T08:46:58.000Z",
-          "slug": "wrapped-coca-cola-tokenized-stock-xstock"
+          "slug": "wrapped-coca-cola-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.coca-colacompany.com",
@@ -1123,7 +1207,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:23:42.000Z",
-          "slug": "wrapped-international-business-tokenized-stock-xstock"
+          "slug": "wrapped-international-business-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.ibm.com",
@@ -1162,7 +1249,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T10:54:48.000Z",
-          "slug": "wrapped-mcdonald-s-tokenized-stock-xstock"
+          "slug": "wrapped-mcdonald-s-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://corporate.mcdonalds.com",
@@ -1201,7 +1291,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:21.000Z",
-          "slug": "wrapped-rocket-lab-tokenized-stock-xstock"
+          "slug": "wrapped-rocket-lab-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -1240,7 +1333,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:33.000Z",
-          "slug": "wrapped-super-micro-computer-inc-tokenized-stock-xstock"
+          "slug": "wrapped-super-micro-computer-inc-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.supermicro.com",
@@ -1279,7 +1375,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:20:41.000Z",
-          "slug": "wrapped-dell-technologies-inc-tokenized-stock-xstock"
+          "slug": "wrapped-dell-technologies-inc-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -1318,7 +1417,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-07T04:54:03.000Z",
-          "slug": "wrapped-walmart-tokenized-stock-xstock"
+          "slug": "wrapped-walmart-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://stock.walmart.com",
@@ -1357,7 +1459,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:25:21.000Z",
-          "slug": "wrapped-reddit-tokenized-stock-xstock"
+          "slug": "wrapped-reddit-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.redditinc.com",
@@ -1396,7 +1501,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T03:11:36.000Z",
-          "slug": "wrapped-berkshire-hathaway-tokenized-stock-xstock"
+          "slug": "wrapped-berkshire-hathaway-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -1435,7 +1543,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:21:55.000Z",
-          "slug": "wrapped-coreweave-tokenized-stock-xstock"
+          "slug": "wrapped-coreweave-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,
@@ -1474,7 +1585,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:24:18.000Z",
-          "slug": "wrapped-moderna-tokenized-stock-xstock"
+          "slug": "wrapped-moderna-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.modernatx.com",
@@ -1513,7 +1627,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:25:16.000Z",
-          "slug": "wrapped-nike-tokenized-stock-xstock"
+          "slug": "wrapped-nike-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.nike.com",
@@ -1552,7 +1669,10 @@
             "tokenized-assets"
           ],
           "date_added": "2025-07-06T11:09:13.000Z",
-          "slug": "wrapped-merck-tokenized-stock-xstock"
+          "slug": "wrapped-merck-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": "https://www.merck.com",
@@ -1591,7 +1711,10 @@
             "xstocks-ecosystem"
           ],
           "date_added": "2026-08-11T16:23:58.000Z",
-          "slug": "wrapped-intercontinental-exchange-tokenized-stock-xstock"
+          "slug": "wrapped-intercontinental-exchange-tokenized-stock-xstock",
+          "contractAddress": null,
+          "decimals": null,
+          "verified": null
         }
       ],
       "website": null,

@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, ChevronDown, ExternalLink, Copy, LogOut } from "lucide-react";
+import { Wallet, ChevronDown, ExternalLink, Copy, LogOut, Check } from "lucide-react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { CreditsModal } from "./CreditsModal";
+import { WalletModal } from "../app/WalletModal";
+import { useWallet } from "../app/WalletContext";
+import { truncateAddress } from "@/lib/wallet";
+import { X_LAYER } from "@/lib/chains";
 import TokenStrip from "./TokenStrip";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -37,11 +41,20 @@ const PAGE_TITLES: Record<string, string> = {
 export default function Topbar() {
   const pathname = usePathname();
   const { prices } = usePrices();
-  const [mockConnected, setMockConnected] = useState(false);
+  const { isConnected, address, isCorrectChain, switchToXLayer, disconnect } = useWallet();
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
-  const [mockAddress] = useState("0xZ1v1c0000000000000000000000000000000000");
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [address]);
 
   const tokenMatch = pathname.match(/^\/dashboard\/token\/([^/]+)\/([^/]+)$/);
   const tokenSlug = tokenMatch?.[1];
@@ -56,7 +69,7 @@ export default function Topbar() {
     name: tokenData.name,
     symbol: tokenData.symbol,
     rwaRank: assetData?.rwa_rank ?? null,
-    mint: tokenData.mint ?? null,
+    contractAddress: tokenData.contractAddress ?? null,
     assetSymbol: assetData?.symbol ?? null,
     assetSlug: assetData?.slug ?? null,
   } : null;
@@ -125,15 +138,15 @@ export default function Topbar() {
               </span>
             )}
           </div>
-          {tokenMeta.mint && (
+          {tokenMeta.contractAddress && (
             <a
-              href={`https://solscan.io/token/${tokenMeta.mint}`}
+              href={`https://www.okx.com/web3/explorer/xlayer/address/${tokenMeta.contractAddress}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-2 py-0.5 rounded-md border border-white/[0.08] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04] transition-colors ml-3"
-              title={tokenMeta.mint}
+              title={tokenMeta.contractAddress}
             >
-              <span className="text-[11px] font-mono text-white/50">{tokenMeta.mint.slice(0, 6)}...{tokenMeta.mint.slice(-4)}</span>
+              <span className="text-[11px] font-mono text-white/50">{tokenMeta.contractAddress.slice(0, 6)}...{tokenMeta.contractAddress.slice(-4)}</span>
               <ExternalLink className="w-3 h-3 text-white/30" />
             </a>
           )}
@@ -186,16 +199,16 @@ export default function Topbar() {
           <span className="text-white/30">credits</span>
         </button>
 
-        {mockConnected ? (
+        {isConnected ? (
           <button onClick={() => setPopoverOpen((v) => !v)} className="relative flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center">
-              <span className="text-[10px] font-bold text-white/90">{mockAddress.slice(2, 4).toUpperCase()}</span>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isCorrectChain ? "bg-gradient-to-br from-accent to-purple-500" : "bg-yellow-500/80"}`}>
+              <span className="text-[10px] font-bold text-white/90">{address?.slice(2, 4).toUpperCase()}</span>
             </div>
             <ChevronDown className={`w-3 h-3 text-white/30 transition-transform ${popoverOpen ? "rotate-180" : ""}`} />
           </button>
         ) : (
           <button
-            onClick={() => setMockConnected(true)}
+            onClick={() => setWalletModalOpen(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] font-medium bg-accent text-white hover:bg-accent/80 transition-colors"
           >
             <Wallet className="w-3.5 h-3.5" />
@@ -204,7 +217,7 @@ export default function Topbar() {
         )}
 
         <AnimatePresence>
-          {popoverOpen && mockConnected && (
+          {popoverOpen && isConnected && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: -8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -212,15 +225,23 @@ export default function Topbar() {
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
               className="absolute top-full right-0 mt-2 w-56 rounded-2xl border border-border3/50 bg-surface shadow-2xl overflow-hidden z-20"
             >
+              {!isCorrectChain && (
+                <button
+                  onClick={() => { void switchToXLayer(); }}
+                  className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-yellow-400 hover:bg-yellow-500/5 transition-colors"
+                >
+                  <span>Switch to {X_LAYER.name}</span>
+                </button>
+              )}
               <button
-                onClick={() => { navigator.clipboard.writeText(mockAddress); }}
+                onClick={handleCopy}
                 className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-white/60 hover:text-white hover:bg-white/[0.03] transition-colors"
               >
-                <span>Copy address</span>
-                <Copy className="w-3.5 h-3.5 text-white/25" />
+                <span>{truncateAddress(address!)}</span>
+                {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5 text-white/25" />}
               </button>
               <button
-                onClick={() => { setMockConnected(false); setPopoverOpen(false); }}
+                onClick={() => { disconnect(); setPopoverOpen(false); }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-red-400 hover:bg-red-500/5 transition-colors border-t border-border3/30"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -231,6 +252,7 @@ export default function Topbar() {
         </AnimatePresence>
       </div>
 
+      <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
       <CreditsModal open={creditsModalOpen} onClose={() => setCreditsModalOpen(false)} />
     </header>
   );

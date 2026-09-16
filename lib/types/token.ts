@@ -10,7 +10,7 @@ export interface Token {
   discord?: string | null;
   tags?: string[] | null;
   date_added?: string | null;
-  mint?: string | null;
+  contractAddress?: string | null;
   decimals?: number | null;
   verified?: boolean | null;
   circulating_supply?: number | null;

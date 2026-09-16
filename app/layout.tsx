@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, Zen_Tokyo_Zoo } from "next/font/google";
 import ConfigureAmplify from "@/components/ConfigureAmplify";
+import { WalletProvider } from "@/components/app/WalletContext";
 import { PriceProvider } from "./contexts/PriceContext";
 import "./globals.css";
 
@@ -36,7 +37,9 @@ export default function RootLayout({
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable} ${zenTokyoZen.variable}`}>
       <body className="font-sans">
         <ConfigureAmplify>
-          <PriceProvider>{children}</PriceProvider>
+          <WalletProvider>
+            <PriceProvider>{children}</PriceProvider>
+          </WalletProvider>
         </ConfigureAmplify>
       </body>
     </html>

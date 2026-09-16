@@ -23,7 +23,7 @@ export default function TokenDetailInfo({ token, asset, price }: { token: Token;
           <DetailRow label="Issuer" value={token.issuer_name} />
         </div>
         <div className="space-y-3">
-          <DetailRow label="Blockchain" value="Solana" />
+          <DetailRow label="Blockchain" value="X Layer" />
           <DetailRow label="Decimals" value={token.decimals != null ? String(token.decimals) : "—"} />
           <DetailRow label="Circulating Supply" value={price?.circulating_supply != null ? price.circulating_supply.toLocaleString() : "—"} />
           <DetailRow label="Total Supply" value={price?.total_supply != null ? price.total_supply.toLocaleString() : "—"} />
@@ -31,12 +31,12 @@ export default function TokenDetailInfo({ token, asset, price }: { token: Token;
           <DetailRow label="Verified" value={token.verified ? "Yes" : "No"} />
           <DetailRow label="Date Added" value={token.date_added ? new Date(token.date_added).toLocaleDateString() : "—"} />
           <div className="flex items-center justify-between">
-            <span className="text-white/40">Mint Address</span>
+            <span className="text-white/40">Contract</span>
             <div className="flex items-center gap-1.5">
               <span className="font-mono text-white/70 text-xs">
-                {token.mint ? `${token.mint.slice(0, 8)}...${token.mint.slice(-6)}` : "—"}
+                {token.contractAddress ? `${token.contractAddress.slice(0, 8)}...${token.contractAddress.slice(-6)}` : "—"}
               </span>
-              {token.mint && <CopyButton text={token.mint} />}
+              {token.contractAddress && <CopyButton text={token.contractAddress} />}
             </div>
           </div>
         </div>
