@@ -131,39 +131,48 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
             placeholder="0.0"
             className="flex-1 bg-transparent text-sm text-white/90 outline-none min-w-0"
           />
-          <button
-            onClick={() => tab === "Buy" && setTokenModalOpen(true)}
-            className="flex items-center gap-1.5 shrink-0 bg-white/[0.06] px-2 py-1 rounded-lg hover:bg-white/[0.1] transition-colors"
-          >
-            {tab === "Buy" ? (
-              <>
-                <img src={baseToken.logo} alt={baseToken.symbol} className="w-4 h-4 rounded-full" />
-                <span className="text-[12px] font-medium text-white/70">{baseToken.symbol}</span>
-                <ChevronDown className="w-3 h-3 text-white/40" />
-              </>
-            ) : (
-              <>
-                {token.logo ? (
-                  <img src={token.logo} alt="" className="w-4 h-4 rounded-full" />
-                ) : (
-                  <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[7px] font-bold text-white/40">
-                    {token.symbol.slice(0, 2)}
-                  </div>
-                )}
-                <span className="text-[12px] font-medium text-white/70">{token.symbol}</span>
-              </>
-            )}
-          </button>
+          {tab === "Buy" ? (
+            <button
+              onClick={() => setTokenModalOpen(true)}
+              className="flex items-center gap-1.5 shrink-0 bg-white/[0.06] px-2 py-1 rounded-lg hover:bg-white/[0.1] transition-colors"
+            >
+              <img src={baseToken.logo} alt={baseToken.symbol} className="w-4 h-4 rounded-full" />
+              <span className="text-[12px] font-medium text-white/70">{baseToken.symbol}</span>
+              <ChevronDown className="w-3 h-3 text-white/40" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 shrink-0 bg-white/[0.06] px-2 py-1 rounded-lg">
+              {token.logo ? (
+                <img src={token.logo} alt="" className="w-4 h-4 rounded-full" />
+              ) : (
+                <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[7px] font-bold text-white/40">
+                  {token.symbol.slice(0, 2)}
+                </div>
+              )}
+              <span className="text-[12px] font-medium text-white/70">{token.symbol}</span>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="mt-3 pt-3 border-t border-white/[0.06]">
-        <div className="flex items-center text-[11px] mb-3">
+        <div className="flex items-center justify-between text-[11px] mb-3">
           <span className="text-white/50 flex items-center gap-1.5">
             Best price via{" "}
             <img src="https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png" alt="OKX" className="w-3.5 h-3.5 rounded-full inline-block" />{" "}
             OKX DEX Router
           </span>
+          {tab === "Sell" && (
+            <button
+              onClick={() => setTokenModalOpen(true)}
+              className="flex items-center gap-1 bg-white/[0.04] px-2 py-1 rounded-lg hover:bg-white/[0.08] transition-colors"
+            >
+              <span className="text-[11px] text-white/40">→</span>
+              <img src={baseToken.logo} alt={baseToken.symbol} className="w-3.5 h-3.5 rounded-full" />
+              <span className="text-[11px] font-medium text-white/60">{baseToken.symbol}</span>
+              <ChevronDown className="w-2.5 h-2.5 text-white/30" />
+            </button>
+          )}
         </div>
         <button
           onClick={handleGetQuote}
@@ -193,7 +202,9 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-border3">
-                <span className="text-sm font-medium text-white/80">Select token</span>
+                <span className="text-sm font-medium text-white/80">
+                  {tab === "Buy" ? "Select token to pay" : "Select token to receive"}
+                </span>
                 <button
                   onClick={() => setTokenModalOpen(false)}
                   className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-white/[0.06] transition-colors"
@@ -260,29 +271,30 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
               </div>
 
               <div className="p-4 space-y-4 max-h-[80vh] overflow-y-auto">
-                {/* Amount Input */}
-                <div>
-                  <div className="text-[11px] text-white/40 mb-1.5">Amount</div>
-                  <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
-                    <input
-                      type="text"
-                      value={quoteAmount}
-                      onChange={(e) => handleAmountChange(e.target.value)}
-                      placeholder="0.0"
-                      className="flex-1 bg-transparent text-sm text-white/90 outline-none min-w-0"
-                    />
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <img
-                        src={tab === "Buy" ? baseToken.logo : (token.logo ?? "")}
-                        alt=""
-                        className="w-4 h-4 rounded-full"
-                      />
-                      <span className="text-[12px] font-medium text-white/70">
-                        {tab === "Buy" ? baseToken.symbol : token.symbol}
-                      </span>
+                    {/* Amount Input */}
+                    <div>
+                      <div className="text-[11px] text-white/40 mb-1.5">Amount</div>
+                      <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
+                        <input
+                          type="text"
+                          value={quoteAmount}
+                          onChange={(e) => handleAmountChange(e.target.value)}
+                          placeholder="0.0"
+                          className="flex-1 bg-transparent text-sm text-white/90 outline-none min-w-0"
+                        />
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <img
+                            src={tab === "Buy" ? baseToken.logo : (token.logo || "")}
+                            alt=""
+                            className="w-4 h-4 rounded-full"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                          />
+                          <span className="text-[12px] font-medium text-white/70">
+                            {tab === "Buy" ? baseToken.symbol : token.symbol}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
                 {/* Loading */}
                 {loading && (
@@ -311,7 +323,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
                     {/* You Pay / You Receive */}
                     <div className="space-y-2">
                       <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
-                        <span className="text-[11px] text-white/40">You pay</span>
+                        <span className="text-[11px] text-white/40">{tab === "Buy" ? "You pay" : "You sell"}</span>
                         <span className="text-sm font-medium text-white/90">
                           {formatTokenAmount(quote.fromTokenAmount, Number(quote.fromToken.decimal))} {quote.fromToken.tokenSymbol}
                           {quote.fromToken.tokenUnitPrice && (
@@ -322,7 +334,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
                         </span>
                       </div>
                       <div className="flex items-center justify-between bg-white/[0.03] border border-white/[0.06] rounded-xl px-3 py-2.5">
-                        <span className="text-[11px] text-white/40">You receive</span>
+                        <span className="text-[11px] text-white/40">{tab === "Buy" ? "You receive" : "You get"}</span>
                         <span className="text-sm font-medium text-white/90">
                           {formatTokenAmount(quote.toTokenAmount, Number(quote.toToken.decimal))} {quote.toToken.tokenSymbol}
                           {quote.toToken.tokenUnitPrice && (
@@ -338,7 +350,13 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
                     <div className="space-y-1.5 text-[11px]">
                       <div className="flex justify-between">
                         <span className="text-white/30">Price Impact</span>
-                        <span className="text-white/50">{quote.priceImpactPercent}%</span>
+                        {(() => {
+                          const absImpact = Math.abs(Number(quote.priceImpactPercent));
+                          let color = "#34d399";
+                          if (absImpact > 3) color = "#f87171";
+                          else if (absImpact > 1) color = "#facc15";
+                          return <span style={{ color }}>{Math.abs(Number(quote.priceImpactPercent)).toFixed(2)}%</span>;
+                        })()}
                       </div>
                       {/* <div className="flex justify-between">
                         <span className="text-white/30">Est. Gas Fee</span>
