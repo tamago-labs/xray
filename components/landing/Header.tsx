@@ -7,9 +7,9 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-zenblue to-zenpurple flex">
-            <span className="text-[20px] font-brand text-center mx-auto">Z</span>
+            <span className="text-[20px] font-brand text-center mx-auto">X</span>
           </div>
-          <span className="font-display text-lg font-semibold tracking-tight">Zivic</span>
+          <span className="font-display text-lg font-semibold tracking-tight">Xray</span>
         </Link>
 
         <nav className="hidden md:flex font-display items-center gap-7 text-[13px] text-white/50 font-medium">
