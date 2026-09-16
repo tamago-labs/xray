@@ -28,7 +28,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
             {tab === t && (
               <motion.div
                 layoutId="active-tab"
-                className="absolute inset-0 rounded-lg bg-gradient-to-r from-zenblue/25 via-accent/15 to-accent2/20"
+                className="absolute inset-0 rounded-lg bg-accent"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}

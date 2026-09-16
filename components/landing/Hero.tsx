@@ -33,7 +33,7 @@ export default function Hero() {
             <ul className="mt-6 space-y-2 text-[13px] text-white/35">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />
-                Trade-ready on <img src="https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png" alt="X Layer" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">X Layer & DEX Router</span>
+                Trade-ready on <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png" alt="X Layer" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">X Layer & DEX Router</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />

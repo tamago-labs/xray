@@ -31,7 +31,7 @@ for (const asset of (listData as any).assets) {
 
 export default function TokenShowcase() {
   const { prices } = usePrices();
-  const [metric, setMetric] = useState(0);
+  const [metric, setMetric] = useState(1);
   const [page, setPage] = useState(0);
 
   const sorted = [...prices]
