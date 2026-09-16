@@ -13,7 +13,7 @@ const nextConfig = {
     CMC_API_KEY: process.env.CMC_API_KEY,
   },
   experimental: {
-    serverComponentsExternalPackages: ["lightweight-charts"],
+    serverComponentsExternalPackages: ["lightweight-charts", "aws-amplify", "@aws-amplify/api-graphql", "@aws-amplify/data-schema"],
   },
 }
 
