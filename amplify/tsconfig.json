@@ -13,8 +13,5 @@
         "../.amplify/generated/*"
       ]
     }
-  },
-  "exclude": [
-    "functions/price-tracker"
-  ]
+  }
 }

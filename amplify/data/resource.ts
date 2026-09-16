@@ -1,5 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-// import { priceTracker } from "../functions/price-tracker/resource";
+import { priceTracker } from "../functions/price-tracker/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -37,7 +37,9 @@ const schema = a.schema({
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
 
-});
+}).authorization((allow) => [
+  allow.resource(priceTracker),
+]);
 
 export type Schema = ClientSchema<typeof schema>;
 

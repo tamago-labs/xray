@@ -1,5 +1,5 @@
-// CMC RWA: Filter active stocks by tokenized market cap
-// Reads rwa-stocks.json, fetches quotes, filters by tokenized_market_cap > $50K
+// CMC RWA: Filter stocks to only wrapped tokens with price > 0
+// Reads rwa-stocks.json, fetches quotes, filters tokens
 // Usage: npx tsx scripts/rwa-filter.ts
 
 import { config } from "dotenv";
@@ -9,7 +9,6 @@ config({ path: ".env.local" });
 
 const CMC_API_KEY = process.env.CMC_API_KEY;
 const BASE_URL = "https://pro-api.coinmarketcap.com";
-const MIN_MARKET_CAP = 50_000;
 const BATCH_SIZE = 25;
 
 if (!CMC_API_KEY) {
@@ -47,10 +46,9 @@ async function main() {
 
   const allSymbols = assets.map((a: any) => a.symbol);
   console.log(`Total RWA stocks in rwa-stocks.json: ${allSymbols.length}`);
-  console.log(`Filtering by tokenized_market_cap > $${MIN_MARKET_CAP.toLocaleString()}...\n`);
+  console.log(`Filtering: only wrapped tokens with price > 0...\n`);
 
-  const active: any[] = [];
-  const inactive: any[] = [];
+  const results: any[] = [];
   const errors: string[] = [];
 
   for (let i = 0; i < allSymbols.length; i += BATCH_SIZE) {
@@ -71,18 +69,21 @@ async function main() {
           continue;
         }
 
-        const mcap = quote.tokenized_market_cap ?? 0;
-        if (mcap >= MIN_MARKET_CAP) {
-          active.push({
+        const filteredTokens = (quote.tokens ?? []).filter((t: any) =>
+          /wrapped/i.test(t.name) && (t.price ?? 0) > 0
+        );
+
+        if (filteredTokens.length > 0) {
+          results.push({
             symbol,
             name: asset.name,
             slug: asset.slug,
             rwa_id: asset.rwa_id,
             rwa_rank: asset.rwa_rank,
-            tokenized_market_cap: mcap,
+            tokenized_market_cap: quote.tokenized_market_cap ?? 0,
             tokenized_volume_24h: quote.tokenized_volume_24h ?? 0,
             tokenized_price: quote.average_tokenized_price ?? null,
-            tokens: quote.tokens?.map((t: any) => ({
+            tokens: filteredTokens.map((t: any) => ({
               symbol: t.symbol,
               name: t.name,
               price: t.price,
@@ -91,10 +92,8 @@ async function main() {
               issuer_name: t.issuer_name,
               market_cap: t.market_cap,
               volume_24h: t.volume_24h,
-            })) ?? [],
+            })),
           });
-        } else {
-          inactive.push({ symbol, name: asset.name, tokenized_market_cap: mcap });
         }
       }
     } catch (err) {
@@ -106,26 +105,24 @@ async function main() {
     }
   }
 
-  active.sort((a, b) => b.tokenized_market_cap - a.tokenized_market_cap);
+  results.sort((a, b) => b.tokenized_market_cap - a.tokenized_market_cap);
 
   console.log(`\n\nResults:`);
-  console.log(`  Active   (MCap > $${MIN_MARKET_CAP.toLocaleString()}): ${active.length}`);
-  console.log(`  Inactive (MCap < $${MIN_MARKET_CAP.toLocaleString()}): ${inactive.length}`);
-  console.log(`  Errors   (no data):     ${errors.length}`);
+  console.log(`  Passed:  ${results.length}`);
+  console.log(`  Errors:  ${errors.length}`);
 
   const outputPath = join(process.cwd(), "lib", "data", "rwa-active-stocks.json");
   writeFileSync(outputPath, JSON.stringify({
     fetched_at: new Date().toISOString(),
-    min_market_cap: MIN_MARKET_CAP,
-    count: active.length,
-    assets: active,
+    count: results.length,
+    assets: results,
   }, null, 2));
 
   console.log(`\nSaved to: ${outputPath}`);
 
   console.log(`\n--- Top 15 by Market Cap ---`);
-  for (const a of active.slice(0, 15)) {
-    console.log(`  ${a.symbol.padEnd(8)} $${Math.round(a.tokenized_market_cap).toLocaleString().padStart(12)}  ${a.name}`);
+  for (const a of results.slice(0, 15)) {
+    console.log(`  ${a.symbol.padEnd(8)} $${Math.round(a.tokenized_market_cap).toLocaleString().padStart(12)}  ${a.name}  (${a.tokens.length} tokens)`);
   }
 
   if (errors.length > 0) {

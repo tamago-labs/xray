@@ -11,10 +11,6 @@ const CMC_API_KEY = process.env.CMC_API_KEY;
 const BASE_URL = "https://pro-api.coinmarketcap.com";
 const BATCH_SIZE = 25;
 
-const ALLOWED_ISSUERS = new Set([
-  "6878977dcbbf471de3366e85",
-  "688ca4ccabae9b5b9fb3167a",
-]);
 
 if (!CMC_API_KEY) {
   console.error("Error: CMC_API_KEY not set in .env.local");
@@ -72,9 +68,7 @@ async function main() {
   const finalList = assets
     .map((asset: any) => {
       const info = infoMap.get(asset.symbol);
-      const tokens = (asset.tokens ?? []).filter((t: any) =>
-        ALLOWED_ISSUERS.has(t.issuer_id)
-      );
+      const tokens = asset.tokens ?? [];
       return {
         symbol: asset.symbol,
         name: asset.name,
