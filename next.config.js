@@ -12,7 +12,9 @@ const nextConfig = {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     CMC_API_KEY: process.env.CMC_API_KEY,
   },
-  serverExternalPackages: ["lightweight-charts"],
+  experimental: {
+    serverComponentsExternalPackages: ["lightweight-charts"],
+  },
 }
 
 module.exports = nextConfig;
