@@ -14,6 +14,15 @@ export function formatLargeNumber(num: number | null, prefix = ""): string {
   return `${prefix}${num.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
+export function formatTokenAmount(raw: string, decimals: number): string {
+  const num = Number(raw) / Math.pow(10, decimals);
+  if (num === 0) return "0";
+  if (num < 0.001) return num.toExponential(2);
+  if (num < 1) return num.toFixed(6);
+  if (num < 1000) return num.toFixed(4);
+  return num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
 export function formatPrice(price: number | null): string {
   if (price == null) return "—";
   if (price < 0.01) return `$${price.toFixed(6)}`;
