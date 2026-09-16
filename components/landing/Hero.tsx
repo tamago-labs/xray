@@ -15,17 +15,16 @@ export default function Hero() {
             <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]">
               Everyone sees the same tokenized stocks<br />
               <span className="bg-gradient-to-r from-zenblue via-accent to-accent2 bg-clip-text text-transparent">
-                Zivic makes it yours
+                Xray makes it yours
               </span>
             </h1>
           </Section>
 
           <Section>
             <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
-              Zivic is a hyper-personalized AI dashboard for tokenized stocks on{' '}
-              <a href="https://solana.com/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">Solana</a>. Tell Zivic your goals and risk appetite — it ranks, filters, and explains the{' '}
+              Xray is a hyper-personalized AI dashboard for tokenized stocks on{' '}
+              <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell Xray your goals and risk appetite — it ranks, filters, and explains the{' '}
               <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">xStocks</a>{' '}
-              / <a href="https://ondo.finance/ondo-stocks" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">Ondo Stocks</a>{' '}
               that matter most to you.
             </p>
           </Section>
@@ -34,7 +33,7 @@ export default function Hero() {
             <ul className="mt-6 space-y-2 text-[13px] text-white/35">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />
-                Trading-ready on <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png" alt="Solana" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">Solana Mainnet</span>
+                Trading-ready on <span className="text-accent font-semibold">X Layer</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />
