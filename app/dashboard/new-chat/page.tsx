@@ -216,7 +216,11 @@ function NewChatInner() {
     setInput('');
 
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_CHAT_API_URL || '', {
+      const apiUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || '';
+      console.log('[handleSend] URL:', apiUrl);
+      console.log('[handleSend] message:', message);
+
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -225,7 +229,14 @@ function NewChatInner() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to create session');
+      console.log('[handleSend] status:', res.status);
+      console.log('[handleSend] ok:', res.ok);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error('[handleSend] error body:', errText);
+        throw new Error('Failed to create session');
+      }
 
       const reader = res.body?.getReader();
       if (!reader) throw new Error('No response stream');
@@ -237,6 +248,7 @@ function NewChatInner() {
         const { done, value } = await reader.read();
         if (done) break;
         const text = decoder.decode(value);
+        console.log('[handleSend] chunk:', text);
         const lines = text.split('\n').filter((l) => l.startsWith('data: '));
         for (const line of lines) {
           try {
@@ -246,11 +258,13 @@ function NewChatInner() {
         }
       }
 
+      console.log('[handleSend] sessionId:', sessionId);
+
       if (sessionId) {
         window.location.href = `/dashboard/chats/${sessionId}`;
       }
     } catch (err) {
-      console.error('Send failed:', err);
+      console.error('[handleSend] failed:', err);
     }
   };
 

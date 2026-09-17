@@ -4,6 +4,12 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../data/resource";
 import { Agent, run } from "@openai/agents";
 import { env } from "$amplify/env/chat-api";
+import { Amplify } from "aws-amplify";
+import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
+
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+
+Amplify.configure(resourceConfig, libraryOptions);
 
 const dataClient = generateClient<Schema>();
 
