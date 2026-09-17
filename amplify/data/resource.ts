@@ -33,9 +33,48 @@ const schema = a.schema({
       experience: a.enum(["newcomer", "regular", "lite_degen", "full_degen"]),
       writingStyle: a.enum(["default", "journalist", "storytelling", "ct_vibes", "concise"]),
       sources: a.string().array(),
+      tokenRegistries: a.hasMany("UserTokenRegistry", "userProfileId"),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
+
+  UserTokenRegistry: a
+    .model({
+      userProfileId: a.id().required(),
+      userProfile: a.belongsTo("UserProfile", "userProfileId"),
+      contractAddress: a.string().required(),
+      symbol: a.string().required(),
+      name: a.string(),
+      decimals: a.integer(),
+      chainId: a.integer().required(),
+      addedAt: a.datetime(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
+    .secondaryIndexes((index) => [index("userProfileId").queryField("byUser")]),
+
+  SystemStatus: a
+    .model({
+      id: a.string().required(),
+      status: a.enum(["ready", "busy", "down"]),
+      activeUsers: a.integer().required(),
+      avgResponseMs: a.integer().required(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "update"])]),
+
+  NewsArticle: a
+    .model({
+      title: a.string().required(),
+      source: a.string().required(),
+      theme: a.string().required(),
+      summary: a.string().required(),
+      url: a.string(),
+      publishedAt: a.datetime().required(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read"])])
+    .secondaryIndexes((index) => [
+      index("theme").queryField("byTheme"),
+      index("publishedAt").queryField("byPublishedAt"),
+    ]),
 
 }).authorization((allow) => [
   allow.resource(priceTracker),
