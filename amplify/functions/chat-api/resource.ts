@@ -7,5 +7,4 @@ export const chatApiFunction = defineFunction({
   environment: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "",
   },
-  access: (allow) => [allow.data(["read", "write"])],
 });
