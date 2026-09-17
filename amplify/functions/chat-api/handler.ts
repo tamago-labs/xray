@@ -55,13 +55,18 @@ async function chatStreamHandler(
   // Mode 1: Create session only (no message) — returns session ID immediately
   if (!message) {
     try {
-      const { data: newSession } = await dataClient.models.AgentSession.create({
+      const { data: newSession, errors } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
         items: [],
         userProfileId: walletAddress,
       });
-      responseStream.write(`data: ${JSON.stringify({ sessionId: newSession?.id })}\n\n`);
+      if (errors) {
+        console.error('[create session] errors:', JSON.stringify(errors));
+      }
+      console.log('[create session] newSession:', JSON.stringify(newSession));
+      responseStream.write(`data: ${JSON.stringify({ sessionId: newSession?.id ?? null })}\n\n`);
     } catch (error) {
+      console.error('[create session] exception:', error);
       responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Failed to create session" })}\n\n`);
     }
     responseStream.end();
