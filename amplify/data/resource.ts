@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { priceTracker } from "../functions/price-tracker/resource";
+import { chatApiFunction } from "../functions/chat-api/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -90,6 +91,7 @@ const schema = a.schema({
 
 }).authorization((allow) => [
   allow.resource(priceTracker),
+  allow.resource(chatApiFunction),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;
