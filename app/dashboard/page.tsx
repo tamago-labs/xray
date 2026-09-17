@@ -1,3 +1,5 @@
-import NewChat from './new-chat/page';
+import { redirect } from 'next/navigation';
 
-export default NewChat;
+export default function DashboardPage() {
+  redirect('/dashboard/new-chat');
+}

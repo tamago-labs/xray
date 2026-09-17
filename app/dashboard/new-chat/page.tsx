@@ -210,6 +210,50 @@ function NewChatInner() {
     setInput(examplePrompts[activeIndex].text);
   };
 
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    const message = input.trim();
+    setInput('');
+
+    try {
+      const res = await fetch(process.env.NEXT_PUBLIC_CHAT_API_URL || '', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          walletAddress: '0x0000000000000000000000000000000000000001',
+          sessionName: message.slice(0, 30),
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to create session');
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No response stream');
+
+      let sessionId = '';
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const text = decoder.decode(value);
+        const lines = text.split('\n').filter((l) => l.startsWith('data: '));
+        for (const line of lines) {
+          try {
+            const json = JSON.parse(line.slice(6));
+            if (json.sessionId) sessionId = json.sessionId;
+          } catch {}
+        }
+      }
+
+      if (sessionId) {
+        window.location.href = `/dashboard/chats/${sessionId}`;
+      }
+    } catch (err) {
+      console.error('Send failed:', err);
+    }
+  };
+
   const current = examplePrompts[activeIndex];
 
   return (
@@ -267,7 +311,10 @@ function NewChatInner() {
                 </motion.span>
               </AnimatePresence>
             </button>
-            <button className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0">
+            <button
+              onClick={handleSend}
+              className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0"
+            >
               <Send className="w-4 h-4 text-white" />
             </button>
           </div>

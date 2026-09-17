@@ -40,14 +40,31 @@ async function chatStreamHandler(
 
   const { message, sessionName, sessionId, walletAddress } = body;
 
-  if (!message || typeof message !== "string") {
-    responseStream.write(`data: ${JSON.stringify({ error: "Message is required" })}\n\n`);
+  if (!walletAddress) {
+    responseStream.write(`data: ${JSON.stringify({ error: "walletAddress is required" })}\n\n`);
     responseStream.end();
     return;
   }
 
-  if (!walletAddress) {
-    responseStream.write(`data: ${JSON.stringify({ error: "walletAddress is required" })}\n\n`);
+  // Mode 1: Create session only (no message) — returns session ID immediately
+  if (!message) {
+    try {
+      const { data: newSession } = await dataClient.models.AgentSession.create({
+        sessionName: sessionName || "New Chat",
+        items: [],
+        userProfileId: walletAddress,
+      });
+      responseStream.write(`data: ${JSON.stringify({ sessionId: newSession?.id })}\n\n`);
+    } catch (error) {
+      responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Failed to create session" })}\n\n`);
+    }
+    responseStream.end();
+    return;
+  }
+
+  // Mode 2: Stream chat
+  if (!message || typeof message !== "string") {
+    responseStream.write(`data: ${JSON.stringify({ error: "Message is required" })}\n\n`);
     responseStream.end();
     return;
   }
