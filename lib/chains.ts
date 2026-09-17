@@ -20,7 +20,18 @@ export const X_LAYER: ChainConfig = {
   icon: "https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png",
 };
 
-export const SUPPORTED_CHAINS: ChainConfig[] = [X_LAYER];
+export const X_LAYER_TESTNET: ChainConfig = {
+  id: 1952,
+  name: "X Layer Testnet",
+  shortName: "X Layer Testnet",
+  rpcUrl: "https://testrpc.xlayer.tech",
+  explorerUrl: "https://www.okx.com/web3/explorer/xlayer-testnet",
+  nativeCurrency: { name: "OKB", symbol: "OKB", decimals: 18 },
+  color: "#275FEE",
+  icon: "https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png",
+};
+
+export const SUPPORTED_CHAINS: ChainConfig[] = [X_LAYER, X_LAYER_TESTNET];
 
 export function getChainById(chainId: number): ChainConfig | undefined {
   return SUPPORTED_CHAINS.find((c) => c.id === chainId);

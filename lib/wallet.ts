@@ -61,8 +61,9 @@ export async function switchChain(provider: EIP1193Provider, chainId: number) {
       params: [{ chainId: hex }],
     });
   } catch (err: unknown) {
-    const e = err as { code?: number };
-    if (e?.code === 4902) {
+    const e = err as { code?: number; message?: string };
+    const isUnrecognized = e?.code === 4902 || e?.code === -32603 || e?.message?.includes("Unrecognized chain ID");
+    if (isUnrecognized) {
       const chain = getChainById(chainId);
       if (!chain) throw err;
       await provider.request({

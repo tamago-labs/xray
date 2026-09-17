@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import { useWallet } from "./WalletContext";
 import { Wallet, X } from "lucide-react";
+import { X_LAYER } from "@/lib/chains";
 import { truncateAddress } from "@/lib/wallet";
 
 const backdrop = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
@@ -15,7 +16,7 @@ const modal = {
 };
 
 export function WalletModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { wallets, connect, disconnect, isConnected, address, isConnecting, switchToXLayer, isCorrectChain } = useWallet();
+  const { wallets, connect, disconnect, isConnected, address, isConnecting, switchChain, isCorrectChain } = useWallet();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
@@ -61,7 +62,7 @@ export function WalletModal({ open, onClose }: { open: boolean; onClose: () => v
                 </div>
                 {!isCorrectChain && (
                   <button
-                    onClick={() => { void switchToXLayer(); }}
+                    onClick={() => { void switchChain(X_LAYER.id); }}
                     className="w-full rounded-xl bg-accent px-4 py-3 text-[13px] font-medium text-white hover:bg-accent/80 transition-colors"
                   >
                     Switch to X Layer

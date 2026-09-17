@@ -9,7 +9,7 @@ import { CreditsModal } from "./CreditsModal";
 import { WalletModal } from "../app/WalletModal";
 import { useWallet } from "../app/WalletContext";
 import { truncateAddress } from "@/lib/wallet";
-import { X_LAYER } from "@/lib/chains";
+import { X_LAYER, SUPPORTED_CHAINS } from "@/lib/chains";
 import TokenStrip from "./TokenStrip";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -42,7 +42,7 @@ const PAGE_TITLES: Record<string, string> = {
 export default function Topbar() {
   const pathname = usePathname();
   const { prices } = usePrices();
-  const { isConnected, address, isCorrectChain, switchToXLayer, disconnect } = useWallet();
+  const { isConnected, address, isCorrectChain, chainId, switchChain, disconnect } = useWallet();
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
@@ -240,11 +240,32 @@ export default function Topbar() {
             >
               {!isCorrectChain && (
                 <button
-                  onClick={() => { void switchToXLayer(); }}
+                  onClick={() => { void switchChain(X_LAYER.id); }}
                   className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-yellow-400 hover:bg-yellow-500/5 transition-colors"
                 >
                   <span>Switch to {X_LAYER.name}</span>
                 </button>
+              )}
+              {isCorrectChain && (
+                <div className="px-4 py-3">
+                  <p className="text-[10px] text-white/25 uppercase tracking-wider mb-2">Network</p>
+                  <div className="flex flex-col gap-1">
+                    {SUPPORTED_CHAINS.map((chain) => (
+                      <button
+                        key={chain.id}
+                        onClick={() => { void switchChain(chain.id); }}
+                        className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
+                          chainId === chain.id
+                            ? "bg-white/[0.06] text-white/80"
+                            : "text-white/40 hover:text-white/60 hover:bg-white/[0.03]"
+                        }`}
+                      >
+                        <span className={`w-1.5 h-1.5 rounded-full ${chainId === chain.id ? "bg-accent" : "bg-white/20"}`} />
+                        {chain.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               <button
                 onClick={handleCopy}

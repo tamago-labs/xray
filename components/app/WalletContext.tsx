@@ -3,7 +3,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { ethers } from "ethers";
 import { connectWallet as libConnectWallet, discoverWallets, switchChain as libSwitchChain, type Wallet } from "@/lib/wallet";
-import { X_LAYER } from "@/lib/chains";
+import { X_LAYER, SUPPORTED_CHAINS } from "@/lib/chains";
 
 type WalletState = {
   wallet: Wallet | null;
@@ -22,7 +22,7 @@ type WalletContextValue = WalletState & {
   discover: () => Promise<Wallet[]>;
   connect: (wallet: Wallet) => Promise<void>;
   disconnect: () => void;
-  switchToXLayer: () => Promise<void>;
+  switchChain: (chainId: number) => Promise<void>;
 };
 
 const WalletContext = createContext<WalletContextValue | null>(null);
@@ -84,18 +84,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, []);
 
-  const switchToXLayer = useCallback(async () => {
+  const switchChain = useCallback(async (chainId: number) => {
     if (!state.wallet) throw new Error("No wallet connected");
-    await libSwitchChain(state.wallet.provider, X_LAYER.id);
-    try {
-      if (state.provider) {
-        const net = await state.provider.getNetwork();
-        setState((s) => ({ ...s, chainId: Number(net.chainId) }));
-      } else {
-        setState((s) => ({ ...s, chainId: X_LAYER.id }));
-      }
-    } catch {}
-  }, [state.wallet, state.provider]);
+    await libSwitchChain(state.wallet.provider, chainId);
+  }, [state.wallet]);
 
   useEffect(() => {
     discover();
@@ -150,14 +142,14 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     () => ({
       ...state,
       isConnected: !!state.address,
-      isCorrectChain: state.chainId === X_LAYER.id,
+      isCorrectChain: SUPPORTED_CHAINS.some((c) => c.id === state.chainId),
       wallets,
       discover,
       connect,
       disconnect,
-      switchToXLayer,
+      switchChain,
     }),
-    [state, wallets, discover, connect, disconnect, switchToXLayer]
+    [state, wallets, discover, connect, disconnect, switchChain]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;
