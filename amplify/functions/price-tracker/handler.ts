@@ -45,7 +45,7 @@ async function fetchCryptoQuotes(cryptoIds: number[]): Promise<any[]> {
 
   const res = await fetch(url.toString(), {
     headers: {
-      "X-CMC_PRO_API_KEY": CMC_API_KEY,
+      "X-CMC_PRO_API_KEY": CMC_API_KEY ?? "",
       Accept: "application/json",
     },
   });
@@ -62,7 +62,7 @@ async function fetchCryptoQuotes(cryptoIds: number[]): Promise<any[]> {
 export const handler: EventBridgeHandler<"Scheduled Event", null, void> = async (event) => {
   console.log("Price tracker started:", JSON.stringify(event.time));
 
-  const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+  const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
   Amplify.configure(resourceConfig, libraryOptions);
 
   const client = generateClient<Schema>();
