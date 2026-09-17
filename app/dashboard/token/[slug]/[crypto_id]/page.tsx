@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import listData from "@/lib/data/rwa-v1-list.json";
 import TokenDetailClient from "@/components/dashboard/token-detail/TokenDetailClient";
 import type { Token, Asset } from "@/lib/types/token";
