@@ -36,7 +36,9 @@ export default function Sidebar() {
 
       <nav className="flex-1 py-4 px-3 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            (item.href === '/dashboard' ? pathname === item.href : pathname.startsWith(item.href)) ||
+            (item.href === '/dashboard/explore' && pathname.startsWith('/dashboard/token'));
           const Icon = item.icon;
           return (
             <Link

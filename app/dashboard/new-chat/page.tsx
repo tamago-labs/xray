@@ -247,7 +247,7 @@ function NewChatInner() {
                   animate={{ opacity: 1, filter: 'blur(0px)' }}
                   exit={{ opacity: 0, filter: 'blur(8px)' }}
                   transition={{ duration: 0.4, ease: 'easeOut' }}
-                  className={`shrink-0 inline-flex items-center text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${current.color}`}
+                  className={`shrink-0 inline-flex items-center text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full border ${current.color}`}
                   title="Click to change"
                 >
                   <span onClick={(e) => { e.stopPropagation(); handleBadgeClick(); }} className="cursor-pointer">
