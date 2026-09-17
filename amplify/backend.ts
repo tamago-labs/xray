@@ -12,7 +12,9 @@ const backend = defineBackend({
   chatApiFunction,
 });
 
-backend.chatApiFunction.resources.lambda.addFunctionUrl({
+const lambdaFunction = backend.chatApiFunction.resources.lambda as LambdaFunction;
+
+const functionUrl = lambdaFunction.addFunctionUrl({
   authType: FunctionUrlAuthType.NONE,
   invokeMode: InvokeMode.RESPONSE_STREAM,
   cors: {
@@ -27,9 +29,9 @@ backend.chatApiFunction.resources.lambda.addFunctionUrl({
 backend.addOutput({
   custom: {
     ChatAPI: {
-      functionUrl: backend.chatApiFunction.resources.lambda.url,
-      region: Stack.of(backend.chatApiFunction.resources.lambda).region,
-      functionName: backend.chatApiFunction.resources.lambda.functionName,
+      functionUrl: functionUrl.url,
+      region: Stack.of(lambdaFunction).region,
+      functionName: lambdaFunction.functionName,
     },
   },
 });
