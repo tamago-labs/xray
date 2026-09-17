@@ -134,7 +134,7 @@ export function CreditsModal({
             {!isConnected || !address ? (
               <div className="text-center py-4">
                 <p className="text-[13px] text-white/40">
-                  Connect your wallet from the top bar to request credits
+                  Connect your wallet to request credits
                 </p>
               </div>
             ) : loading ? (

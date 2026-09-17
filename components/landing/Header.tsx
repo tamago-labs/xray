@@ -15,6 +15,7 @@ export default function Header() {
         <nav className="hidden md:flex font-display items-center gap-7 text-[13px] text-white/50 font-medium">
           <Link href="/dashboard" className="hover:text-white transition-colors">Chat</Link>
           <Link href="/dashboard/explore" className="hover:text-white transition-colors">Explore</Link>
+          <Link href="/dashboard/pre-ipo" className="hover:text-white transition-colors">Pre-IPO</Link>
           <Link href="#how-it-works" className="hover:text-white transition-colors">How it works</Link>
           <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
 

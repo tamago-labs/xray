@@ -21,12 +21,12 @@ export default function Hero() {
           </Section>
 
           <Section>
-            <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
-              Xray is a hyper-personalized AI dashboard for tokenized stocks on{' '}
-              <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell the agent your goals and risk appetite — it ranks, filters, and explains the{' '}
-              <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">xStocks</a>{' '}
-              that matter most to you.
-            </p>
+              <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
+                Hyper-personalized AI for tokenized stocks on{' '}
+                <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Set your goals and risk appetite — the agent finds and explains the best{' '}
+                <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">xStocks</a>{' '}
+                and pre-IPO tokens for you.
+              </p>
           </Section>
 
           <Section>

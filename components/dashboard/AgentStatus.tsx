@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
 
 type Status = 'ready' | 'busy' | 'down';
 
@@ -11,20 +13,25 @@ const statusConfig: Record<Status, { emoji: string; label: string }> = {
   down: { emoji: '😴', label: 'Taking a nap' },
 };
 
-function getRandomData(): { status: Status; users: number; ms: number } {
-  const rand = Math.random();
-  if (rand < 0.7) return { status: 'ready', users: Math.floor(Math.random() * 15) + 3, ms: Math.floor(Math.random() * 30) + 8 };
-  if (rand < 0.9) return { status: 'busy', users: Math.floor(Math.random() * 40) + 20, ms: Math.floor(Math.random() * 200) + 150 };
-  return { status: 'down', users: 0, ms: 0 };
-}
+const dataClient = generateClient<Schema>();
 
 export default function AgentStatus() {
-  const [data, setData] = useState({ status: 'ready' as Status, users: 5, ms: 12 });
+  const [data, setData] = useState<{ status: Status; users: number; ms: number } | null>(null);
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
-    setData(getRandomData());
+    dataClient.models.SystemStatus.get({ id: 'current' }).then((res) => {
+      if (res.data) {
+        setData({
+          status: res.data.status as Status,
+          users: res.data.activeUsers,
+          ms: res.data.avgResponseMs,
+        });
+      }
+    }).catch(() => {});
   }, []);
+
+  if (!data) return null;
 
   const config = statusConfig[data.status];
 

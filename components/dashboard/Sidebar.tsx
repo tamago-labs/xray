@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { MessageSquare, PieChart, Compass, Bell, Newspaper, List, ChevronDown } from 'lucide-react';
+import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { href: '/dashboard', label: 'New Chat', icon: MessageSquare },
   { href: '/dashboard/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/dashboard/explore', label: 'Explore', icon: Compass },
+  { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
   // { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
   { href: '/dashboard/top-news', label: 'Top News', icon: Newspaper },
 ];
