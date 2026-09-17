@@ -58,7 +58,7 @@ async function chatStreamHandler(
       const { data: newSession, errors } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
         items: [],
-        userProfileId: walletAddress,
+        walletAddress,
       });
       if (errors) {
         console.error('[create session] errors:', JSON.stringify(errors));
@@ -95,7 +95,7 @@ async function chatStreamHandler(
       const { data: newSession } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
         items: [],
-        userProfileId: walletAddress,
+        walletAddress,
       });
       currentSessionId = newSession?.id ?? undefined;
     }

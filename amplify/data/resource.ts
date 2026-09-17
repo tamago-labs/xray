@@ -28,14 +28,13 @@ const schema = a.schema({
     ]),
   AgentSession: a
     .model({
-      userProfileId: a.id().required(),
-      userProfile: a.belongsTo("UserProfile", "userProfileId"),
+      walletAddress: a.string().required(),
       sessionName: a.string().required(),
       items: a.json().required(),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
     .secondaryIndexes((index) => [
-      index("userProfileId").queryField("ByUser"),
+      index("walletAddress").queryField("byWallet"),
     ]),
   UserProfile: a
     .model({
@@ -46,7 +45,6 @@ const schema = a.schema({
       writingStyle: a.enum(["default", "journalist", "storytelling", "ct_vibes", "concise"]),
       sources: a.string().array(),
       tokenRegistries: a.hasMany("UserTokenRegistry", "userProfileId"),
-      agentSessions: a.hasMany("AgentSession", "userProfileId"),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
