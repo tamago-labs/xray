@@ -7,7 +7,7 @@ import { env } from "$amplify/env/chat-api";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
 
-const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
 
 Amplify.configure(resourceConfig, libraryOptions);
 

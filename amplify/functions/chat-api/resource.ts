@@ -1,5 +1,4 @@
 import { defineFunction } from "@aws-amplify/backend";
-import { data } from "../../data/resource";
 
 export const chatApiFunction = defineFunction({
   name: "chat-api",
@@ -8,5 +7,4 @@ export const chatApiFunction = defineFunction({
   environment: {
     OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? "",
   },
-  data,
 });
