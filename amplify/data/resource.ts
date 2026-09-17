@@ -25,6 +25,17 @@ const schema = a.schema({
       index("rwa_id").queryField("byRwaId"),
       index("token_symbol").queryField("byTokenSymbol"),
     ]),
+  AgentSession: a
+    .model({
+      userProfileId: a.id().required(),
+      userProfile: a.belongsTo("UserProfile", "userProfileId"),
+      sessionName: a.string().required(),
+      items: a.json().required(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
+    .secondaryIndexes((index) => [
+      index("userProfileId").queryField("ByUser"),
+    ]),
   UserProfile: a
     .model({
       walletAddress: a.string().required(),
@@ -34,6 +45,7 @@ const schema = a.schema({
       writingStyle: a.enum(["default", "journalist", "storytelling", "ct_vibes", "concise"]),
       sources: a.string().array(),
       tokenRegistries: a.hasMany("UserTokenRegistry", "userProfileId"),
+      agentSessions: a.hasMany("AgentSession", "userProfileId"),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
