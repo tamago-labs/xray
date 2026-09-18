@@ -18,7 +18,7 @@ export default function DashboardLayout({
         <Sidebar />
         <div className={`ml-56 flex flex-col ${isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
           <Topbar />
-          <main className={isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'p-6'}>{children}</main>
+          <main className={isNewChat || isChatSession ? 'h-screen' : 'p-6'}>{children}</main>
         </div>
     </div>
   );

@@ -1,8 +1,8 @@
 'use client';
 
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, MoreVertical, Trash2 } from 'lucide-react';
 import { useWallet } from '@/components/app/WalletContext';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
@@ -24,7 +24,9 @@ export default function ChatSession() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
+  const router = useRouter();
   const [error, setError] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const autoSentRef = useRef(false);
 
@@ -50,9 +52,15 @@ export default function ChatSession() {
     }).catch(() => {});
   }, [id]);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const handleDelete = async () => {
+    if (!confirm('Delete this chat session?')) return;
+    try {
+      await dataClient.models.AgentSession.delete({ id });
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Delete failed:', err);
+    }
+  };
 
   useEffect(() => {
     const prompt = searchParams.get('prompt');
@@ -153,14 +161,36 @@ export default function ChatSession() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-screen pt-12 relative overflow-hidden grid-bg">
+    <div className="flex-1 flex flex-col  grid-bg overflow-hidden h-[calc(100vh-3.5rem)] relative ">
       <div className="absolute w-[500px] h-[500px] top-1/2 -translate-y-1/2 -left-48 rounded-full blur-[120px] opacity-25 bg-accent pointer-events-none" />
       <div className="absolute w-[400px] h-[400px] top-1/2 -translate-y-1/2 -right-40 rounded-full blur-[120px] opacity-25 bg-zenpurple pointer-events-none" />
-      <div className="border-b border-border3/50 px-6 py-4 relative z-10">
+      <div className="border-b border-border3/50 px-6 py-4 relative z-10 flex items-center justify-between">
         <h1 className="font-display text-lg font-semibold">Chat Session</h1>
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="p-1.5 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-colors"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {menuOpen && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+              <div className="absolute right-0 top-full mt-1 w-40 rounded-lg border border-border3/50 bg-surface shadow-xl z-20 overflow-hidden">
+                <button
+                  onClick={handleDelete}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-red-400 hover:bg-red-500/5 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete chat</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 min-h-0">
         {messages.map((msg, i) => {
           const isEmptyAi = msg.role === 'ai' && !msg.content && loading && i === messages.length - 1;
           if (msg.role === 'ai' && !msg.content && !loading) return null;

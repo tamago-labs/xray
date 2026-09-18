@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Send, ChevronDown, Check, Info } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { examplePrompts, getRandomPrompt } from '@/lib/prompts';
@@ -182,6 +182,7 @@ function ToggleDropdown({
 // ─── New Chat Page ───────────────────────────────────────────────────────────
 
 function NewChatInner() {
+  const router = useRouter();
   const { isConnected, address } = useWallet();
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get('prompt');
@@ -286,7 +287,7 @@ function NewChatInner() {
       console.log('[handleSend] sessionId:', sessionId);
 
       if (sessionId) {
-        window.location.href = `/dashboard/chats/${sessionId}?prompt=${encodeURIComponent(message)}`;
+        router.push(`/dashboard/chats/${sessionId}?prompt=${encodeURIComponent(message)}`);
       }
     } catch (err) {
       console.error('[handleSend] failed:', err);
