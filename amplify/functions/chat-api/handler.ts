@@ -2,10 +2,12 @@ import type { APIGatewayProxyEventV2 } from "aws-lambda";
 import { streamifyResponse, ResponseStream } from "lambda-stream";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../data/resource";
-import { Agent, run } from "@openai/agents";
+import { run } from "@openai/agents";
 import { env } from "$amplify/env/chat-api";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
+import { PROVIDER_BASE_URL, PROVIDER_MODEL } from "./provider";
+import { triageAgent } from "./agents";
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
 
@@ -13,8 +15,6 @@ Amplify.configure(resourceConfig, libraryOptions);
 
 const dataClient = generateClient<Schema>();
 
-const PROVIDER_BASE_URL = "https://api.longcat.ai/openai/v1";
-const PROVIDER_MODEL = "LongCat-2.0";
 const CREDIT_RATE = 0.01;
 
 function estimateTokens(text: string): number {
@@ -115,15 +115,6 @@ async function chatStreamHandler(
     setDefaultOpenAIClient(client);
     setTracingDisabled(true);
 
-    const agent = new Agent({
-      name: "Xray Agent",
-      instructions: `
-        You are Xray, an AI agent for tokenized stocks and pre-IPO on X Layer.
-        Be concise and remember context from earlier in the conversation.
-      `,
-      model: PROVIDER_MODEL,
-    });
-
     const historyMessages = sessionItems.map((item: any) => ({
       type: item.type ?? "message",
       role: item.role ?? "user",
@@ -135,11 +126,14 @@ async function chatStreamHandler(
       { type: "message" as const, role: "user" as const, content: [{ type: "input_text" as const, text: message }] },
     ];
 
-    const stream = await run(agent, allMessages as any, { stream: true });
+    const stream = await run(triageAgent, allMessages as any, { stream: true });
 
     for await (const event of stream) {
       if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
         responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
+      }
+      if (event.type === "agent_handoff") {
+        responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
       }
     }
 

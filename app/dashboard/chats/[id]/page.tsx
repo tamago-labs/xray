@@ -27,6 +27,7 @@ export default function ChatSession() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const router = useRouter();
   const [error, setError] = useState('');
@@ -79,6 +80,7 @@ export default function ChatSession() {
       autoSentRef.current = true;
       setMessages([{ role: 'user', content: prompt }]);
       setLoading(true);
+      setActiveAgent(null);
       fetch(process.env.NEXT_PUBLIC_CHAT_API_URL || '', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -105,10 +107,13 @@ export default function ChatSession() {
                   return next;
                 });
               }
+              if (json.agent) {
+                setActiveAgent(json.agent);
+              }
             } catch {}
           }
         }
-      }).catch(console.error).finally(() => setLoading(false));
+      }).catch(console.error).finally(() => { setLoading(false); setActiveAgent(null); });
     }
   }, [searchParams, address, id]);
 
@@ -142,6 +147,7 @@ export default function ChatSession() {
 
       const decoder = new TextDecoder();
       let aiContent = '';
+      setActiveAgent(null);
 
       setMessages((prev) => [...prev, { role: 'ai', content: '' }]);
 
@@ -161,6 +167,9 @@ export default function ChatSession() {
                 return next;
               });
             }
+            if (json.agent) {
+              setActiveAgent(json.agent);
+            }
           } catch {}
         }
       }
@@ -168,6 +177,7 @@ export default function ChatSession() {
       console.error('Stream error:', err);
     } finally {
       setLoading(false);
+      setActiveAgent(null);
     }
   };
 
@@ -219,6 +229,12 @@ export default function ChatSession() {
                   ? 'bg-accent text-white'
                   : 'bg-white/[0.03] border border-border3/50 text-white/80 prose prose-invert prose-sm prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:my-2 prose-pre:my-2 prose-pre:bg-black/30 prose-pre:border prose-pre:border-border3/50 prose-code:text-accent prose-code:bg-white/[0.06] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none'
               }`}>
+                {msg.role === 'ai' && activeAgent && i === messages.length - 1 && (
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-accent mb-2 block">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                    {activeAgent}
+                  </span>
+                )}
                 {msg.role === 'ai' ? (
                   <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
                     {msg.content}
