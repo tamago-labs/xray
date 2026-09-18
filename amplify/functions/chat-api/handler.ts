@@ -57,7 +57,7 @@ async function chatStreamHandler(
     try {
       const { data: newSession, errors } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
-        items: [],
+        items: JSON.stringify([]),
         walletAddress,
       });
       if (errors) {
@@ -87,14 +87,14 @@ async function chatStreamHandler(
     if (currentSessionId) {
       const { data: sessions } = await dataClient.models.AgentSession.get({ id: currentSessionId });
       if (sessions) {
-        sessionItems = (sessions.items as any[]) ?? [];
+        sessionItems = JSON.parse(sessions.items as string) ?? [];
       }
     }
 
     if (!currentSessionId) {
       const { data: newSession } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
-        items: [],
+        items: JSON.stringify([]),
         walletAddress,
       });
       currentSessionId = newSession?.id ?? undefined;
@@ -147,7 +147,7 @@ async function chatStreamHandler(
     if (currentSessionId) {
       await dataClient.models.AgentSession.update({
         id: currentSessionId,
-        items: finalItems,
+        items: JSON.stringify(finalItems),
       });
     }
 
