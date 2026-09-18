@@ -52,12 +52,15 @@ async function chatStreamHandler(
     return;
   }
 
-  // Mode 1: Create session only (no message) — returns session ID immediately
-  if (!message) {
+  // Mode 1: Create session (with optional initial message) — returns session ID immediately
+  if (!message || !sessionId) {
     try {
+      const initialItems = message
+        ? JSON.stringify([{ type: 'message', role: 'user', content: message }])
+        : JSON.stringify([]);
       const { data: newSession, errors } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
-        items: JSON.stringify([]),
+        items: initialItems,
         walletAddress,
       });
       if (errors) {

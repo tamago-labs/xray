@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Send, ChevronDown, Check, Info } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { examplePrompts, getRandomPrompt } from '@/lib/prompts';
+import { useWallet } from '@/components/app/WalletContext';
 
 const experienceOptions = [
   { value: 'newcomer', label: 'Newcomer', desc: 'New to crypto. Plain language, more explanations.' },
@@ -176,12 +177,14 @@ function ToggleDropdown({
 // ─── New Chat Page ───────────────────────────────────────────────────────────
 
 function NewChatInner() {
+  const { isConnected, address } = useWallet();
   const searchParams = useSearchParams();
   const initialPrompt = searchParams.get('prompt');
   const [input, setInput] = useState(initialPrompt ?? '');
   const [activeIndex, setActiveIndex] = useState(0);
   const [animKey, setAnimKey] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [experience, setExperience] = useState('regular');
 
   const [writingStyle, setWritingStyle] = useState('default');
@@ -211,9 +214,10 @@ function NewChatInner() {
   };
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !isConnected || !address || sending) return;
     const message = input.trim();
     setInput('');
+    setSending(true);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_CHAT_API_URL || '';
@@ -224,8 +228,9 @@ function NewChatInner() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: '0x0000000000000000000000000000000000000001',
+          walletAddress: address,
           sessionName: message.slice(0, 30),
+          message,
         }),
       });
 
@@ -261,10 +266,12 @@ function NewChatInner() {
       console.log('[handleSend] sessionId:', sessionId);
 
       if (sessionId) {
-        window.location.href = `/dashboard/chats/${sessionId}`;
+        window.location.href = `/dashboard/chats/${sessionId}?prompt=${encodeURIComponent(message)}`;
       }
     } catch (err) {
       console.error('[handleSend] failed:', err);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -277,7 +284,7 @@ function NewChatInner() {
       <div className="absolute w-[400px] h-[400px] top-1/2 -translate-y-1/2 -right-40 rounded-full blur-[120px] opacity-25 bg-zenpurple pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6 max-w-3xl mx-auto">
+      <div className="relative z-1 h-full flex flex-col items-center justify-center px-6 max-w-3xl mx-auto">
         {/* Example prompt */}
         <p className="font-display text-2xl md:text-3xl font-semibold text-center text-white/70 mb-8">
           &ldquo;Ask Xray anything about the market&rdquo;
@@ -327,9 +334,17 @@ function NewChatInner() {
             </button>
             <button
               onClick={handleSend}
-              className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0"
+              disabled={sending}
+              className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0 disabled:opacity-50"
             >
-              <Send className="w-4 h-4 text-white" />
+              {sending ? (
+                <svg className="w-4 h-4 text-white animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              ) : (
+                <Send className="w-4 h-4 text-white" />
+              )}
             </button>
           </div>
         </div>

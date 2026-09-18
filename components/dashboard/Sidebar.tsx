@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
+import { useWallet } from '@/components/app/WalletContext';
 
 const navItems = [
   { href: '/dashboard', label: 'New Chat', icon: MessageSquare },
@@ -15,16 +18,31 @@ const navItems = [
   { href: '/dashboard/top-news', label: 'Top News', icon: Newspaper },
 ];
 
-const mockSessions = [
-  { id: '12333454', title: 'TSLA xStock analysis' },
-  { id: '98765432', title: 'NVDA risk assessment' },
-  { id: '55512345', title: 'AAPL vs MSFT comparison' },
-  { id: '22288899', title: 'Portfolio rebalancing' },
-];
+const dataClient = generateClient<Schema>();
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isConnected, address } = useWallet();
   const [chatsOpen, setChatsOpen] = useState(false);
+  const [sessions, setSessions] = useState<{ id: string; sessionName: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isConnected || !address) {
+      setSessions([]);
+      return;
+    }
+    setLoading(true);
+    dataClient.models.AgentSession.list({
+      filter: { walletAddress: { eq: address } },
+    }).then((res) => {
+      setSessions((res.data ?? []).map((s) => ({ id: s.id, sessionName: s.sessionName })));
+    }).catch(() => {
+      setSessions([]);
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [isConnected, address]);
 
   return (
     <aside className="w-56 h-screen border-r border-border3/50 bg-surface flex flex-col fixed left-0 top-0">
@@ -82,22 +100,30 @@ export default function Sidebar() {
                 className="overflow-hidden"
               >
                 <div className="pl-10 pr-3 py-1 space-y-0.5">
-                  {mockSessions.map((session) => {
-                    const isActive = pathname === `/dashboard/chats/${session.id}`;
-                    return (
-                      <Link
-                        key={session.id}
-                        href={`/dashboard/chats/${session.id}`}
-                        className={`block px-3 py-1.5 rounded-md text-[12px] font-display truncate transition-colors ${
-                          isActive
-                            ? 'bg-accent/10 text-accent'
-                            : 'text-white/40 hover:text-white/70 hover:bg-white/[0.02]'
-                        }`}
-                      >
-                        {session.title}
-                      </Link>
-                    );
-                  })}
+                  {!isConnected ? (
+                    <p className="px-3 py-1.5 text-[11px] text-white/30">Connect wallet to see chats</p>
+                  ) : loading ? (
+                    <p className="px-3 py-1.5 text-[11px] text-white/30">Loading...</p>
+                  ) : sessions.length === 0 ? (
+                    <p className="px-3 py-1.5 text-[11px] text-white/30">No chats yet</p>
+                  ) : (
+                    sessions.map((session) => {
+                      const isActive = pathname === `/dashboard/chats/${session.id}`;
+                      return (
+                        <Link
+                          key={session.id}
+                          href={`/dashboard/chats/${session.id}`}
+                          className={`block px-3 py-1.5 rounded-md text-[12px] font-display truncate transition-colors ${
+                            isActive
+                              ? 'bg-accent/10 text-accent'
+                              : 'text-white/40 hover:text-white/70 hover:bg-white/[0.02]'
+                          }`}
+                        >
+                          {session.sessionName}
+                        </Link>
+                      );
+                    })
+                  )}
                 </div>
               </motion.div>
             )}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
+import { useWallet } from '@/components/app/WalletContext';
 
 interface Message {
   role: 'user' | 'ai';
@@ -11,15 +12,57 @@ interface Message {
 
 export default function ChatSession() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const { address } = useWallet();
   const id = params.id as string;
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const autoSentRef = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const prompt = searchParams.get('prompt');
+    if (prompt && !autoSentRef.current && address) {
+      autoSentRef.current = true;
+      setMessages([{ role: 'user', content: prompt }]);
+      setLoading(true);
+      fetch(process.env.NEXT_PUBLIC_CHAT_API_URL || '', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress: address, sessionId: id, message: prompt }),
+      }).then(async (res) => {
+        const reader = res.body?.getReader();
+        if (!reader) return;
+        const decoder = new TextDecoder();
+        let aiContent = '';
+        setMessages((prev) => [...prev, { role: 'ai', content: '' }]);
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const text = decoder.decode(value);
+          const lines = text.split('\n').filter((l) => l.startsWith('data: '));
+          for (const line of lines) {
+            try {
+              const json = JSON.parse(line.slice(6));
+              if (json.chunk) {
+                aiContent += json.chunk;
+                setMessages((prev) => {
+                  const next = [...prev];
+                  next[next.length - 1] = { role: 'ai', content: aiContent };
+                  return next;
+                });
+              }
+            } catch {}
+          }
+        }
+      }).catch(console.error).finally(() => setLoading(false));
+    }
+  }, [searchParams, address, id]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -33,7 +76,7 @@ export default function ChatSession() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walletAddress: '0x0000000000000000000000000000000000000001',
+          walletAddress: address,
           sessionId: id,
           message,
         }),
