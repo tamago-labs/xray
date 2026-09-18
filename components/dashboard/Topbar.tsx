@@ -67,7 +67,7 @@ export default function Topbar() {
         setCredits(profiles[0]?.credits ?? null);
       } catch { setCredits(null); }
     })();
-  }, [isConnected, address, creditsModalOpen]);
+  }, [isConnected, address, pathname, creditsModalOpen]);
 
   const tokenMatch = pathname.match(/^\/dashboard\/token\/([^/]+)\/([^/]+)$/);
   const tokenSlug = tokenMatch?.[1];

@@ -27,8 +27,14 @@ export default function ChatSession() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const autoSentRef = useRef(false);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (!address) { setCredits(null); return; }
@@ -190,10 +196,17 @@ export default function ChatSession() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 min-h-0">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-4 min-h-0">
         {messages.map((msg, i) => {
-          const isEmptyAi = msg.role === 'ai' && !msg.content && loading && i === messages.length - 1;
-          if (msg.role === 'ai' && !msg.content && !loading) return null;
+          if (msg.role === 'ai' && !msg.content) {
+            return loading ? (
+              <div key={i} className="flex justify-start">
+                <div className="max-w-[70%] rounded-2xl px-4 py-3 text-[14px] bg-white/[0.03] border border-border3/50 text-white/40">
+                  Thinking…
+                </div>
+              </div>
+            ) : null;
+          }
           return (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed ${
@@ -201,12 +214,11 @@ export default function ChatSession() {
                   ? 'bg-accent text-white'
                   : 'bg-white/[0.03] border border-border3/50 text-white/80'
               }`}>
-                {isEmptyAi ? 'Thinking…' : msg.content}
+                {msg.content}
               </div>
             </div>
           );
         })}
-        <div ref={bottomRef} />
       </div>
 
       <div className="border-t border-border3/50 px-6 py-4">

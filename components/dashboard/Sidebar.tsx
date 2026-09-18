@@ -27,9 +27,8 @@ export default function Sidebar() {
   const [sessions, setSessions] = useState<{ id: string; sessionName: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchSessions = () => {
     if (!isConnected || !address) {
-      console.log('[sidebar] not connected or no address', { isConnected, address });
       setSessions([]);
       return;
     }
@@ -43,7 +42,18 @@ export default function Sidebar() {
     }).finally(() => {
       setLoading(false);
     });
-  }, [isConnected, address]);
+  };
+
+  useEffect(() => {
+    fetchSessions();
+  }, [isConnected, address, pathname]);
+
+  const toggleChats = () => {
+    setChatsOpen((v) => {
+      if (!v) fetchSessions();
+      return !v;
+    });
+  };
 
   return (
     <aside className="w-56 h-screen border-r border-border3/50 bg-surface flex flex-col fixed left-0 top-0">
@@ -79,7 +89,7 @@ export default function Sidebar() {
         {/* Chats accordion */}
         <div>
           <button
-            onClick={() => setChatsOpen(!chatsOpen)}
+            onClick={toggleChats}
             className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-sm font-display font-medium text-white/50 hover:text-white hover:bg-white/[0.03] transition-colors"
           >
             <motion.div
