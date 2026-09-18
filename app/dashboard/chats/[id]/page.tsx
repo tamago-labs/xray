@@ -50,6 +50,7 @@ export default function ChatSession() {
   }, [address]);
 
   useEffect(() => {
+    if (searchParams.get('prompt')) return;
     dataClient.models.AgentSession.get({ id }).then((res) => {
       if (res.data?.items) {
         const items = JSON.parse(res.data.items as string);
@@ -60,7 +61,7 @@ export default function ChatSession() {
         setMessages(history);
       }
     }).catch(() => {});
-  }, [id]);
+  }, [id, searchParams]);
 
   const handleDelete = async () => {
     if (!confirm('Delete this chat session?')) return;
