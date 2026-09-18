@@ -4,6 +4,11 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import { useWallet } from '@/components/app/WalletContext';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
+
+const dataClient = generateClient<Schema>();
+const MIN_CREDITS = 1;
 
 interface Message {
   role: 'user' | 'ai';
@@ -18,8 +23,19 @@ export default function ChatSession() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [error, setError] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const autoSentRef = useRef(false);
+
+  useEffect(() => {
+    if (!address) { setCredits(null); return; }
+    dataClient.models.UserProfile.list({
+      filter: { walletAddress: { eq: address } },
+    }).then((res) => {
+      setCredits(res.data?.[0]?.credits ?? null);
+    }).catch(() => setCredits(null));
+  }, [address]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,8 +82,13 @@ export default function ChatSession() {
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
+    if (credits !== null && credits < MIN_CREDITS) {
+      setError(`Insufficient credits. You have ${credits.toFixed(2)} credits.`);
+      return;
+    }
     const message = input.trim();
     setInput('');
+    setError('');
     setMessages((prev) => [...prev, { role: 'user', content: message }]);
     setLoading(true);
 
@@ -157,11 +178,15 @@ export default function ChatSession() {
           />
           <button
             onClick={handleSend}
-            disabled={loading}
+            disabled={loading || (credits !== null && credits < MIN_CREDITS)}
             className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0 disabled:opacity-50"
           >
             <Send className="w-4 h-4 text-white" />
           </button>
+        </div>
+        {error && (
+          <p className="text-[11px] text-red-400 mt-2">{error}</p>
+        )}
         </div>
       </div>
     </div>

@@ -15,6 +15,11 @@ const dataClient = generateClient<Schema>();
 
 const PROVIDER_BASE_URL = "https://api.longcat.ai/openai/v1";
 const PROVIDER_MODEL = "LongCat-2.0";
+const CREDIT_RATE = 0.01;
+
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
 
 async function chatStreamHandler(
   event: APIGatewayProxyEventV2,
@@ -56,7 +61,7 @@ async function chatStreamHandler(
   if (!message || !sessionId) {
     try {
       const initialItems = message
-        ? JSON.stringify([{ type: 'message', role: 'user', content: message }])
+        ? JSON.stringify([{ type: 'message', role: 'user', content: [{ type: 'input_text', text: message }] }])
         : JSON.stringify([]);
       const { data: newSession, errors } = await dataClient.models.AgentSession.create({
         sessionName: sessionName || "New Chat",
@@ -130,7 +135,7 @@ async function chatStreamHandler(
 
     const allMessages = [
       ...historyMessages,
-      { type: "message" as const, role: "user" as const, content: message },
+      { type: "message" as const, role: "user" as const, content: [{ type: "input_text" as const, text: message }] },
     ];
 
     const stream = await run(agent, allMessages as any, { stream: true });
@@ -144,7 +149,7 @@ async function chatStreamHandler(
     await stream.completed;
 
     const finalItems = allMessages.concat(
-      [{ type: "message", role: "assistant", content: stream.finalOutput }]
+      [{ type: "message", role: "assistant", content: [{ type: "output_text", text: stream.finalOutput }] }]
     );
 
     if (currentSessionId) {
@@ -152,6 +157,28 @@ async function chatStreamHandler(
         id: currentSessionId,
         items: JSON.stringify(finalItems),
       });
+    }
+
+    const inputTokens = estimateTokens(message);
+    const outputTokens = estimateTokens(stream.finalOutput ?? '');
+    const creditsUsed = (inputTokens + outputTokens) * CREDIT_RATE;
+    console.log(`[credits] inputTokens=${inputTokens} outputTokens=${outputTokens} creditsUsed=${creditsUsed}`);
+
+    try {
+      const { data: profiles } = await dataClient.models.UserProfile.list({
+        filter: { walletAddress: { eq: walletAddress } },
+      });
+      const profile = profiles?.[0];
+      if (profile) {
+        const newCredits = Math.max(0, (profile.credits ?? 0) - creditsUsed);
+        await dataClient.models.UserProfile.update({
+          id: profile.id,
+          credits: newCredits,
+        });
+        console.log(`[credits] deducted ${creditsUsed} from ${profile.id}, new balance: ${newCredits}`);
+      }
+    } catch (creditErr) {
+      console.error('[credits] failed to deduct:', creditErr);
     }
 
     responseStream.write(`data: ${JSON.stringify({ done: true, sessionId: currentSessionId })}\n\n`);

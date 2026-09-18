@@ -6,6 +6,11 @@ import { Send, ChevronDown, Check, Info } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { examplePrompts, getRandomPrompt } from '@/lib/prompts';
 import { useWallet } from '@/components/app/WalletContext';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
+
+const dataClient = generateClient<Schema>();
+const MIN_CREDITS = 1;
 
 const experienceOptions = [
   { value: 'newcomer', label: 'Newcomer', desc: 'New to crypto. Plain language, more explanations.' },
@@ -185,6 +190,17 @@ function NewChatInner() {
   const [animKey, setAnimKey] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [sending, setSending] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!address) { setCredits(null); return; }
+    dataClient.models.UserProfile.list({
+      filter: { walletAddress: { eq: address } },
+    }).then((res) => {
+      setCredits(res.data?.[0]?.credits ?? null);
+    }).catch(() => setCredits(null));
+  }, [address]);
   const [experience, setExperience] = useState('regular');
 
   const [writingStyle, setWritingStyle] = useState('default');
@@ -215,6 +231,10 @@ function NewChatInner() {
 
   const handleSend = async () => {
     if (!input.trim() || !isConnected || !address || sending) return;
+    if (credits !== null && credits < MIN_CREDITS) {
+      setError(`Insufficient credits. You have ${credits.toFixed(2)} credits.`);
+      return;
+    }
     const message = input.trim();
     setInput('');
     setSending(true);
@@ -334,7 +354,7 @@ function NewChatInner() {
             </button>
             <button
               onClick={handleSend}
-              disabled={sending}
+              disabled={sending || (credits !== null && credits < MIN_CREDITS)}
               className="h-9 w-9 rounded-lg bg-accent flex items-center justify-center hover:bg-accent/80 transition-colors shrink-0 disabled:opacity-50"
             >
               {sending ? (
@@ -346,6 +366,10 @@ function NewChatInner() {
                 <Send className="w-4 h-4 text-white" />
               )}
             </button>
+          </div>
+          {error && (
+            <p className="text-[11px] text-red-400 mt-2 px-1">{error}</p>
+          )}
           </div>
         </div>
 
