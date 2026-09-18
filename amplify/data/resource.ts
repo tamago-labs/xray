@@ -34,7 +34,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
     .secondaryIndexes((index) => [
-      index("walletAddress").queryField("byWallet"),
+      index("walletAddress").queryField("bySessionWallet"),
     ]),
   UserProfile: a
     .model({
