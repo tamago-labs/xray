@@ -187,7 +187,6 @@ export default function ChatSession() {
         {error && (
           <p className="text-[11px] text-red-400 mt-2">{error}</p>
         )}
-        </div>
       </div>
     </div>
   );
