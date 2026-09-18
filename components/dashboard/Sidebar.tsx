@@ -29,6 +29,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!isConnected || !address) {
+      console.log('[sidebar] not connected or no address', { isConnected, address });
       setSessions([]);
       return;
     }

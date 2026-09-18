@@ -11,13 +11,14 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const isNewChat = pathname === '/dashboard' || pathname === '/dashboard/';
+  const isChatSession = pathname.startsWith('/dashboard/chats/');
 
   return (
     <div className="min-h-screen bg-dark">
         <Sidebar />
-        <div className="ml-56">
+        <div className={`ml-56 flex flex-col ${isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
           <Topbar />
-          <main className={isNewChat ? '' : 'p-6'}>{children}</main>
+          <main className={isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'p-6'}>{children}</main>
         </div>
     </div>
   );

@@ -38,6 +38,19 @@ export default function ChatSession() {
   }, [address]);
 
   useEffect(() => {
+    dataClient.models.AgentSession.get({ id }).then((res) => {
+      if (res.data?.items) {
+        const items = JSON.parse(res.data.items as string);
+        const history: Message[] = items.map((item: any) => ({
+          role: item.role === 'assistant' ? 'ai' : 'user',
+          content: item.content?.[0]?.text ?? '',
+        }));
+        setMessages(history);
+      }
+    }).catch(() => {});
+  }, [id]);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
@@ -89,7 +102,7 @@ export default function ChatSession() {
     const message = input.trim();
     setInput('');
     setError('');
-    setMessages((prev) => [...prev, { role: 'user', content: message }]);
+    setMessages((prev) => [...prev, { role: 'user', content: message }, { role: 'ai', content: '' }]);
     setLoading(true);
 
     try {
@@ -140,30 +153,29 @@ export default function ChatSession() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-screen">
-      <div className="border-b border-border3/50 px-6 py-4">
+    <div className="flex-1 flex flex-col h-screen pt-12 relative overflow-hidden grid-bg">
+      <div className="absolute w-[500px] h-[500px] top-1/2 -translate-y-1/2 -left-48 rounded-full blur-[120px] opacity-25 bg-accent pointer-events-none" />
+      <div className="absolute w-[400px] h-[400px] top-1/2 -translate-y-1/2 -right-40 rounded-full blur-[120px] opacity-25 bg-zenpurple pointer-events-none" />
+      <div className="border-b border-border3/50 px-6 py-4 relative z-10">
         <h1 className="font-display text-lg font-semibold">Chat Session</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed ${
-              msg.role === 'user'
-                ? 'bg-accent text-white'
-                : 'bg-white/[0.03] border border-border3/50 text-white/80'
-            }`}>
-              {msg.content}
+        {messages.map((msg, i) => {
+          const isEmptyAi = msg.role === 'ai' && !msg.content && loading && i === messages.length - 1;
+          if (msg.role === 'ai' && !msg.content && !loading) return null;
+          return (
+            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed ${
+                msg.role === 'user'
+                  ? 'bg-accent text-white'
+                  : 'bg-white/[0.03] border border-border3/50 text-white/80'
+              }`}>
+                {isEmptyAi ? 'Thinking…' : msg.content}
+              </div>
             </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className="max-w-[70%] rounded-2xl px-4 py-3 text-[14px] bg-white/[0.03] border border-border3/50 text-white/40">
-              Thinking…
-            </div>
-          </div>
-        )}
+          );
+        })}
         <div ref={bottomRef} />
       </div>
 
