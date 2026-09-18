@@ -132,7 +132,7 @@ async function chatStreamHandler(
       if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
         responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
       }
-      if (event.type === "agent_handoff") {
+      if (event.type === "agent_updated_stream_event") {
         responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
       }
     }

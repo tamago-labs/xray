@@ -38,8 +38,8 @@ export const assessRisk = tool({
     }),
   }),
   execute: async ({ answers }: { answers: any }) => {
-    const scores = { beginner: 1, intermediate: 2, advanced: 3, short: 1, medium: 2, long: 3, low: 1, medium: 2, high: 3, income: 1, growth: 2, speculation: 3 };
-    const total = scores[answers.experience as keyof typeof scores] + scores[answers.horizon as keyof typeof scores] + scores[answers.lossTolerance as keyof typeof scores] + scores[answers.goal as keyof typeof scores];
+    const scoreMap: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3, short: 1, medium: 2, long: 3, low: 1, high: 3, income: 1, growth: 2, speculation: 3 };
+    const total = (scoreMap[answers.experience] ?? 0) + (scoreMap[answers.horizon] ?? 0) + (scoreMap[answers.lossTolerance] ?? 0) + (scoreMap[answers.goal] ?? 0);
     const level = total <= 5 ? "Conservative" : total <= 9 ? "Moderate" : "Aggressive";
     return JSON.stringify({
       riskLevel: level,

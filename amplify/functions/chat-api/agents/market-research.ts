@@ -4,7 +4,7 @@ import { searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compare
 
 export const marketResearchAgent = new Agent({
   name: "Market Research Agent",
-  handoff_description:
+  handoffDescription:
     "Research tokenized stocks and pre-IPO tokens using Xray market data.",
   instructions: `
     You are Xray's market research specialist.

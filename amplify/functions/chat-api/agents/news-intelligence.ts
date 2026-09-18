@@ -4,7 +4,7 @@ import { searchNews, getLatestNews } from "./tools/news";
 
 export const newsIntelligenceAgent = new Agent({
   name: "News Intelligence Agent",
-  handoff_description:
+  handoffDescription:
     "Research market news and explain events affecting tokenized stocks.",
   instructions: `
     You are Xray's market intelligence specialist.

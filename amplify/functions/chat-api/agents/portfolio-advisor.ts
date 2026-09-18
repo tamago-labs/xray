@@ -4,7 +4,7 @@ import { getPortfolio, assessRisk, compareAssets } from "./tools/portfolio";
 
 export const portfolioAdvisorAgent = new Agent({
   name: "Portfolio Advisor",
-  handoff_description:
+  handoffDescription:
     "Help users compare assets and build portfolios based on goals and risk appetite.",
   instructions: `
     You are Xray's portfolio advisor.

@@ -4,7 +4,7 @@ import { getSwapRoute, estimateGas, prepareTrade } from "./tools/trade";
 
 export const tradeSpecialistAgent = new Agent({
   name: "Trade Specialist",
-  handoff_description:
+  handoffDescription:
     "Prepare and execute approved trades through OKX DEX Router on X Layer.",
   instructions: `
     You are Xray's trade specialist.
