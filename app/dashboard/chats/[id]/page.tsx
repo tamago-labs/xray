@@ -6,6 +6,10 @@ import { Send, MoreVertical, Trash2 } from 'lucide-react';
 import { useWallet } from '@/components/app/WalletContext';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 const dataClient = generateClient<Schema>();
 const MIN_CREDITS = 1;
@@ -212,9 +216,13 @@ export default function ChatSession() {
               <div className={`max-w-[70%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed ${
                 msg.role === 'user'
                   ? 'bg-accent text-white'
-                  : 'bg-white/[0.03] border border-border3/50 text-white/80'
+                  : 'bg-white/[0.03] border border-border3/50 text-white/80 prose prose-invert prose-sm prose-p:my-1.5 prose-ul:my-1.5 prose-ol:my-1.5 prose-li:my-0.5 prose-headings:my-2 prose-pre:my-2 prose-pre:bg-black/30 prose-pre:border prose-pre:border-border3/50 prose-code:text-accent prose-code:bg-white/[0.06] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none'
               }`}>
-                {msg.content}
+                {msg.role === 'ai' ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : msg.content}
               </div>
             </div>
           );
