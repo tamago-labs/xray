@@ -122,12 +122,9 @@ contract Perpetual is IPerpetual {
 
         uint256 avgPrice;
         if (side == Types.Side.LONG) {
-            uint256 maxCost = _toCollateralDecimals((size * oracle.getPrice() * 2) / 1e18);
-            SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), maxCost);
-            IERC20(collateralToken).approve(address(amm), maxCost);
-            avgPrice = amm.buy(size, type(uint256).max);
+            avgPrice = amm.getBuyPrice(size);
         } else {
-            avgPrice = amm.sell(size, 0);
+            avgPrice = amm.getSellPrice(size);
         }
 
         pos.side = side;
@@ -158,11 +155,7 @@ contract Perpetual is IPerpetual {
             }
         }
 
-        if (pos.side == Types.Side.LONG) {
-            amm.sell(pos.size, 0);
-        } else {
-            amm.buy(pos.size, type(uint256).max);
-        }
+        // AMM is used for pricing only; actual settlement is in Perpetual
 
         emit PositionClosed(msg.sender, pnl);
 

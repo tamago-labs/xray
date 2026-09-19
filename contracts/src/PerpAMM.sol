@@ -102,15 +102,15 @@ contract PerpAMM is IAMM {
         avgPrice = getBuyPrice(size);
         if (avgPrice > maxPrice) revert SlippageExceeded();
 
-        uint256 marginCost = (size * avgPrice) / 1e18;
-        uint256 marginCostAdjusted = collateralDecimals < 18
-            ? marginCost / (10 ** (18 - collateralDecimals))
-            : (collateralDecimals > 18 ? marginCost * (10 ** (collateralDecimals - 18)) : marginCost);
+        uint256 marginCost18 = (size * avgPrice) / 1e18;
+        uint256 marginCost = collateralDecimals < 18
+            ? marginCost18 / (10 ** (18 - collateralDecimals))
+            : (collateralDecimals > 18 ? marginCost18 * (10 ** (collateralDecimals - 18)) : marginCost18);
 
-        marginBalance += marginCostAdjusted;
+        marginBalance += marginCost;
         positionBalance += size;
 
-        SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginCostAdjusted);
+        SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginCost);
 
         emit Bought(msg.sender, size, avgPrice, marginCost);
 
@@ -123,17 +123,17 @@ contract PerpAMM is IAMM {
         avgPrice = getSellPrice(size);
         if (avgPrice < minPrice) revert SlippageExceeded();
 
-        uint256 marginRefund = (size * avgPrice) / 1e18;
-        uint256 marginRefundAdjusted = collateralDecimals < 18
-            ? marginRefund / (10 ** (18 - collateralDecimals))
-            : (collateralDecimals > 18 ? marginRefund * (10 ** (collateralDecimals - 18)) : marginRefund);
+        uint256 marginRefund18 = (size * avgPrice) / 1e18;
+        uint256 marginRefund = collateralDecimals < 18
+            ? marginRefund18 / (10 ** (18 - collateralDecimals))
+            : (collateralDecimals > 18 ? marginRefund18 * (10 ** (collateralDecimals - 18)) : marginRefund18);
 
         if (positionBalance < size) revert InsufficientLiquidity();
 
-        marginBalance -= marginRefundAdjusted;
+        marginBalance -= marginRefund;
         positionBalance -= size;
 
-        SafeTransferLib.safeTransfer(collateralToken, msg.sender, marginRefundAdjusted);
+        SafeTransferLib.safeTransfer(collateralToken, msg.sender, marginRefund);
 
         emit Sold(msg.sender, size, avgPrice, marginRefund);
 
