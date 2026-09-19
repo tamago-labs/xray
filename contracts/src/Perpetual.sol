@@ -36,6 +36,7 @@ contract Perpetual is IPerpetual {
     uint256 public maintenanceMarginRate;
     uint256 public liquidationPenaltyRate;
     uint8 public immutable collateralDecimals;
+    uint256 public settlementPrice;
 
     event Deposited(address indexed trader, uint256 amount);
     event Withdrawn(address indexed trader, uint256 amount);
@@ -52,6 +53,11 @@ contract Perpetual is IPerpetual {
 
     modifier onlyNormal() {
         if (status != Types.Status.NORMAL) revert MarketNotNormal();
+        _;
+    }
+
+    modifier notSettled() {
+        if (status == Types.Status.SETTLED) revert MarketSettled();
         _;
     }
 
@@ -85,7 +91,7 @@ contract Perpetual is IPerpetual {
     }
 
     /// @notice Deposits collateral into the perpetual. Tokens held in contract custody.
-    function deposit(uint256 amount) external onlyNormal {
+    function deposit(uint256 amount) external notSettled onlyNormal {
         if (amount == 0) revert InvalidConfig();
 
         deposits[msg.sender] += amount;
@@ -97,7 +103,7 @@ contract Perpetual is IPerpetual {
     }
 
     /// @notice Withdraws collateral. Fails if position would become undercollateralized.
-    function withdraw(uint256 amount) external onlyNormal {
+    function withdraw(uint256 amount) external {
         if (amount == 0) revert InvalidConfig();
         if (deposits[msg.sender] < amount) revert InvalidConfig();
 
@@ -117,18 +123,23 @@ contract Perpetual is IPerpetual {
     }
 
     /// @notice Opens a long or short position at the AMM's current price.
-    function openPosition(Types.Side side, uint256 size) external onlyNormal {
+    function openPosition(Types.Side side, uint256 size) external notSettled onlyNormal {
         if (size == 0 || side == Types.Side.FLAT) revert InvalidConfig();
 
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side != Types.Side.FLAT) revert InvalidConfig();
 
+        uint256 price = oracle.getPrice();
         uint256 avgPrice;
         if (side == Types.Side.LONG) {
             avgPrice = amm.getBuyPrice(size);
         } else {
             avgPrice = amm.getSellPrice(size);
         }
+
+        // Check initial margin requirement
+        uint256 requiredMargin = _toCollateralDecimals((size * price * initialMarginRate) / 1e36);
+        if (pos.collateral < requiredMargin) revert InvalidConfig();
 
         pos.side = side;
         pos.size = size;
@@ -270,9 +281,42 @@ contract Perpetual is IPerpetual {
         emit EmergencyDeclared();
     }
 
-    function settle(uint256 settlementPrice) external onlyOwner {
+    /// @notice Settles the market at the given IPO price. No new positions allowed after.
+    function settle(uint256 _settlementPrice) external onlyOwner {
+        if (_settlementPrice == 0) revert InvalidConfig();
         status = Types.Status.SETTLED;
-        emit Settled(settlementPrice);
+        settlementPrice = _settlementPrice;
+        emit Settled(_settlementPrice);
+    }
+
+    /// @notice Closes a position at the settlement price. Only available after market settlement.
+    function settlePosition() external {
+        if (status != Types.Status.SETTLED) revert MarketNotNormal();
+
+        Types.PositionData storage pos = positions[msg.sender];
+        if (pos.side == Types.Side.FLAT) revert InvalidConfig();
+
+        int256 pnl = _getPnL(pos, settlementPrice);
+
+        if (pnl >= 0) {
+            pos.collateral += uint256(pnl);
+            deposits[msg.sender] += uint256(pnl);
+        } else {
+            uint256 loss = uint256(-pnl);
+            if (loss >= pos.collateral) {
+                deposits[msg.sender] -= pos.collateral;
+                pos.collateral = 0;
+            } else {
+                pos.collateral -= loss;
+                deposits[msg.sender] -= loss;
+            }
+        }
+
+        emit PositionClosed(msg.sender, pnl);
+
+        pos.side = Types.Side.FLAT;
+        pos.size = 0;
+        pos.entryValue = 0;
     }
 
     function transferOwnership(address newOwner) external onlyOwner {

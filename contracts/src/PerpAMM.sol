@@ -73,9 +73,9 @@ contract PerpAMM is IAMM {
 
         SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginAmount);
 
-        marginBalance += marginAmount;
-
         uint256 shares = _mintShares(msg.sender, marginAmount);
+
+        marginBalance += marginAmount;
 
         emit LiquidityAdded(msg.sender, marginAmount, shares);
     }
