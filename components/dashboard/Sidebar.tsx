@@ -90,15 +90,16 @@ export default function Sidebar() {
         <div>
           <button
             onClick={toggleChats}
-            className="w-full flex items-center gap-4 px-3 py-2 rounded-lg text-sm font-display font-medium text-white/50 hover:text-white hover:bg-white/[0.03] transition-colors"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-display font-medium text-white/50 hover:text-white hover:bg-white/[0.03] transition-colors"
           >
+            <MessageSquare className="w-4 h-4" />
+            <span className="flex-1 text-left">Chats</span>
             <motion.div
               animate={{ rotate: chatsOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
               <ChevronDown className="w-3 h-3" />
             </motion.div>
-            <span className="flex-1 text-left">Chats</span>
           </button>
 
           <AnimatePresence>

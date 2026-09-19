@@ -231,8 +231,11 @@ export default function ChatSession() {
               }`}>
                 {msg.role === 'ai' && activeAgent && i === messages.length - 1 && (
                   <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-accent mb-2 block">
-                    <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                    {activeAgent}
+                    <span className="relative flex items-center justify-center w-3 h-3">
+                      <span className="absolute w-2.5 h-2.5 rounded-full bg-accent/30 animate-ping" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent relative z-10" />
+                    </span>
+                    Using {activeAgent}
                   </span>
                 )}
                 {msg.role === 'ai' ? (

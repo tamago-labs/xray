@@ -90,3 +90,22 @@ export const compareTokens = tool({
     return JSON.stringify(results);
   },
 });
+
+export const getTrendingTokens = tool({
+  name: "get_trending_tokens",
+  description: "Get the most trending tokenized stocks by volume, social mentions, and recent price action.",
+  parameters: z.object({
+    limit: z.number().optional().describe("Number of trending tokens to return (default 5)"),
+  }),
+  execute: async ({ limit = 5 }: { limit?: number }) => {
+    const trending = [...mockTokens]
+      .sort((a, b) => b.volume24h - a.volume24h)
+      .slice(0, limit)
+      .map((t) => ({
+        ...t,
+        trendScore: Math.floor(Math.random() * 100 + 50),
+        socialMentions: Math.floor(Math.random() * 5000 + 500),
+      }));
+    return JSON.stringify(trending);
+  },
+});

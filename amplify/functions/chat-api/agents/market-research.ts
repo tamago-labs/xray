@@ -1,6 +1,6 @@
 import { Agent } from "@openai/agents";
 import { PROVIDER_MODEL } from "../provider";
-import { searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compareTokens } from "./tools/market";
+import { searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compareTokens, getTrendingTokens } from "./tools/market";
 
 export const marketResearchAgent = new Agent({
   name: "Market Research Agent",
@@ -20,6 +20,6 @@ export const marketResearchAgent = new Agent({
     You may recommend assets for further consideration,
     but do not make guaranteed-return claims.
   `,
-  tools: [searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compareTokens],
+  tools: [searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compareTokens, getTrendingTokens],
   model: PROVIDER_MODEL,
 });
