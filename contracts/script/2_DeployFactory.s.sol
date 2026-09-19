@@ -2,29 +2,32 @@
 pragma solidity ^0.8.0;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ERC20Mock} from "../src/mocks/ERC20Mock.sol";
+import {PerpFactory} from "../src/PerpFactory.sol";
 
-contract DeployMockTokens is Script {
+contract DeployFactory is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
 
         console.log("===========================================");
-        console.log("0_DeployMockTokens - X Layer Testnet");
+        console.log("2_DeployFactory - X Layer Testnet");
         console.log("===========================================");
         console.log("Chain ID:", block.chainid);
         console.log("Deployer:", deployer);
 
         vm.startBroadcast(deployerPrivateKey);
 
-        ERC20Mock usdc = new ERC20Mock("USD Coin", "USDC", 6);
-        console.log("USDC (6) deployed at:", address(usdc));
+        PerpFactory factory = new PerpFactory();
+
+        console.log("PerpFactory deployed at:", address(factory));
 
         vm.stopBroadcast();
 
         console.log("\n===========================================");
         console.log("Update .env:");
-        console.log("USDC_ADDRESS=%s", address(usdc));
+        console.log("FACTORY_ADDRESS=%s", address(factory));
         console.log("===========================================");
+
+        console.log("\nNext: Run 3_CreateMarket.s.sol to create a market");
     }
 }
