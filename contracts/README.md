@@ -2,6 +2,145 @@
 
 A perpetual swap DEX for pre-IPO token prices. Trade synthetic exposure to companies like OpenAI, SpaceX, and Stripe before they go public. Built with [Foundry](https://book.getfoundry.sh/).
 
+## How It Works
+
+### Counter-Party Model
+
+Unlike order-book exchanges, this DEX uses an Automated Market Maker (AMM) as the counter-party to every trade:
+
+```
+Trader goes LONG  →  Pool goes SHORT  (pool sells to trader)
+Trader goes SHORT →  Pool goes LONG   (pool buys from trader)
+```
+
+The pool's profit = all traders' losses. The pool's loss = all traders' traders' profits.
+
+### Leverage
+
+Traders only need to deposit a fraction of the position value (margin). With 10% initial margin:
+
+```
+$1,000 collateral → $10,000 notional exposure → 10x leverage
+```
+
+### Dynamic Pricing
+
+The AMM adjusts prices based on pool utilization (net exposure):
+
+```
+Pool net short  →  Buying more increases risk  →  Higher premium
+Pool net long   →  Selling more increases risk →  Higher premium for sells
+```
+
+This incentivizes trades that rebalance the pool.
+
+---
+
+## Trade Lifecycle
+
+```mermaid
+flowchart TD
+    Start([LP provides liquidity]) --> Pool[Pool has margin]
+    Pool --> Deposit[Trader deposits USDC]
+    Deposit --> Decision{Open position?}
+
+    Decision --> LONG[Go LONG]
+    Decision --> SHORT[Go SHORT]
+
+    LONG --> LB[AMM.buy: pool goes SHORT]
+    SHORT --> SB[AMM.sell: pool goes LONG]
+
+    LB --> Position[Position active]
+    SB --> Position
+
+    Position --> Check{Margin OK?}
+
+    Check --> Close[Close position]
+    Check --> Liquidate[Liquidate]
+
+    Close --> PnL{PnL positive?}
+    PnL --> Profit[Profit credited]
+    PnL --> Loss[Loss deducted]
+
+    Profit --> Withdraw[Withdraw USDC]
+    Loss --> Withdraw
+    Liquidate --> LP[Pays liquidator penalty]
+
+    Withdraw --> End([End])
+```
+
+---
+
+## System Interaction
+
+```mermaid
+sequenceDiagram
+    participant T as Trader
+    participant P as Perpetual
+    participant A as PerpAMM
+    participant O as PriceOracle
+    participant LP as LP Provider
+
+    LP->>A: initializePool(100_000 USDC)
+    A-->>LP: mint LP shares
+
+    T->>P: deposit(10_000 USDC)
+    P->>P: deposits[trader] += 10_000
+
+    T->>P: openPosition(LONG, 5 tokens)
+    P->>A: getBuyPrice(5e18)
+    A->>O: oracle.getPrice()
+    O-->>A: 500e18
+    A-->>P: avgPrice = 505e18
+    P->>A: buy(5e18, maxPrice)
+    A->>A: marginBalance += 2525 USDC
+    A->>A: netPosition += 5 (pool short)
+    A-->>P: avgPrice
+
+    Note over P: Position recorded
+
+    T->>P: closePosition()
+    P->>A: sell(5e18, 0)
+    A->>A: marginBalance -= 2600 USDC
+    A->>A: netPosition -= 5 (pool flat)
+    A-->>P: 2600 USDC returned
+
+    P->>P: PnL = 2600 - 2525 = +75 USDC
+    P->>P: deposits[trader] += 75
+
+    T->>P: withdraw(10_075 USDC)
+```
+
+---
+
+## Settlement & IPO Flow
+
+```mermaid
+flowchart TD
+    IPO([IPO Announced]) --> Settle[Owner calls settle ipoPrice]
+    Settle --> Status[Market status = SETTLED]
+
+    Status --> BlockNew[Block new deposits]
+    Status --> BlockPos[Block new positions]
+
+    BlockNew --> Traders[Traders settle positions]
+    BlockPos --> Traders
+
+    Traders --> SettlePos[settlePosition]
+    SettlePos --> Calc[PnL = size × settlementPrice - entryValue]
+
+    Calc --> Credit[Credit profit to deposits]
+    Calc --> Debit[Debit loss from deposits]
+
+    Credit --> Withdraw[Withdraw remaining USDC]
+    Debit --> Withdraw
+
+    Withdraw --> LPWithdraw[LPs remove liquidity]
+    LPWithdraw --> Close([Market permanently closed])
+```
+
+---
+
 ## Architecture
 
 ```
@@ -12,9 +151,10 @@ A perpetual swap DEX for pre-IPO token prices. Trade synthetic exposure to compa
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ PriceOracle  │  │  PerpAMM     │  │ FundingCalc   │  │
 │  │              │  │              │  │               │  │
-│  │ • Fallback   │  │ • Pricing    │  │ • EMA premium │  │
-│  │ • Chainlink  │  │ • LP tokens  │  │ • Dampener    │  │
-│  │ • Pyth       │  │ • Liquidity  │  │ • Settlement  │  │
+│  │ • Fallback   │  │ • Counter-   │  │ • EMA premium │  │
+│  │ • Chainlink  │  │   party      │  │ • Dampener    │  │
+│  │ • Pyth       │  │ • Dynamic    │  │ • Settlement  │  │
+│  │              │  │   pricing    │  │               │  │
 │  └──────────────┘  └──────────────┘  └───────────────┘  │
 │                                                          │
 │  • Position tracking  • Margin checks  • Liquidations    │
@@ -43,11 +183,11 @@ oracle.confirmPriceUpdate();
 
 ### PerpAMM (`src/PerpAMM.sol`)
 
-Automated market maker that uses the oracle price as its base and applies a utilization-based spread.
+Automated market maker that acts as counter-party to all trades.
 
-- **Base price**: always falls back to oracle when pool is empty
-- **Buy premium**: `oraclePrice * (1 + utilization * 1%)` — price rises as pool gets long
-- **Sell discount**: `oraclePrice * (1 - utilization * 0.5%)` — price falls as pool gets short
+- **Counter-party**: pool takes opposite side of every trade
+- **Dynamic pricing**: `oraclePrice × (1 + utilization × spread)` based on pool exposure
+- **Net position tracking**: positive = pool short, negative = pool long
 - **LP deposits**: add/remove collateral, receive LP share tokens
 - **Decimal-aware**: handles USDC (6dp) vs oracle (18dp) conversion
 
@@ -55,8 +195,14 @@ Automated market maker that uses the oracle price as its base and applies a util
 // LP initializes pool with collateral
 amm.initializePool(100_000e6);  // $100k USDC
 
-// Trader opens long 10 preOPENAI at current AMM price
+// Trader opens long 10 preOPENAI (pool goes short)
 uint256 avgPrice = amm.buy(10e18, type(uint256).max);
+// Pool: marginBalance += 5000, netPosition += 10 (short)
+
+// Trader opens short 5 preOPENAI (pool goes long)
+amm.sell(5e18, 0);
+// Pool: marginBalance -= 2500, netPosition -= 5
+// Pool net: short 5 tokens
 ```
 
 ### Perpetual (`src/Perpetual.sol`)
@@ -64,7 +210,7 @@ uint256 avgPrice = amm.buy(10e18, type(uint256).max);
 Main entry point. Deploys its own AMM and coordinates all components.
 
 - **Deposit/withdraw**: traders deposit USDC collateral
-- **Trade**: open long/short via AMM pricing
+- **Trade**: open long/short via AMM (pool takes opposite side)
 - **Liquidate**: anyone can liquidate undercollateralized positions
 - **Emergency**: owner can pause trading
 - **Settle & Close**: owner settles at IPO price, market permanently closes
@@ -73,8 +219,8 @@ Main entry point. Deploys its own AMM and coordinates all components.
 ```solidity
 // Full trade flow
 perpetual.deposit(10_000e6);                    // Deposit $10k
-perpetual.openPosition(Side.LONG, 5e18);         // Long 5 tokens
-perpetual.closePosition();                        // Close at current price
+perpetual.openPosition(Side.LONG, 5e18);         // Long 5 tokens (pool shorts)
+perpetual.closePosition();                        // Close at AMM price
 perpetual.withdraw(5_000e6);                      // Withdraw profits
 
 // Settlement (after IPO)
@@ -106,67 +252,7 @@ Funding rate mechanism to tether AMM mark price to oracle spot price.
 
 Standard ERC20 representing pool ownership. LPs mint shares on deposit, burn on withdrawal.
 
-## Key Parameters
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| Initial Margin | 10% | Required to open a position |
-| Maintenance Margin | 5% | Minimum to avoid liquidation |
-| Liquidation Penalty | 0.5% | Paid to liquidator |
-| Funding Period | 8 hours | Funding rate calculation window |
-| EMA Half-life | ~20 min | Premium smoothing |
-| Funding Dampener | 0.05% | No-funding band |
-| Premium Limit | 0.5% | Max funding rate |
-| Update Delay | 5 min | Min time between price updates |
-| Staleness | 1 hour | Oracle price expiry |
-
-## Trade Flow
-
-```
-1. LP adds liquidity
-   └─► amm.initializePool(USDC) → mints LP shares
-
-2. Trader deposits collateral
-   └─► perpetual.deposit(USDC) → tokens held in contract
-
-3. Trader opens position
-   └─► perpetual.openPosition(LONG, size)
-       ├─► amm.getBuyPrice(size) → uses oracle + utilization spread
-       └─► records position (side, size, entryPrice)
-
-4. Price moves (oracle updates via bot)
-   └─► oracle.updatePrice() → confirmPriceUpdate()
-
-5. Funding accrues (if position open across funding period)
-   └─► funding.updateIndex() → accumulates based on EMA premium
-
-6. Trader closes position
-   └─► perpetual.closePosition()
-       ├─► oracle.getPrice() → current exit price
-       └─► settles PnL to trader's collateral
-
-7. Trader withdraws
-   └─► perpetual.withdraw(amount) → USDC back to wallet
-```
-
-## Settlement Flow (After IPO)
-
-```
-1. Owner declares settlement price
-   └─► perpetual.settle(ipoPrice) → market status = SETTLED
-       └─► No new deposits or positions allowed
-
-2. Traders settle positions
-   └─► perpetual.settlePosition()
-       ├─► Calculates PnL at settlement price (not oracle)
-       └─► Credits profit or subtracts loss from collateral
-
-3. Anyone can withdraw
-   └─► perpetual.withdraw(amount) → works in SETTLED state
-
-4. LPs can remove liquidity
-   └─► amm.removeLiquidity(shares) → market is permanently closed
-```
+---
 
 ## Margin & Liquidation
 
@@ -181,6 +267,24 @@ Margin Ratio = (Collateral + Unrealized PnL) / Notional Value
          │
     0%  ─└─ Liquidatable (anyone can liquidate, receives 0.5% penalty)
 ```
+
+---
+
+## Key Parameters
+
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Initial Margin | 10% | Required to open a position (max 10x leverage) |
+| Maintenance Margin | 5% | Minimum to avoid liquidation |
+| Liquidation Penalty | 0.5% | Paid to liquidator |
+| Funding Period | 8 hours | Funding rate calculation window |
+| EMA Half-life | ~20 min | Premium smoothing |
+| Funding Dampener | 0.05% | No-funding band |
+| Premium Limit | 0.5% | Max funding rate |
+| Update Delay | 5 min | Min time between price updates |
+| Staleness | 1 hour | Oracle price expiry |
+
+---
 
 ## Testing
 
@@ -200,6 +304,8 @@ forge test --gas-report
 
 **83 tests passing** across 7 suites: unit tests for each contract + full multi-contract integration tests.
 
+---
+
 ## Development
 
 ```bash
@@ -216,10 +322,12 @@ forge fmt
 forge coverage
 ```
 
+---
+
 ## Design Notes
 
 - **No upgradeable proxies**: immutable contracts for trust minimization
 - **No governance token**: owner-controlled for testnet, can be renounced
 - **Decimal-agnostic**: works with any collateral decimals (USDC 6dp, DAI 18dp, etc.)
-- **AMM is pricing-only**: Perpetual holds tokens, AMM provides price quotes
+- **Counter-party AMM**: pool takes opposite side of every trade
 - **Oracle-agnostic**: supports admin-push, Chainlink, or Pyth feeds
