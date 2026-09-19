@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import {FundingCalculator} from "../src/FundingCalculator.sol";
-import {Types} from "../src/Types.sol";
+import {Types} from "../src/libraries/Types.sol";
 
 interface IERC20Mock {
     function mint(address to, uint256 amount) external;

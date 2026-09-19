@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import {Perpetual} from "../src/Perpetual.sol";
 import {PriceOracle} from "../src/PriceOracle.sol";
 import {FundingCalculator} from "../src/FundingCalculator.sol";
-import {Types} from "../src/Types.sol";
+import {Types} from "../src/libraries/Types.sol";
 
 interface IERC20Mock {
     function mint(address to, uint256 amount) external;

@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {IPreIpoOracle} from "./interfaces/IPreIpoOracle.sol";
 import {AggregatorV2V3Interface} from "./interfaces/AggregatorV2V3Interface.sol";
-import {Types} from "./Types.sol";
+import {Types} from "./libraries/Types.sol";
 
 /// @title PriceOracle
 /// @notice Multi-source price oracle for pre-IPO token prices

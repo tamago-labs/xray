@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Types} from "./Types.sol";
+import {Types} from "./libraries/Types.sol";
 import {SafeTransferLib} from "./libraries/SafeTransferLib.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
 

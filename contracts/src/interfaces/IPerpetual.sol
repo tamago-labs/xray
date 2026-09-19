@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Types} from "../Types.sol";
+import {Types} from "../libraries/Types.sol";
 
 /// @title IPerpetual
 /// @notice Interface for the Pre-IPO perpetual contract

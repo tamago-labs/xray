@@ -2,7 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {IPerpetual} from "./interfaces/IPerpetual.sol";
-import {Types} from "./Types.sol";
+import {Types} from "./libraries/Types.sol";
 import {PerpAMM} from "./PerpAMM.sol";
 import {IERC20} from "./interfaces/IERC20.sol";
 import {IPreIpoOracle} from "./interfaces/IPreIpoOracle.sol";

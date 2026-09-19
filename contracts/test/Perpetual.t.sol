@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "forge-std/Test.sol";
 import {Perpetual} from "../src/Perpetual.sol";
 import {PriceOracle} from "../src/PriceOracle.sol";
-import {Types} from "../src/Types.sol";
+import {Types} from "../src/libraries/Types.sol";
 
 interface IPerpAMM {
     function initializePool(uint256 marginAmount) external;
