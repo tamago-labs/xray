@@ -102,27 +102,24 @@ contract Perpetual is IPerpetual {
         emit Deposited(msg.sender, amount);
     }
 
-    /// @notice Withdraws collateral. Fails if position would become undercollateralized.
+    /// @notice Withdraws available collateral. Fails if amount exceeds available balance.
     function withdraw(uint256 amount) external {
         if (amount == 0) revert InvalidConfig();
         if (deposits[msg.sender] < amount) revert InvalidConfig();
 
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side != Types.Side.FLAT) {
-            uint256 required = _getRequiredMargin(pos);
-            uint256 remaining = pos.collateral > amount ? pos.collateral - amount : 0;
-            if (remaining < required) revert InvalidConfig();
+            revert InvalidConfig();
         }
 
         deposits[msg.sender] -= amount;
-        positions[msg.sender].collateral -= amount;
 
         SafeTransferLib.safeTransfer(collateralToken, msg.sender, amount);
 
         emit Withdrawn(msg.sender, amount);
     }
 
-    /// @notice Opens a long or short position at the AMM's current price.
+    /// @notice Opens a long or short position. Pool takes the opposite side.
     function openPosition(Types.Side side, uint256 size) external notSettled onlyNormal {
         if (size == 0 || side == Types.Side.FLAT) revert InvalidConfig();
 
@@ -130,53 +127,64 @@ contract Perpetual is IPerpetual {
         if (pos.side != Types.Side.FLAT) revert InvalidConfig();
 
         uint256 price = oracle.getPrice();
+
+        uint256 requiredMargin = _toCollateralDecimals((size * price * initialMarginRate) / 1e36);
+        if (deposits[msg.sender] < requiredMargin) revert InvalidConfig();
+
+        IERC20(collateralToken).approve(address(amm), type(uint256).max);
+
         uint256 avgPrice;
         if (side == Types.Side.LONG) {
-            avgPrice = amm.getBuyPrice(size);
+            avgPrice = amm.buy(size, type(uint256).max);
         } else {
-            avgPrice = amm.getSellPrice(size);
+            avgPrice = amm.sell(size, 0);
         }
 
-        // Check initial margin requirement
-        uint256 requiredMargin = _toCollateralDecimals((size * price * initialMarginRate) / 1e36);
-        if (pos.collateral < requiredMargin) revert InvalidConfig();
+        uint256 marginCost = _toCollateralDecimals((size * avgPrice) / 1e18);
+        deposits[msg.sender] -= marginCost;
 
         pos.side = side;
         pos.size = size;
         pos.entryValue = avgPrice;
+        pos.collateral = marginCost;
 
         emit PositionOpened(msg.sender, side, size, avgPrice);
     }
 
-    /// @notice Closes an open position. Settles PnL to collateral (absorbs loss or credits profit).
+    /// @notice Closes an open position via AMM. Pool counters the trade and settles PnL.
     function closePosition() external onlyNormal {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side == Types.Side.FLAT) revert InvalidConfig();
 
-        uint256 currentPrice = oracle.getPrice();
-        int256 pnl = _getPnL(pos, currentPrice);
+        IERC20(collateralToken).approve(address(amm), type(uint256).max);
+
+        uint256 closePrice;
+        if (pos.side == Types.Side.LONG) {
+            closePrice = amm.sell(pos.size, 0);
+        } else {
+            closePrice = amm.buy(pos.size, type(uint256).max);
+        }
+
+        uint256 marginReturned = _toCollateralDecimals((pos.size * closePrice) / 1e18);
+        int256 pnl = int256(marginReturned) - int256(pos.collateral);
 
         if (pnl >= 0) {
-            pos.collateral += uint256(pnl);
             deposits[msg.sender] += uint256(pnl);
         } else {
             uint256 loss = uint256(-pnl);
-            if (loss >= pos.collateral) {
-                deposits[msg.sender] -= pos.collateral;
-                pos.collateral = 0;
+            if (loss >= deposits[msg.sender]) {
+                deposits[msg.sender] = 0;
             } else {
-                pos.collateral -= loss;
                 deposits[msg.sender] -= loss;
             }
         }
-
-        // AMM is used for pricing only; actual settlement is in Perpetual
 
         emit PositionClosed(msg.sender, pnl);
 
         pos.side = Types.Side.FLAT;
         pos.size = 0;
         pos.entryValue = 0;
+        pos.collateral = 0;
     }
 
     /// @notice Liquidates an undercollateralized position. Liquidator receives penalty from remaining collateral.
@@ -184,15 +192,26 @@ contract Perpetual is IPerpetual {
         if (!isLiquidatable(trader)) revert InvalidConfig();
 
         Types.PositionData storage pos = positions[trader];
-        uint256 currentPrice = oracle.getPrice();
-        int256 pnl = _getPnL(pos, currentPrice);
+        uint256 posCollateral = pos.collateral;
+
+        IERC20(collateralToken).approve(address(amm), type(uint256).max);
+
+        uint256 closePrice;
+        if (pos.side == Types.Side.LONG) {
+            closePrice = amm.sell(pos.size, 0);
+        } else {
+            closePrice = amm.buy(pos.size, type(uint256).max);
+        }
+
+        uint256 marginReturned = _toCollateralDecimals((pos.size * closePrice) / 1e18);
+        int256 pnl = int256(marginReturned) - int256(posCollateral);
 
         uint256 remainingCollateral;
         if (pnl >= 0) {
-            remainingCollateral = pos.collateral + uint256(pnl);
+            remainingCollateral = posCollateral + uint256(pnl);
         } else {
             uint256 loss = uint256(-pnl);
-            remainingCollateral = loss >= pos.collateral ? 0 : pos.collateral - loss;
+            remainingCollateral = loss >= posCollateral ? 0 : posCollateral - loss;
         }
 
         uint256 penalty = (remainingCollateral * liquidationPenaltyRate) / 1e18;
@@ -206,7 +225,7 @@ contract Perpetual is IPerpetual {
         pos.entryValue = 0;
         pos.collateral = 0;
 
-        if (liquidationPenaltyRate > 0) {
+        if (penalty > 0) {
             SafeTransferLib.safeTransfer(collateralToken, msg.sender, penalty);
         }
 
@@ -296,18 +315,18 @@ contract Perpetual is IPerpetual {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side == Types.Side.FLAT) revert InvalidConfig();
 
-        int256 pnl = _getPnL(pos, settlementPrice);
+        uint256 posCollateral = pos.collateral;
+
+        uint256 marginReturned = _toCollateralDecimals((pos.size * settlementPrice) / 1e18);
+        int256 pnl = int256(marginReturned) - int256(posCollateral);
 
         if (pnl >= 0) {
-            pos.collateral += uint256(pnl);
             deposits[msg.sender] += uint256(pnl);
         } else {
             uint256 loss = uint256(-pnl);
-            if (loss >= pos.collateral) {
-                deposits[msg.sender] -= pos.collateral;
-                pos.collateral = 0;
+            if (loss >= deposits[msg.sender]) {
+                deposits[msg.sender] = 0;
             } else {
-                pos.collateral -= loss;
                 deposits[msg.sender] -= loss;
             }
         }
@@ -317,6 +336,7 @@ contract Perpetual is IPerpetual {
         pos.side = Types.Side.FLAT;
         pos.size = 0;
         pos.entryValue = 0;
+        pos.collateral = 0;
     }
 
     function transferOwnership(address newOwner) external onlyOwner {

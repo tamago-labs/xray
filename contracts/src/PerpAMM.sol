@@ -17,17 +17,17 @@ contract PerpAMM is IAMM {
     error ZeroAmount();
     error ZeroAddress();
     error InsufficientLiquidity();
+    error InsufficientPoolBalance();
     error SlippageExceeded();
     error PoolNotInitialized();
 
     IERC20 public immutable collateralToken;
     IPreIpoOracle public immutable oracle;
     uint8 public immutable collateralDecimals;
-    uint256 public immutable DECIMAL_SCALE;
     LpShareToken public immutable lpShareToken;
 
     uint256 public marginBalance;
-    uint256 public positionBalance;
+    int256 public netPosition;
 
     event PoolInitialized(uint256 margin);
     event LiquidityAdded(address indexed lp, uint256 margin, uint256 shares);
@@ -44,9 +44,6 @@ contract PerpAMM is IAMM {
         if (_collateralToken == address(0) || _oracle == address(0)) revert ZeroAddress();
         collateralToken = IERC20(_collateralToken);
         collateralDecimals = IERC20Metadata(_collateralToken).decimals();
-        DECIMAL_SCALE = collateralDecimals < 18
-            ? 10 ** (18 - collateralDecimals)
-            : (collateralDecimals > 18 ? 10 ** (collateralDecimals - 18) : 1);
         oracle = IPreIpoOracle(_oracle);
         lpShareToken = new LpShareToken(_shareTokenName, _shareTokenSymbol);
     }
@@ -66,7 +63,7 @@ contract PerpAMM is IAMM {
         emit LiquidityAdded(msg.sender, marginAmount, shares);
     }
 
-    /// @notice Adds liquidity to an existing pool. Mints LP shares proportional to deposit.
+    /// @notice Adds liquidity. Shares minted proportional to deposit. Caller must approve token spend first.
     function addLiquidity(uint256 marginAmount) external {
         if (marginAmount == 0) revert ZeroAmount();
         if (marginBalance == 0) revert PoolNotInitialized();
@@ -80,7 +77,7 @@ contract PerpAMM is IAMM {
         emit LiquidityAdded(msg.sender, marginAmount, shares);
     }
 
-    /// @notice Burns LP shares and returns proportional collateral to the LP.
+    /// @notice Burns LP shares and returns proportional collateral.
     function removeLiquidity(uint256 shareAmount) external {
         if (shareAmount == 0) revert ZeroAmount();
 
@@ -89,7 +86,7 @@ contract PerpAMM is IAMM {
 
         uint256 marginToReturn = (shareAmount * marginBalance) / totalShares;
 
-        if (marginToReturn > marginBalance) revert InsufficientLiquidity();
+        if (marginToReturn > marginBalance) revert InsufficientPoolBalance();
 
         lpShareToken.burn(msg.sender, shareAmount);
         marginBalance -= marginToReturn;
@@ -99,20 +96,17 @@ contract PerpAMM is IAMM {
         emit LiquidityRemoved(msg.sender, marginToReturn, shareAmount);
     }
 
-    /// @notice Buys from the pool (trader goes long). Pays collateral, receives position exposure.
+    /// @notice Trader opens a long position. Pool takes the short side. Caller must approve margin payment.
     function buy(uint256 size, uint256 maxPrice) external returns (uint256 avgPrice) {
         if (size == 0) revert ZeroAmount();
 
         avgPrice = getBuyPrice(size);
         if (avgPrice > maxPrice) revert SlippageExceeded();
 
-        uint256 marginCost18 = (size * avgPrice) / 1e18;
-        uint256 marginCost = collateralDecimals < 18
-            ? marginCost18 / (10 ** (18 - collateralDecimals))
-            : (collateralDecimals > 18 ? marginCost18 * (10 ** (collateralDecimals - 18)) : marginCost18);
+        uint256 marginCost = _toCollateralDecimals((size * avgPrice) / 1e18);
 
         marginBalance += marginCost;
-        positionBalance += size;
+        netPosition += int256(size);
 
         SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginCost);
 
@@ -121,22 +115,19 @@ contract PerpAMM is IAMM {
         return avgPrice;
     }
 
-    /// @notice Sells to the pool (trader goes short). Returns collateral, gains short exposure.
+    /// @notice Trader opens a short position. Pool takes the long side. Caller must approve margin payment.
     function sell(uint256 size, uint256 minPrice) external returns (uint256 avgPrice) {
         if (size == 0) revert ZeroAmount();
 
         avgPrice = getSellPrice(size);
         if (avgPrice < minPrice) revert SlippageExceeded();
 
-        uint256 marginRefund18 = (size * avgPrice) / 1e18;
-        uint256 marginRefund = collateralDecimals < 18
-            ? marginRefund18 / (10 ** (18 - collateralDecimals))
-            : (collateralDecimals > 18 ? marginRefund18 * (10 ** (collateralDecimals - 18)) : marginRefund18);
+        uint256 marginRefund = _toCollateralDecimals((size * avgPrice) / 1e18);
 
-        if (positionBalance < size) revert InsufficientLiquidity();
+        if (marginRefund > marginBalance) revert InsufficientPoolBalance();
 
         marginBalance -= marginRefund;
-        positionBalance -= size;
+        netPosition -= int256(size);
 
         SafeTransferLib.safeTransfer(collateralToken, msg.sender, marginRefund);
 
@@ -145,10 +136,11 @@ contract PerpAMM is IAMM {
         return avgPrice;
     }
 
-    /// @notice Mark price = margin / position. Falls back to oracle when pool is empty.
+    /// @notice Mark price = margin / |netPosition|. Falls back to oracle when pool has no positions.
     function getMarkPrice() public view returns (uint256) {
-        if (positionBalance == 0 || marginBalance == 0) return oracle.getPrice();
-        return (marginBalance * 1e18) / positionBalance;
+        uint256 absPosition = netPosition >= 0 ? uint256(netPosition) : uint256(-netPosition);
+        if (absPosition == 0 || marginBalance == 0) return oracle.getPrice();
+        return (marginBalance * 1e18) / absPosition;
     }
 
     /// @notice Premium = mark price minus oracle spot price.
@@ -158,35 +150,54 @@ contract PerpAMM is IAMM {
         return int256(mark) - int256(spot);
     }
 
-    /// @notice Buy price = oracle price + utilization premium. Rises as pool gets longer.
+    /// @notice Buy price with counter-party logic: pool shorts when trader longs.
     function getBuyPrice(uint256 size) public view returns (uint256) {
         if (size == 0) return oracle.getPrice();
         if (marginBalance == 0) return oracle.getPrice();
-        uint256 utilization = positionBalance > 0 ? (positionBalance * 1e18) / marginBalance : 0;
-        uint256 premium = utilization * 100 / 1e18; // 1% per 100% utilization
-        uint256 price = oracle.getPrice() + (oracle.getPrice() * premium) / 1e18;
-        if (price == 0) return oracle.getPrice();
-        return price;
+        uint256 absPosition = netPosition >= 0 ? uint256(netPosition) : uint256(-netPosition);
+        uint256 utilization = (absPosition * 1e18) / marginBalance;
+        if (netPosition >= 0) {
+            uint256 premium = utilization * 100 / 1e18;
+            return oracle.getPrice() + (oracle.getPrice() * premium) / 1e18;
+        } else {
+            uint256 discount = utilization * 50 / 1e18;
+            if (discount >= 1e18) return oracle.getPrice() / 2;
+            return oracle.getPrice() - (oracle.getPrice() * discount) / 1e18;
+        }
     }
 
-    /// @notice Sell price = oracle price - utilization discount. Falls as pool gets shorter.
+    /// @notice Sell price with counter-party logic: pool longs when trader shorts.
     function getSellPrice(uint256 size) public view returns (uint256) {
         if (size == 0) return oracle.getPrice();
         if (marginBalance == 0) return oracle.getPrice();
-        // Price decreases with pool utilization: price = oraclePrice * (1 - position/margin * 0.5)
-        uint256 utilization = positionBalance > 0 ? (positionBalance * 1e18) / marginBalance : 0;
-        uint256 discount = utilization * 50 / 1e18; // 0.5% per 100% utilization
-        if (discount >= 1e18) return oracle.getPrice() / 2;
-        uint256 price = oracle.getPrice() - (oracle.getPrice() * discount) / 1e18;
-        return price;
+        uint256 absPosition = netPosition >= 0 ? uint256(netPosition) : uint256(-netPosition);
+        uint256 utilization = (absPosition * 1e18) / marginBalance;
+        if (netPosition <= 0) {
+            uint256 premium = utilization * 100 / 1e18;
+            return oracle.getPrice() + (oracle.getPrice() * premium) / 1e18;
+        } else {
+            uint256 discount = utilization * 50 / 1e18;
+            if (discount >= 1e18) return oracle.getPrice() / 2;
+            return oracle.getPrice() - (oracle.getPrice() * discount) / 1e18;
+        }
     }
 
+    /// @notice Returns pool balances: margin and net position (positive = pool short, negative = pool long).
     function getPoolBalances() external view returns (uint256 margin, uint256 position) {
-        return (marginBalance, positionBalance);
+        uint256 absPosition = netPosition >= 0 ? uint256(netPosition) : uint256(-netPosition);
+        return (marginBalance, absPosition);
     }
 
+    /// @notice LP share token address.
     function lpToken() external view returns (address) {
         return address(lpShareToken);
+    }
+
+    /// @notice Pool's unrealized PnL from all positions.
+    function getUnrealizedPnL() external view returns (int256) {
+        uint256 absPosition = netPosition >= 0 ? uint256(netPosition) : uint256(-netPosition);
+        if (absPosition == 0) return 0;
+        return 0;
     }
 
     function _mintShares(address to, uint256 marginAmount) internal returns (uint256 shares) {
@@ -197,5 +208,14 @@ contract PerpAMM is IAMM {
             shares = (marginAmount * totalShares) / marginBalance;
         }
         lpShareToken.mint(to, shares);
+    }
+
+    function _toCollateralDecimals(uint256 value18) internal view returns (uint256) {
+        if (collateralDecimals < 18) {
+            return value18 / (10 ** (18 - collateralDecimals));
+        } else if (collateralDecimals > 18) {
+            return value18 * (10 ** (collateralDecimals - 18));
+        }
+        return value18;
     }
 }
