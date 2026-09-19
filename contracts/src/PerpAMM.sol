@@ -28,6 +28,7 @@ contract PerpAMM is IAMM {
 
     uint256 public marginBalance;
     int256 public netPosition;
+    uint256 public marginRate;
 
     event PoolInitialized(uint256 margin);
     event LiquidityAdded(address indexed lp, uint256 margin, uint256 shares);
@@ -39,13 +40,15 @@ contract PerpAMM is IAMM {
         address _collateralToken,
         address _oracle,
         string memory _shareTokenName,
-        string memory _shareTokenSymbol
+        string memory _shareTokenSymbol,
+        uint256 _marginRate
     ) {
         if (_collateralToken == address(0) || _oracle == address(0)) revert ZeroAddress();
         collateralToken = IERC20(_collateralToken);
         collateralDecimals = IERC20Metadata(_collateralToken).decimals();
         oracle = IPreIpoOracle(_oracle);
         lpShareToken = new LpShareToken(_shareTokenName, _shareTokenSymbol);
+        marginRate = _marginRate;
     }
 
     /// @notice Initializes the pool with initial collateral. Can only be called once.
@@ -103,7 +106,7 @@ contract PerpAMM is IAMM {
         avgPrice = getBuyPrice(size);
         if (avgPrice > maxPrice) revert SlippageExceeded();
 
-        uint256 marginCost = _toCollateralDecimals((size * avgPrice) / 1e18);
+        uint256 marginCost = _calcMargin(size, avgPrice);
 
         marginBalance += marginCost;
         netPosition += int256(size);
@@ -122,7 +125,7 @@ contract PerpAMM is IAMM {
         avgPrice = getSellPrice(size);
         if (avgPrice < minPrice) revert SlippageExceeded();
 
-        uint256 marginRefund = _toCollateralDecimals((size * avgPrice) / 1e18);
+        uint256 marginRefund = _calcMargin(size, avgPrice);
 
         if (marginRefund > marginBalance) revert InsufficientPoolBalance();
 
@@ -217,5 +220,10 @@ contract PerpAMM is IAMM {
             return value18 * (10 ** (collateralDecimals - 18));
         }
         return value18;
+    }
+
+    function _calcMargin(uint256 size, uint256 price) internal view returns (uint256) {
+        uint256 margin18 = (size * price * marginRate) / 1e36;
+        return _toCollateralDecimals(margin18);
     }
 }

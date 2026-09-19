@@ -36,7 +36,8 @@ contract PerpAMMTest is Test {
             address(collateral),
             address(oracle),
             "LP Token",
-            "LPT"
+            "LPT",
+            0.1e18
         );
     }
 

@@ -86,7 +86,8 @@ contract Perpetual is IPerpetual {
             _collateralToken,
             _oracle,
             string(abi.encodePacked("LP ", _name)),
-            string(abi.encodePacked("lp", _symbol))
+            string(abi.encodePacked("lp", _symbol)),
+            _initialMarginRate
         );
     }
 
@@ -126,9 +127,7 @@ contract Perpetual is IPerpetual {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side != Types.Side.FLAT) revert InvalidConfig();
 
-        uint256 price = oracle.getPrice();
-
-        uint256 requiredMargin = _toCollateralDecimals((size * price * initialMarginRate) / 1e36);
+        uint256 requiredMargin = _getRequiredMargin(size);
         if (deposits[msg.sender] < requiredMargin) revert InvalidConfig();
 
         IERC20(collateralToken).approve(address(amm), type(uint256).max);
@@ -140,13 +139,15 @@ contract Perpetual is IPerpetual {
             avgPrice = amm.sell(size, 0);
         }
 
-        uint256 marginCost = _toCollateralDecimals((size * avgPrice) / 1e18);
-        deposits[msg.sender] -= marginCost;
+        uint256 marginPaid = amm.marginRate() > 0
+            ? _toCollateralDecimals((size * avgPrice * amm.marginRate()) / 1e36)
+            : 0;
+        deposits[msg.sender] -= marginPaid;
 
         pos.side = side;
         pos.size = size;
         pos.entryValue = avgPrice;
-        pos.collateral = marginCost;
+        pos.collateral = marginPaid;
 
         emit PositionOpened(msg.sender, side, size, avgPrice);
     }
@@ -165,17 +166,16 @@ contract Perpetual is IPerpetual {
             closePrice = amm.buy(pos.size, type(uint256).max);
         }
 
-        uint256 marginReturned = _toCollateralDecimals((pos.size * closePrice) / 1e18);
-        int256 pnl = int256(marginReturned) - int256(pos.collateral);
+        int256 pnl = _getPnL(pos, closePrice);
 
         if (pnl >= 0) {
-            deposits[msg.sender] += uint256(pnl);
+            deposits[msg.sender] += pos.collateral + uint256(pnl);
         } else {
             uint256 loss = uint256(-pnl);
-            if (loss >= deposits[msg.sender]) {
-                deposits[msg.sender] = 0;
+            if (loss >= pos.collateral) {
+                deposits[msg.sender] += 0;
             } else {
-                deposits[msg.sender] -= loss;
+                deposits[msg.sender] += pos.collateral - loss;
             }
         }
 
@@ -203,8 +203,7 @@ contract Perpetual is IPerpetual {
             closePrice = amm.buy(pos.size, type(uint256).max);
         }
 
-        uint256 marginReturned = _toCollateralDecimals((pos.size * closePrice) / 1e18);
-        int256 pnl = int256(marginReturned) - int256(posCollateral);
+        int256 pnl = _getPnL(pos, closePrice);
 
         uint256 remainingCollateral;
         if (pnl >= 0) {
@@ -315,19 +314,16 @@ contract Perpetual is IPerpetual {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side == Types.Side.FLAT) revert InvalidConfig();
 
-        uint256 posCollateral = pos.collateral;
-
-        uint256 marginReturned = _toCollateralDecimals((pos.size * settlementPrice) / 1e18);
-        int256 pnl = int256(marginReturned) - int256(posCollateral);
+        int256 pnl = _getPnL(pos, settlementPrice);
 
         if (pnl >= 0) {
-            deposits[msg.sender] += uint256(pnl);
+            deposits[msg.sender] += pos.collateral + uint256(pnl);
         } else {
             uint256 loss = uint256(-pnl);
-            if (loss >= deposits[msg.sender]) {
-                deposits[msg.sender] = 0;
+            if (loss >= pos.collateral) {
+                deposits[msg.sender] += 0;
             } else {
-                deposits[msg.sender] -= loss;
+                deposits[msg.sender] += pos.collateral - loss;
             }
         }
 
@@ -344,9 +340,13 @@ contract Perpetual is IPerpetual {
         owner = newOwner;
     }
 
+    function _getRequiredMargin(uint256 size) internal view returns (uint256) {
+        uint256 price = oracle.getPrice();
+        return _toCollateralDecimals((size * price * initialMarginRate) / 1e36);
+    }
+
     function _getRequiredMargin(Types.PositionData memory pos) internal view returns (uint256) {
-        uint256 currentPrice = oracle.getPrice();
-        return (pos.size * currentPrice * maintenanceMarginRate) / 1e36;
+        return _toCollateralDecimals((pos.size * oracle.getPrice() * maintenanceMarginRate) / 1e36);
     }
 
     function _getPnL(Types.PositionData memory pos, uint256 currentPrice) internal view returns (int256) {
