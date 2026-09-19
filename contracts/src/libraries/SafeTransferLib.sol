@@ -29,7 +29,7 @@ library SafeTransferLib {
         require(address(token).code.length > 0, ErrorsLib.NO_CODE);
 
         (bool success, bytes memory returndata) =
-            address(token).call(abi.encodeCall(IERC20Internal.transferFrom, (from, to, value)));
+            address(token).call(abi.encodeWithSelector(IERC20Internal.transferFrom.selector, from, to, value));
         require(success, ErrorsLib.TRANSFER_FROM_REVERTED);
         require(returndata.length == 0 || abi.decode(returndata, (bool)), ErrorsLib.TRANSFER_FROM_RETURNED_FALSE);
     }

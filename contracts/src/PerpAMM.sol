@@ -102,13 +102,15 @@ contract PerpAMM is IAMM {
         avgPrice = getBuyPrice(size);
         if (avgPrice > maxPrice) revert SlippageExceeded();
 
-        uint256 marginCost18 = (size * avgPrice) / 1e18;
-        uint256 marginCost = DECIMAL_SCALE > 1 ? marginCost18 / DECIMAL_SCALE : marginCost18;
+        uint256 marginCost = (size * avgPrice) / 1e18;
+        uint256 marginCostAdjusted = collateralDecimals < 18
+            ? marginCost / (10 ** (18 - collateralDecimals))
+            : (collateralDecimals > 18 ? marginCost * (10 ** (collateralDecimals - 18)) : marginCost);
 
-        marginBalance += marginCost;
+        marginBalance += marginCostAdjusted;
         positionBalance += size;
 
-        SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginCost);
+        SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), marginCostAdjusted);
 
         emit Bought(msg.sender, size, avgPrice, marginCost);
 
@@ -121,15 +123,17 @@ contract PerpAMM is IAMM {
         avgPrice = getSellPrice(size);
         if (avgPrice < minPrice) revert SlippageExceeded();
 
-        uint256 marginRefund18 = (size * avgPrice) / 1e18;
-        uint256 marginRefund = DECIMAL_SCALE > 1 ? marginRefund18 / DECIMAL_SCALE : marginRefund18;
+        uint256 marginRefund = (size * avgPrice) / 1e18;
+        uint256 marginRefundAdjusted = collateralDecimals < 18
+            ? marginRefund / (10 ** (18 - collateralDecimals))
+            : (collateralDecimals > 18 ? marginRefund * (10 ** (collateralDecimals - 18)) : marginRefund);
 
         if (positionBalance < size) revert InsufficientLiquidity();
 
-        marginBalance -= marginRefund;
+        marginBalance -= marginRefundAdjusted;
         positionBalance -= size;
 
-        SafeTransferLib.safeTransfer(collateralToken, msg.sender, marginRefund);
+        SafeTransferLib.safeTransfer(collateralToken, msg.sender, marginRefundAdjusted);
 
         emit Sold(msg.sender, size, avgPrice, marginRefund);
 

@@ -70,21 +70,37 @@ contract PositionManager is IPositionManager {
     // ──────────────────────────── Deposit ───────────────────────────────
 
     function deposit(uint256 amount) external {
+        _depositFor(msg.sender, amount);
+    }
+
+    function depositFor(address trader, uint256 amount) external {
+        _depositFor(trader, amount);
+    }
+
+    function _depositFor(address trader, uint256 amount) internal {
         if (amount == 0) revert ZeroAmount();
 
-        positions[msg.sender].collateral += amount;
+        positions[trader].collateral += amount;
 
-        SafeTransferLib.safeTransferFrom(collateralToken, msg.sender, address(this), amount);
+        SafeTransferLib.safeTransferFrom(collateralToken, trader, address(this), amount);
 
-        emit Deposited(msg.sender, amount);
+        emit Deposited(trader, amount);
     }
 
     // ──────────────────────────── Withdraw ──────────────────────────────
 
     function withdraw(uint256 amount) external {
+        _withdrawTo(msg.sender, amount);
+    }
+
+    function withdrawFor(address trader, uint256 amount) external {
+        _withdrawTo(trader, amount);
+    }
+
+    function _withdrawTo(address trader, uint256 amount) internal {
         if (amount == 0) revert ZeroAmount();
 
-        Types.PositionData storage pos = positions[msg.sender];
+        Types.PositionData storage pos = positions[trader];
         if (amount > pos.collateral) revert InsufficientBalance();
 
         uint256 remainingCollateral = pos.collateral - amount;
@@ -96,9 +112,9 @@ contract PositionManager is IPositionManager {
 
         pos.collateral = remainingCollateral;
 
-        SafeTransferLib.safeTransfer(collateralToken, msg.sender, amount);
+        SafeTransferLib.safeTransfer(collateralToken, trader, amount);
 
-        emit Withdrawn(msg.sender, amount);
+        emit Withdrawn(trader, amount);
     }
 
     // ──────────────────────────── Open Position ─────────────────────────
