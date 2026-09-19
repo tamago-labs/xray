@@ -9,9 +9,9 @@ contract DeployOracle is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
 
-        uint256 initialPrice = vm.envUint("INITIAL_PRICE");
-        uint256 staleness = vm.envUint("STALENESS_THRESHOLD");
-        uint256 updateDelay = vm.envUint("UPDATE_DELAY");
+        uint256 initialPrice = 500e18;
+        uint256 staleness = type(uint256).max;
+        uint256 updateDelay = 300;
 
         console.log("===========================================");
         console.log("1_DeployOracle - X Layer Testnet");
