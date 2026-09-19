@@ -293,6 +293,95 @@ contract IntegrationTest is Test {
         vm.expectRevert(Perpetual.MarketNotNormal.selector);
         perpetual.deposit(100e6);
     }
+
+    function test_SettleMarket() public {
+        address ammAddr = address(perpetual.amm());
+
+        _mintAndApprove(lp, LP_AMOUNT, ammAddr);
+        vm.prank(lp);
+        IPerpAMM(ammAddr).initializePool(LP_AMOUNT);
+
+        _mintAndApprove(trader, TRADER_AMOUNT, address(perpetual));
+        vm.prank(trader);
+        perpetual.deposit(TRADER_AMOUNT);
+
+        vm.prank(trader);
+        perpetual.openPosition(Types.Side.LONG, 5e18);
+
+        uint256 ipoPrice = 550e18;
+
+        perpetual.settle(ipoPrice);
+
+        assertEq(perpetual.settlementPrice(), ipoPrice);
+        assertEq(uint256(perpetual.getStatus()), uint256(Types.Status.SETTLED));
+    }
+
+    function test_SettlePosition() public {
+        address ammAddr = address(perpetual.amm());
+
+        _mintAndApprove(lp, LP_AMOUNT, ammAddr);
+        vm.prank(lp);
+        IPerpAMM(ammAddr).initializePool(LP_AMOUNT);
+
+        _mintAndApprove(trader, TRADER_AMOUNT, address(perpetual));
+        vm.prank(trader);
+        perpetual.deposit(TRADER_AMOUNT);
+
+        vm.prank(trader);
+        perpetual.openPosition(Types.Side.LONG, 5e18);
+
+        uint256 ipoPrice = 550e18;
+        perpetual.settle(ipoPrice);
+
+        uint256 depositBefore = perpetual.deposits(trader);
+
+        vm.prank(trader);
+        perpetual.settlePosition();
+
+        Types.PositionData memory pos = perpetual.getPosition(trader);
+        assertEq(uint256(pos.side), uint256(Types.Side.FLAT));
+
+        uint256 depositAfter = perpetual.deposits(trader);
+        assertGt(depositAfter, depositBefore);
+    }
+
+    function test_PositionBlockedAfterSettlement() public {
+        _mintAndApprove(trader, TRADER_AMOUNT, address(perpetual));
+        vm.prank(trader);
+        perpetual.deposit(TRADER_AMOUNT);
+
+        perpetual.settle(500e18);
+
+        vm.prank(trader);
+        vm.expectRevert(Perpetual.MarketSettled.selector);
+        perpetual.openPosition(Types.Side.LONG, 1e18);
+    }
+
+    function test_DepositBlockedAfterSettlement() public {
+        _mintAndApprove(trader, TRADER_AMOUNT, address(perpetual));
+
+        perpetual.settle(500e18);
+
+        vm.prank(trader);
+        vm.expectRevert(Perpetual.MarketSettled.selector);
+        perpetual.deposit(1000e6);
+    }
+
+    function test_WithdrawAfterSettlement() public {
+        _mintAndApprove(trader, TRADER_AMOUNT, address(perpetual));
+        vm.prank(trader);
+        perpetual.deposit(TRADER_AMOUNT);
+
+        perpetual.settle(500e18);
+
+        uint256 balanceBefore = collateral.balanceOf(trader);
+
+        vm.prank(trader);
+        perpetual.withdraw(5000e6);
+
+        uint256 balanceAfter = collateral.balanceOf(trader);
+        assertGt(balanceAfter, balanceBefore);
+    }
 }
 
 contract MockToken {
