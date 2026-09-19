@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// forge script script/5_MintTokens.s.sol --rpc-url $XLAYER_RPC --broadcast
+
 import {Script, console} from "forge-std/Script.sol";
 import {ERC20Mock} from "../src/mocks/ERC20Mock.sol";
 

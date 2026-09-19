@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// forge script script/3_CreateMarket.s.sol --rpc-url $XLAYER_RPC --broadcast
+
 import {Script, console} from "forge-std/Script.sol";
 import {PerpFactory} from "../src/PerpFactory.sol";
 
