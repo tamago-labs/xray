@@ -84,6 +84,7 @@ contract Perpetual is IPerpetual {
         );
     }
 
+    /// @notice Deposits collateral into the perpetual. Tokens held in contract custody.
     function deposit(uint256 amount) external onlyNormal {
         if (amount == 0) revert InvalidConfig();
 
@@ -95,6 +96,7 @@ contract Perpetual is IPerpetual {
         emit Deposited(msg.sender, amount);
     }
 
+    /// @notice Withdraws collateral. Fails if position would become undercollateralized.
     function withdraw(uint256 amount) external onlyNormal {
         if (amount == 0) revert InvalidConfig();
         if (deposits[msg.sender] < amount) revert InvalidConfig();
@@ -114,6 +116,7 @@ contract Perpetual is IPerpetual {
         emit Withdrawn(msg.sender, amount);
     }
 
+    /// @notice Opens a long or short position at the AMM's current price.
     function openPosition(Types.Side side, uint256 size) external onlyNormal {
         if (size == 0 || side == Types.Side.FLAT) revert InvalidConfig();
 
@@ -134,6 +137,7 @@ contract Perpetual is IPerpetual {
         emit PositionOpened(msg.sender, side, size, avgPrice);
     }
 
+    /// @notice Closes an open position. Settles PnL to collateral (absorbs loss or credits profit).
     function closePosition() external onlyNormal {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side == Types.Side.FLAT) revert InvalidConfig();
@@ -164,6 +168,7 @@ contract Perpetual is IPerpetual {
         pos.entryValue = 0;
     }
 
+    /// @notice Liquidates an undercollateralized position. Liquidator receives penalty from remaining collateral.
     function liquidate(address trader) external onlyNormal {
         if (!isLiquidatable(trader)) revert InvalidConfig();
 
@@ -209,6 +214,7 @@ contract Perpetual is IPerpetual {
         return status;
     }
 
+    /// @notice Returns margin ratio = (collateral + PnL) / notional. Max if no position.
     function getMarginRatio(address trader) external view returns (uint256) {
         Types.PositionData memory pos = positions[trader];
         if (pos.side == Types.Side.FLAT) return type(uint256).max;
@@ -224,6 +230,7 @@ contract Perpetual is IPerpetual {
         return (uint256(equity) * 1e18) / notional;
     }
 
+    /// @notice True if position's margin ratio is below maintenance margin threshold.
     function isLiquidatable(address trader) public view returns (bool) {
         Types.PositionData memory pos = positions[trader];
         if (pos.side == Types.Side.FLAT) return false;
@@ -257,6 +264,7 @@ contract Perpetual is IPerpetual {
         return amm.lpToken();
     }
 
+    /// @notice Pauses all trading. Only closures and withdrawals allowed in emergency.
     function declareEmergency() external onlyOwner {
         status = Types.Status.EMERGENCY;
         emit EmergencyDeclared();

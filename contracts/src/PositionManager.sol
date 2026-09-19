@@ -69,10 +69,12 @@ contract PositionManager is IPositionManager {
 
     // ──────────────────────────── Deposit ───────────────────────────────
 
+    /// @notice Deposits collateral for msg.sender.
     function deposit(uint256 amount) external {
         _depositFor(msg.sender, amount);
     }
 
+    /// @notice Deposits collateral on behalf of a specific trader (used by Perpetual).
     function depositFor(address trader, uint256 amount) external {
         _depositFor(trader, amount);
     }
@@ -89,10 +91,12 @@ contract PositionManager is IPositionManager {
 
     // ──────────────────────────── Withdraw ──────────────────────────────
 
+    /// @notice Withdraws collateral for msg.sender.
     function withdraw(uint256 amount) external {
         _withdrawTo(msg.sender, amount);
     }
 
+    /// @notice Withdraws collateral on behalf of a specific trader (used by Perpetual).
     function withdrawFor(address trader, uint256 amount) external {
         _withdrawTo(trader, amount);
     }
@@ -119,6 +123,7 @@ contract PositionManager is IPositionManager {
 
     // ──────────────────────────── Open Position ─────────────────────────
 
+    /// @notice Opens a position after checking initial margin requirement.
     function openPosition(Types.Side side, uint256 size) external {
         if (side == Types.Side.FLAT) revert WrongSide();
         if (size == 0) revert ZeroAmount();
@@ -140,6 +145,7 @@ contract PositionManager is IPositionManager {
 
     // ──────────────────────────── Close Position ────────────────────────
 
+    /// @notice Closes position and settles PnL (adds profit or subtracts loss from collateral).
     function closePosition() external {
         Types.PositionData storage pos = positions[msg.sender];
         if (pos.side == Types.Side.FLAT) revert NoPosition();
@@ -167,6 +173,7 @@ contract PositionManager is IPositionManager {
 
     // ──────────────────────────── Liquidate ─────────────────────────────
 
+    /// @notice Liquidates an undercollateralized position. Liquidator receives penalty from remaining collateral.
     function liquidate(address trader) external {
         if (!isLiquidatable(trader)) revert PositionHealthy();
 
@@ -209,6 +216,7 @@ contract PositionManager is IPositionManager {
         return positions[trader];
     }
 
+    /// @notice Returns margin ratio = (collateral + PnL) / notional. Max if no position.
     function getMarginRatio(address trader) external view returns (uint256) {
         Types.PositionData memory pos = positions[trader];
         if (pos.side == Types.Side.FLAT) return type(uint256).max;
@@ -225,6 +233,7 @@ contract PositionManager is IPositionManager {
         return (uint256(equity) * 1e18) / notional;
     }
 
+    /// @notice True if position's margin ratio is below maintenance margin threshold.
     function isLiquidatable(address trader) public view returns (bool) {
         Types.PositionData memory pos = positions[trader];
         if (pos.side == Types.Side.FLAT) return false;

@@ -51,6 +51,7 @@ contract PerpAMM is IAMM {
         lpShareToken = new LpShareToken(_shareTokenName, _shareTokenSymbol);
     }
 
+    /// @notice Initializes the pool with initial collateral. Can only be called once.
     function initializePool(uint256 marginAmount) external {
         if (marginBalance != 0) revert("pool already initialized");
         if (marginAmount == 0) revert ZeroAmount();
@@ -65,6 +66,7 @@ contract PerpAMM is IAMM {
         emit LiquidityAdded(msg.sender, marginAmount, shares);
     }
 
+    /// @notice Adds liquidity to an existing pool. Mints LP shares proportional to deposit.
     function addLiquidity(uint256 marginAmount) external {
         if (marginAmount == 0) revert ZeroAmount();
         if (marginBalance == 0) revert PoolNotInitialized();
@@ -78,6 +80,7 @@ contract PerpAMM is IAMM {
         emit LiquidityAdded(msg.sender, marginAmount, shares);
     }
 
+    /// @notice Burns LP shares and returns proportional collateral to the LP.
     function removeLiquidity(uint256 shareAmount) external {
         if (shareAmount == 0) revert ZeroAmount();
 
@@ -96,6 +99,7 @@ contract PerpAMM is IAMM {
         emit LiquidityRemoved(msg.sender, marginToReturn, shareAmount);
     }
 
+    /// @notice Buys from the pool (trader goes long). Pays collateral, receives position exposure.
     function buy(uint256 size, uint256 maxPrice) external returns (uint256 avgPrice) {
         if (size == 0) revert ZeroAmount();
 
@@ -117,6 +121,7 @@ contract PerpAMM is IAMM {
         return avgPrice;
     }
 
+    /// @notice Sells to the pool (trader goes short). Returns collateral, gains short exposure.
     function sell(uint256 size, uint256 minPrice) external returns (uint256 avgPrice) {
         if (size == 0) revert ZeroAmount();
 
@@ -140,21 +145,23 @@ contract PerpAMM is IAMM {
         return avgPrice;
     }
 
+    /// @notice Mark price = margin / position. Falls back to oracle when pool is empty.
     function getMarkPrice() public view returns (uint256) {
         if (positionBalance == 0 || marginBalance == 0) return oracle.getPrice();
         return (marginBalance * 1e18) / positionBalance;
     }
 
+    /// @notice Premium = mark price minus oracle spot price.
     function getPremium() external view returns (int256) {
         uint256 mark = getMarkPrice();
         uint256 spot = oracle.getPrice();
         return int256(mark) - int256(spot);
     }
 
+    /// @notice Buy price = oracle price + utilization premium. Rises as pool gets longer.
     function getBuyPrice(uint256 size) public view returns (uint256) {
         if (size == 0) return oracle.getPrice();
         if (marginBalance == 0) return oracle.getPrice();
-        // Price increases with pool utilization: price = oraclePrice * (1 + position/margin)
         uint256 utilization = positionBalance > 0 ? (positionBalance * 1e18) / marginBalance : 0;
         uint256 premium = utilization * 100 / 1e18; // 1% per 100% utilization
         uint256 price = oracle.getPrice() + (oracle.getPrice() * premium) / 1e18;
@@ -162,6 +169,7 @@ contract PerpAMM is IAMM {
         return price;
     }
 
+    /// @notice Sell price = oracle price - utilization discount. Falls as pool gets shorter.
     function getSellPrice(uint256 size) public view returns (uint256) {
         if (size == 0) return oracle.getPrice();
         if (marginBalance == 0) return oracle.getPrice();

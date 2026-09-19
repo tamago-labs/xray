@@ -50,6 +50,8 @@ contract FundingCalculator {
         lastUpdateTime = block.timestamp;
     }
 
+    /// @notice Updates the EMA premium and accumulates funding for the elapsed period.
+    ///         Should be called periodically (e.g. hourly) by a bot.
     function updateIndex() external {
         if (block.timestamp == lastUpdateTime) revert IndexNotUpdated();
 
@@ -57,6 +59,7 @@ contract FundingCalculator {
         int256 v0 = fundingState.premium;
         int256 lastPremium = fundingState.emaPremium;
 
+        // EMA update: vt = lastPremium + (premium - lastPremium) * alpha * n
         int256 vt = v0 - lastPremium;
         vt = (vt * int256(emaAlpha) * int256(n)) / 1e18;
         vt = lastPremium + vt;
@@ -69,6 +72,9 @@ contract FundingCalculator {
         emit IndexUpdated(block.timestamp, fundingState.premium, vt);
     }
 
+    /// @notice Returns the current funding rate based on EMA premium.
+    ///         Positive rate → longs pay shorts. Negative rate → shorts pay longs.
+    ///         Zero within the dampener band.
     function getFundingRate() public view returns (int256) {
         int256 emaPremium = fundingState.emaPremium;
         if (emaPremium > int256(fundingDampener)) {
@@ -87,6 +93,8 @@ contract FundingCalculator {
         return accumulatedFunding[trader];
     }
 
+    /// @notice Settles accumulated funding for a trader.
+    ///         Positive owed → trader receives payment. Negative → debt recorded.
     function settleFunding(address trader) external {
         int256 owed = accumulatedFunding[trader];
         if (owed == 0) return;
@@ -103,6 +111,7 @@ contract FundingCalculator {
         emit FundingSettled(trader, owed);
     }
 
+    /// @notice Internal: accrues funding over time based on current rate.
     function _accumulateFunding(uint256 n) internal {
         int256 rate = getFundingRate();
         if (rate == 0) return;
