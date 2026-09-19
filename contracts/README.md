@@ -7,7 +7,7 @@ A perpetual swap DEX for pre-IPO token prices. Trade synthetic exposure to compa
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                      Perpetual                           │
-│  (Main entry point — deposit, trade, liquidate)          │
+│  (Main entry point — deposit, trade, liquidate, settle)  │
 │                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │ PriceOracle  │  │  PerpAMM     │  │ FundingCalc   │  │
@@ -17,10 +17,8 @@ A perpetual swap DEX for pre-IPO token prices. Trade synthetic exposure to compa
 │  │ • Pyth       │  │ • Liquidity  │  │ • Settlement  │  │
 │  └──────────────┘  └──────────────┘  └───────────────┘  │
 │                                                          │
-│  ┌──────────────────────────────────────────────────┐    │
-│  │              PositionManager                      │    │
-│  │  • Margin checks  • Liquidations  • PnL          │    │
-│  └──────────────────────────────────────────────────┘    │
+│  • Position tracking  • Margin checks  • Liquidations    │
+│  • PnL settlement     • Token custody  • Emergency       │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -68,7 +66,8 @@ Main entry point. Deploys its own AMM and coordinates all components.
 - **Deposit/withdraw**: traders deposit USDC collateral
 - **Trade**: open long/short via AMM pricing
 - **Liquidate**: anyone can liquidate undercollateralized positions
-- **Emergency**: owner can pause trading or settle market
+- **Emergency**: owner can pause trading
+- **Settle & Close**: owner settles at IPO price, market permanently closes
 - **Token custody**: holds all USDC, settles PnL internally
 
 ```solidity
@@ -77,6 +76,11 @@ perpetual.deposit(10_000e6);                    // Deposit $10k
 perpetual.openPosition(Side.LONG, 5e18);         // Long 5 tokens
 perpetual.closePosition();                        // Close at current price
 perpetual.withdraw(5_000e6);                      // Withdraw profits
+
+// Settlement (after IPO)
+perpetual.settle(ipoPrice);                      // Owner settles at IPO price
+perpetual.settlePosition();                       // Trader exits at settlement price
+perpetual.withdraw(remaining);                    // Withdraw settled funds
 ```
 
 ### PositionManager (`src/PositionManager.sol`)
@@ -138,11 +142,30 @@ Standard ERC20 representing pool ownership. LPs mint shares on deposit, burn on 
 
 6. Trader closes position
    └─► perpetual.closePosition()
-       ├─► amm.getSellPrice(size) → current exit price
+       ├─► oracle.getPrice() → current exit price
        └─► settles PnL to trader's collateral
 
 7. Trader withdraws
    └─► perpetual.withdraw(amount) → USDC back to wallet
+```
+
+## Settlement Flow (After IPO)
+
+```
+1. Owner declares settlement price
+   └─► perpetual.settle(ipoPrice) → market status = SETTLED
+       └─► No new deposits or positions allowed
+
+2. Traders settle positions
+   └─► perpetual.settlePosition()
+       ├─► Calculates PnL at settlement price (not oracle)
+       └─► Credits profit or subtracts loss from collateral
+
+3. Anyone can withdraw
+   └─► perpetual.withdraw(amount) → works in SETTLED state
+
+4. LPs can remove liquidity
+   └─► amm.removeLiquidity(shares) → market is permanently closed
 ```
 
 ## Margin & Liquidation
@@ -175,7 +198,7 @@ forge test -vvvv
 forge test --gas-report
 ```
 
-**78 tests passing** across 6 suites: unit tests for each contract + full multi-contract integration tests.
+**83 tests passing** across 7 suites: unit tests for each contract + full multi-contract integration tests.
 
 ## Development
 
