@@ -29,5 +29,5 @@ interface IAMM {
 
     /// @notice Get LP share token address
     /// @return shareToken The LP share token contract
-    function shareToken() external view returns (address shareToken);
+    function lpToken() external view returns (address);
 }
