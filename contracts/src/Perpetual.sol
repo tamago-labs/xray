@@ -349,6 +349,39 @@ contract Perpetual is IPerpetual {
         return _toCollateralDecimals((pos.size * oracle.getPrice() * maintenanceMarginRate) / 1e36);
     }
 
+    /// @notice Returns a trader's unrealized PnL at current oracle price.
+    function getUnrealizedPnL(address trader) external view returns (int256) {
+        return _getPnL(positions[trader], oracle.getPrice());
+    }
+
+    /// @notice Returns a trader's equity = collateral + unrealized PnL.
+    function getEquity(address trader) external view returns (uint256) {
+        Types.PositionData memory pos = positions[trader];
+        if (pos.side == Types.Side.FLAT) return deposits[trader];
+        int256 pnl = _getPnL(pos, oracle.getPrice());
+        int256 equity = int256(pos.collateral) + pnl;
+        return equity > 0 ? uint256(equity) : 0;
+    }
+
+    /// @notice Returns position notional value = size * currentPrice.
+    function getNotionalValue(address trader) external view returns (uint256) {
+        Types.PositionData memory pos = positions[trader];
+        if (pos.side == Types.Side.FLAT) return 0;
+        return _toCollateralDecimals((pos.size * oracle.getPrice()) / 1e18);
+    }
+
+    /// @notice Returns minimum margin required to avoid liquidation.
+    function getMaintenanceMargin(address trader) external view returns (uint256) {
+        Types.PositionData memory pos = positions[trader];
+        if (pos.side == Types.Side.FLAT) return 0;
+        return _getRequiredMargin(pos);
+    }
+
+    /// @notice Returns a trader's available deposits (excludes locked margin).
+    function getDeposits(address trader) external view returns (uint256) {
+        return deposits[trader];
+    }
+
     function _getPnL(Types.PositionData memory pos, uint256 currentPrice) internal view returns (int256) {
         if (pos.side == Types.Side.FLAT) return 0;
 
