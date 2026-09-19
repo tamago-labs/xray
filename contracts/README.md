@@ -229,16 +229,6 @@ perpetual.settlePosition();                       // Trader exits at settlement 
 perpetual.withdraw(remaining);                    // Withdraw settled funds
 ```
 
-### PositionManager (`src/PositionManager.sol`)
-
-Handles margin, liquidations, and PnL tracking.
-
-- **Initial margin**: 10% (configurable)
-- **Maintenance margin**: 5% (configurable)
-- **Liquidation penalty**: 0.5% to liquidator
-- **Margin ratio**: `(collateral + PnL) / notional`
-- **Decimal-aware PnL**: converts between 18dp pricing and 6dp collateral
-
 ### FundingCalculator (`src/FundingCalculator.sol`)
 
 Funding rate mechanism to tether AMM mark price to oracle spot price.
