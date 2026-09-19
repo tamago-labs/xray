@@ -23,9 +23,7 @@ export default function Hero() {
           <Section>
               <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
                 Hyper-personalized AI for tokenized stocks on{' '}
-                <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Set your goals and risk appetite — the agent finds and explains the best{' '}
-                <a href="https://xstocks.fi/" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">xStocks</a>{' '}
-                and pre-IPO tokens for you.
+                <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell Xray what you&apos;re looking for, and it researches the market, explains the opportunities, and finds what fits you.
               </p>
           </Section>
 
@@ -33,7 +31,7 @@ export default function Hero() {
             <ul className="mt-6 space-y-2 text-[13px] text-white/35">
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />
-                Trade-ready on <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png" alt="X Layer" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">X Layer with OKX Router</span>
+                Trading-ready on <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png" alt="X Layer" className="w-4 h-4 inline-block rounded-full" /> <span className="text-accent font-semibold">X Layer + OKX Router</span>
               </li>
               <li className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent2" />

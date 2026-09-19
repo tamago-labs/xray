@@ -185,7 +185,7 @@ export default function ChatSession() {
     <div className="flex-1 flex flex-col  grid-bg overflow-hidden h-[calc(100vh-3.5rem)] relative ">
       <div className="absolute w-[500px] h-[500px] top-1/2 -translate-y-1/2 -left-48 rounded-full blur-[120px] opacity-25 bg-accent pointer-events-none" />
       <div className="absolute w-[400px] h-[400px] top-1/2 -translate-y-1/2 -right-40 rounded-full blur-[120px] opacity-25 bg-zenpurple pointer-events-none" />
-      <div className="border-b border-border3/50 px-6 py-4 relative z-10 flex items-center justify-between">
+      <div className="border-b border-border3/50 px-6 py-4 relative z-1 flex items-center justify-between">
         <h1 className="font-display text-lg font-semibold">Chat Session</h1>
         <div className="relative">
           <button
