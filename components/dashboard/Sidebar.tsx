@@ -10,10 +10,10 @@ import type { Schema } from '@/amplify/data/resource';
 import { useWallet } from '@/components/app/WalletContext';
 
 const navItems = [
+  { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
   { href: '/dashboard', label: 'New Chat', icon: MessageSquare },
   { href: '/dashboard/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/dashboard/explore', label: 'Explore', icon: Compass },
-  { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
   // { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
   { href: '/dashboard/top-news', label: 'Top News', icon: Newspaper },
 ];

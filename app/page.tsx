@@ -7,6 +7,7 @@ import HowItWorks from '@/components/landing/HowItWorks';
 import Differentiator from '@/components/landing/Differentiator';
 import CTA from '@/components/landing/CTA';
 import Pricing from '@/components/landing/Pricing';
+import FAQ from '@/components/landing/FAQ';
 import Footer from '@/components/landing/Footer';
 
 export default function Home() {
@@ -24,6 +25,7 @@ export default function Home() {
         <Problem />
         <HowItWorks />
         <Pricing />
+        <FAQ />
         <CTA />
         <Footer />
     </main>

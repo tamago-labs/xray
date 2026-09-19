@@ -22,8 +22,8 @@ export default function Hero() {
 
           <Section>
               <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
-                Hyper-personalized AI for tokenized stocks on{' '}
-                <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a>. Tell Xray what you&apos;re looking for, and it researches the market, explains the opportunities, and finds what fits you.
+                One-stop for tokenized stocks on{' '}
+                <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a> with hyper-personalized AI. Tell Xray what you&apos;re looking for, and it researches the market, explains the opportunities, and finds what fits you.
               </p>
           </Section>
 
