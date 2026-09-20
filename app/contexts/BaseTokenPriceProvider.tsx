@@ -32,7 +32,7 @@ export function BaseTokenPriceProvider({ children }: { children: ReactNode }) {
     fetchedRef.current = true;
 
     const allTokens = [...BASE_TOKENS, ...BASE_TOKENS_TESTNET];
-    const ids = [...new Set(allTokens.map((t) => t.coinmarketcapId))].join(',');
+    const ids = Array.from(new Set(allTokens.map((t) => t.coinmarketcapId))).join(',');
 
     const fetchPrices = async () => {
       try {

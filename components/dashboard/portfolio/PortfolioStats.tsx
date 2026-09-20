@@ -16,7 +16,7 @@ const themes = [
 export default function PortfolioStats() {
   const { address, chainId } = useWallet();
   const tokens = chainId === 1952 ? BASE_TOKENS_TESTNET : BASE_TOKENS;
-  const { balances } = useTokenBalances(address, chainId);
+  const { balances } = useTokenBalances(address ?? undefined, chainId ?? undefined);
   const { getPrice, getChange24h } = useBaseTokenPrices();
 
   const totalValue = tokens.reduce((sum, token) => {

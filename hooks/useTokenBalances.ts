@@ -11,7 +11,7 @@ const RPC_URLS: Record<number, string> = {
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
 
-export function useTokenBalances(address: string | undefined, chainId: number) {
+export function useTokenBalances(address: string | undefined, chainId: number | undefined) {
   const [balances, setBalances] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

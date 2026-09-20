@@ -8,7 +8,7 @@ import { useBaseTokenPrices } from '@/app/contexts/BaseTokenPriceProvider';
 export default function HoldingsList() {
   const { address, chainId } = useWallet();
   const tokens = chainId === 1952 ? BASE_TOKENS_TESTNET : BASE_TOKENS;
-  const { balances, loading } = useTokenBalances(address, chainId);
+  const { balances, loading } = useTokenBalances(address ?? undefined, chainId ?? undefined);
   const { getPrice, getChange24h, loading: pricesLoading } = useBaseTokenPrices();
 
   const holdings = tokens.map((token) => {
