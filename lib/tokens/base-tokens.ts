@@ -15,6 +15,11 @@ export const BASE_TOKENS: BaseToken[] = [
   { symbol: "OKB", name: "X Layer", decimals: 18, address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", logo: "https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png" },
 ];
 
+export const BASE_TOKENS_TESTNET: BaseToken[] = [
+  { symbol: "USDC", name: "USDC", decimals: 6, address: "0x3eF520aA55f9d4C74479038C47F41B4037e2Ba6D", logo: "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" },
+  { symbol: "OKB", name: "X Layer", decimals: 18, address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", logo: "https://s2.coinmarketcap.com/static/img/coins/64x64/3897.png" },
+];
+
 export function getBaseToken(symbol: string): BaseToken | undefined {
   return BASE_TOKENS.find((t) => t.symbol === symbol);
 }
