@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { priceTracker } from "../functions/price-tracker/resource";
 import { chatApiFunction } from "../functions/chat-api/resource";
+import { preIpoTracker } from "../functions/pre-ipo-tracker/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -25,6 +26,19 @@ const schema = a.schema({
     .secondaryIndexes((index) => [
       index("rwa_id").queryField("byRwaId"),
       index("token_symbol").queryField("byTokenSymbol"),
+    ]),
+  PreIpoSnapshot: a
+    .model({
+      symbol: a.string().required(),
+      markPrice: a.float().required(),
+      markValuation: a.float().required(),
+      impliedValuation: a.float().required(),
+    })
+    .authorization((allow) => [
+      allow.publicApiKey().to(["read"]),
+    ])
+    .secondaryIndexes((index) => [
+      index("symbol").queryField("bySymbol"),
     ]),
   AgentSession: a
     .model({
@@ -90,6 +104,7 @@ const schema = a.schema({
 }).authorization((allow) => [
   allow.resource(priceTracker),
   allow.resource(chatApiFunction),
+  allow.resource(preIpoTracker),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;

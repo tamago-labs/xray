@@ -17,6 +17,7 @@ export default function Header() {
           <Link href="/dashboard" className="hover:text-white transition-colors">Chat</Link>
           <Link href="/dashboard/explore" className="hover:text-white transition-colors">Explore</Link> 
           {/*<Link href="#how-it-works" className="hover:text-white transition-colors">How it works</Link>*/}
+          <Link href="/dashboard/portfolio" className="hover:text-white transition-colors">Portfolio</Link>
           <Link href="#faq" className="hover:text-white transition-colors">FAQ</Link>
 
         </nav>
