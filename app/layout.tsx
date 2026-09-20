@@ -25,8 +25,8 @@ const zenTokyoZen = Zen_Tokyo_Zoo({
 });
 
 export const metadata: Metadata = {
-  title: "Xray — One-Stop for Tokenized Stocks on X Layer",
-  description: "Explore tokenized stocks and pre-IPO on X Layer with Xray, your one-stop AI platform powered by frontier AI and real-time market data. Discover opportunities that fit your goals.",
+  title: "Xray — One-Stop for Tokenized Equities on X Layer",
+  description: "Explore tokenized equities and pre-IPO on X Layer with Xray, your one-stop AI platform powered by frontier AI and real-time market data. Discover opportunities that fit your goals.",
 };
 
 export default function RootLayout({

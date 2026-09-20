@@ -81,7 +81,7 @@ export function FaucetModal({ open, onClose }: FaucetModalProps) {
             ) : (
               <>
                 <p className="text-[13px] text-white/50 mb-4">
-                  Claim 1000 testnet USDC to your connected wallet. No real funds required.
+                  Claim 1000 testnet USDC to your connected wallet. Use it to trade pre-IPO tokens on Xray&apos;s prep DEX.
                 </p>
                 <button
                   onClick={handleClaim}

@@ -13,16 +13,16 @@ export default function Hero() {
         <div>
           <Section>
             <h1 className="font-display text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]">
-              Everyone sees the same tokenized stocks<br />
+              Your One-Stop for{' '}
               <span className="bg-gradient-to-r from-zenblue via-accent to-accent2 bg-clip-text text-transparent">
-                Xray makes it yours
+                Tokenized Equities
               </span>
             </h1>
           </Section>
 
           <Section>
               <p className="mt-5 text-[15px] text-white/50 leading-relaxed">
-                One-stop for tokenized stocks on{' '}
+                One-stop for tokenized equities on{' '}
                 <a href="https://web3.okx.com/xlayer" target="_blank" rel="noopener noreferrer" className="text-accent font-semibold hover:underline">X Layer</a> with hyper-personalized AI. Tell Xray what you&apos;re looking for, and it researches the market, explains the opportunities, and finds what fits you.
               </p>
           </Section>
