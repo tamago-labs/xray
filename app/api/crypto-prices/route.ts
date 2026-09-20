@@ -1,5 +1,7 @@
+import getConfig from "next/config";
 import { NextRequest, NextResponse } from 'next/server';
 
+const { serverRuntimeConfig } = getConfig();
 const CMC_API_URL = 'https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest';
 
 export async function GET(request: NextRequest) {
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     url.searchParams.set('convert', 'USD');
     const res = await fetch(url.toString(), {
       headers: {
-        'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY || '',
+        'X-CMC_PRO_API_KEY': serverRuntimeConfig.CMC_API_KEY || process.env.CMC_API_KEY || '',
         'Accept': 'application/json',
       },
     });

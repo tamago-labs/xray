@@ -1,9 +1,11 @@
 import crypto from "crypto";
+import getConfig from "next/config";
 import { NextRequest, NextResponse } from "next/server";
 
-const OKX_API_KEY = process.env.OKX_API_KEY;
-const OKX_SECRET_KEY = process.env.OKX_SECRET_KEY;
-const OKX_PASSPHRASE = process.env.OKX_PASSPHRASE;
+const { serverRuntimeConfig } = getConfig();
+const OKX_API_KEY = serverRuntimeConfig.OKX_API_KEY || process.env.OKX_API_KEY;
+const OKX_SECRET_KEY = serverRuntimeConfig.OKX_SECRET_KEY || process.env.OKX_SECRET_KEY;
+const OKX_PASSPHRASE = serverRuntimeConfig.OKX_PASSPHRASE || process.env.OKX_PASSPHRASE;
 const BASE_URL = "https://web3.okx.com/api/v6/dex/aggregator/get-liquidity";
 
 let cachedLogos: Record<string, string> | null = null;
