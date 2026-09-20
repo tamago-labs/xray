@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wallet, ChevronDown, ExternalLink, Copy, LogOut, Check } from "lucide-react";
+import { Wallet, ChevronDown, ExternalLink, Copy, LogOut, Check, Droplets } from "lucide-react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 import { CreditsModal } from "./CreditsModal";
 import { WalletModal } from "../app/WalletModal";
+import { FaucetModal } from "./FaucetModal";
 import { useWallet } from "../app/WalletContext";
 import { truncateAddress } from "@/lib/wallet";
 import { X_LAYER, SUPPORTED_CHAINS } from "@/lib/chains";
@@ -46,6 +47,7 @@ export default function Topbar() {
   const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [creditsModalOpen, setCreditsModalOpen] = useState(false);
+  const [faucetModalOpen, setFaucetModalOpen] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -275,6 +277,13 @@ export default function Topbar() {
                 {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5 text-white/25" />}
               </button>
               <button
+                onClick={() => { setFaucetModalOpen(true); setPopoverOpen(false); }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-white/60 hover:text-white hover:bg-white/[0.03] transition-colors"
+              >
+                <Droplets className="w-3.5 h-3.5" />
+                <span>Faucet</span>
+              </button>
+              <button
                 onClick={() => { disconnect(); setPopoverOpen(false); }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-[13px] text-red-400 hover:bg-red-500/5 transition-colors border-t border-border3/30"
               >
@@ -288,6 +297,7 @@ export default function Topbar() {
 
       <WalletModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
       <CreditsModal open={creditsModalOpen} onClose={() => setCreditsModalOpen(false)} />
+      <FaucetModal open={faucetModalOpen} onClose={() => setFaucetModalOpen(false)} />
     </header>
   );
 }

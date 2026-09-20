@@ -68,7 +68,7 @@ export default function HoldingsList() {
                   <span className={h.change >= 0 ? 'text-accent2' : 'text-warn2'}>
                     {h.change >= 0 ? '+' : ''}{h.change.toFixed(1)}%
                   </span>
-                  {' · '}${h.price.toFixed(2)}
+                  {' · '}${h.price < 1 ? h.price.toFixed(6) : h.price.toFixed(2)}
                 </p>
               </div>
             </div>
