@@ -3,6 +3,7 @@ import { Space_Grotesk, Inter, Zen_Tokyo_Zoo } from "next/font/google";
 import ConfigureAmplify from "@/components/ConfigureAmplify";
 import { WalletProvider } from "@/components/app/WalletContext";
 import { PriceProvider } from "./contexts/PriceContext";
+import { BaseTokenPriceProvider } from "./contexts/BaseTokenPriceProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body className="font-sans">
         <ConfigureAmplify>
           <WalletProvider>
-            <PriceProvider>{children}</PriceProvider>
+            <PriceProvider>
+              <BaseTokenPriceProvider>{children}</BaseTokenPriceProvider>
+            </PriceProvider>
           </WalletProvider>
         </ConfigureAmplify>
       </body>

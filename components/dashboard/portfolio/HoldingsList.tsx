@@ -3,34 +3,29 @@
 import { BASE_TOKENS, BASE_TOKENS_TESTNET } from '@/lib/tokens/base-tokens';
 import { useWallet } from '@/components/app/WalletContext';
 import { useTokenBalances } from '@/hooks/useTokenBalances';
-
-const mockPrices: Record<string, { price: number; change: number }> = {
-  ETH: { price: 2580.00, change: 5.2 },
-  SOL: { price: 378.00, change: 2.1 },
-  USDC: { price: 1.00, change: 0.0 },
-  USDT: { price: 1.00, change: 0.0 },
-  OKB: { price: 602.22, change: 0.9 },
-};
+import { useBaseTokenPrices } from '@/app/contexts/BaseTokenPriceProvider';
 
 export default function HoldingsList() {
   const { address, chainId } = useWallet();
   const tokens = chainId === 1952 ? BASE_TOKENS_TESTNET : BASE_TOKENS;
   const { balances, loading } = useTokenBalances(address, chainId);
+  const { getPrice, getChange24h, loading: pricesLoading } = useBaseTokenPrices();
 
   const holdings = tokens.map((token) => {
     const balance = parseFloat(balances[token.symbol] ?? '0');
-    const priceData = mockPrices[token.symbol] ?? { price: 0, change: 0 };
+    const price = getPrice(token.symbol);
     return {
       symbol: token.symbol,
       name: token.name,
       logo: token.logo,
       balance,
-      value: balance * priceData.price,
-      change: priceData.change,
+      value: balance * price,
+      price,
+      change: getChange24h(token.symbol),
     };
   });
 
-  if (loading) {
+  if (loading || pricesLoading) {
     return (
       <div className="flex-1 min-h-0 overflow-y-auto">
         <h3 className="text-[14px] font-semibold mb-4">Holdings</h3>
@@ -71,9 +66,9 @@ export default function HoldingsList() {
                 <p className="text-[13px] font-medium text-white/80">${h.value.toLocaleString()}</p>
                 <p className="text-[11px] text-white/40">
                   <span className={h.change >= 0 ? 'text-accent2' : 'text-warn2'}>
-                    {h.change >= 0 ? '+' : ''}{h.change}%
+                    {h.change >= 0 ? '+' : ''}{h.change.toFixed(1)}%
                   </span>
-                  {' · '}${(h.value / h.balance).toFixed(2)}
+                  {' · '}${h.price.toFixed(2)}
                 </p>
               </div>
             </div>
