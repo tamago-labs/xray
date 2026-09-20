@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// forge script script/3_CreateMarket.s.sol --rpc-url $XLAYER_RPC --broadcast
+// forge script script/3_CreateMarket.s.sol --rpc-url https://testrpc.xlayer.tech --broadcast
 
 import {Script, console} from "forge-std/Script.sol";
 import {PerpFactory} from "../src/PerpFactory.sol";
@@ -15,11 +15,11 @@ contract CreateMarket is Script {
         address usdcAddr = vm.envAddress("USDC_ADDRESS");
         address oracleAddr = vm.envAddress("ORACLE_ADDRESS");
 
-        string memory name = vm.envString("MARKET_NAME");
-        string memory symbol = vm.envString("MARKET_SYMBOL");
-        uint256 initialMargin = vm.envUint("INITIAL_MARGIN");
-        uint256 maintenanceMargin = vm.envUint("MAINTENANCE_MARGIN");
-        uint256 liquidationPenalty = vm.envUint("LIQUIDATION_PENALTY");
+        string memory name = "OpenAI Pre-IPO Xray";
+        string memory symbol = "OpenAI";
+        uint256 initialMargin = 0.1e18;
+        uint256 maintenanceMargin = 0.05e18;
+        uint256 liquidationPenalty = 0.005e18;
 
         console.log("===========================================");
         console.log("3_CreateMarket - X Layer Testnet");

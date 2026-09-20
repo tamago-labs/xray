@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// forge script script/6_ProvideLiquidity.s.sol --rpc-url $XLAYER_RPC --broadcast
+// forge script script/6_ProvideLiquidity.s.sol --rpc-url https://testrpc.xlayer.tech --broadcast
 
 import {Script, console} from "forge-std/Script.sol";
 import {PerpAMM} from "../src/PerpAMM.sol";
@@ -10,12 +10,12 @@ import {IERC20} from "../src/interfaces/IERC20.sol";
 
 contract ProvideLiquidity is Script {
     function run() external {
-        uint256 lpPrivateKey = vm.envUint("LP_PRIVATE_KEY");
+        uint256 lpPrivateKey = vm.envUint("PRIVATE_KEY");
         address lp = vm.addr(lpPrivateKey);
 
         address perpetualAddr = vm.envAddress("PERPETUAL_ADDRESS");
         address usdcAddr = vm.envAddress("USDC_ADDRESS");
-        uint256 amount = vm.envUint("LIQUIDITY_AMOUNT");
+        uint256 amount = 10000e6;
 
         console.log("===========================================");
         console.log("6_ProvideLiquidity - X Layer Testnet");

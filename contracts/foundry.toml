@@ -5,7 +5,7 @@ names = true
 sizes = true
 via_ir = true
 optimizer = true
-optimizer_runs = 999999
+optimizer_runs = 1
 bytecode_hash = "none"
 evm_version = "london"
 

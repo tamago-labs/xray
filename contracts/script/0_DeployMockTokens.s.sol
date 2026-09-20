@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Script, console} from "forge-std/Script.sol";
 import {ERC20Mock} from "../src/mocks/ERC20Mock.sol";
 
-// forge script script/0_DeployMockTokens.s.sol --rpc-url $XLAYER_RPC --broadcast
+// forge script script/0_DeployMockTokens.s.sol --rpc-url https://testrpc.xlayer.tech --broadcast
 
 contract DeployMockTokens is Script {
     function run() external {

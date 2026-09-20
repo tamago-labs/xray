@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// forge script script/4_InitializeMarket.s.sol --rpc-url $XLAYER_RPC --broadcast
+// forge script script/4_InitializeMarket.s.sol --rpc-url https://testrpc.xlayer.tech --broadcast
 
 import {Script, console} from "forge-std/Script.sol";
 import {Perpetual} from "../src/Perpetual.sol";
