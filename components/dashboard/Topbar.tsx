@@ -240,7 +240,7 @@ export default function Topbar() {
             >
               {!isCorrectChain && (
                 <button
-                  onClick={() => { void switchChain(X_LAYER.id); }}
+                  onClick={() => { void switchChain(X_LAYER.id); setPopoverOpen(false); }}
                   className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-yellow-400 hover:bg-yellow-500/5 transition-colors"
                 >
                   <span>Switch to {X_LAYER.name}</span>
@@ -253,7 +253,7 @@ export default function Topbar() {
                     {SUPPORTED_CHAINS.map((chain) => (
                       <button
                         key={chain.id}
-                        onClick={() => { void switchChain(chain.id); }}
+                        onClick={() => { void switchChain(chain.id); setPopoverOpen(false); }}
                         className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
                           chainId === chain.id
                             ? "bg-white/[0.06] text-white/80"

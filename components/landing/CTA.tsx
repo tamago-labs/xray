@@ -16,7 +16,7 @@ export default function CTA() {
                 Get in before the IPO
               </h2>
               <p className="mt-4 text-[15px] text-white/45">
-                Your one-stop AI platform for tokenized stocks and pre-IPO markets. Trade tokens like OpenAI before they hit the market. Real pricing, settled on X Layer.
+                Your one-stop AI platform for tokenized stocks and pre-IPO markets. Trade tokens like OpenAI, Anthropic before they hit the market. Real pricing, settled on X Layer.
               </p>
               <div className="mt-8 flex items-center justify-center gap-4">
                 <Link
