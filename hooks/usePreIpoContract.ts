@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { ethers } from 'ethers';
-import { PERPETUAL_ABI, ERC20_ABI, AMM_ABI, SIDE } from '@/lib/pre-ipo/contracts';
+import { PERPETUAL_ABI, ERC20_ABI, AMM_ABI, ORACLE_ABI, SIDE } from '@/lib/pre-ipo/contracts';
 
 export interface Position {
   collateral: bigint;
@@ -15,22 +15,20 @@ export interface Position {
 
 export interface PreIpoContractState {
   position: Position | null;
-  unrealizedPnL: bigint;
   equity: bigint;
   deposits: bigint;
-  markPrice: bigint;
   collateralDecimals: number;
   collateralSymbol: string;
   isLiquidatable: boolean;
   status: number;
   initialMarginRate: bigint;
   maintenanceMarginRate: bigint;
-  marginRatio: bigint;
   maintenanceMargin: bigint;
-  notionalValue: bigint;
   poolMargin: bigint;
   poolPosition: bigint;
-  premium: bigint;
+  oraclePrice: bigint;
+  tokenPrice: number;
+  premiumPercent: number;
   loading: boolean;
 }
 
@@ -54,51 +52,63 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
       const collateral = getContract(collateralTokenAddr, ERC20_ABI, provider);
       const amm = getContract(ammAddr, AMM_ABI, provider);
 
-      const [markPrice, status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol, poolBalances, premium] =
+      const [status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol, poolBalances, oracleAddr] =
         await Promise.all([
-          perpetual.getMarkPrice(),
           perpetual.getStatus(),
           perpetual.initialMarginRate(),
           perpetual.maintenanceMarginRate(),
           collateral.decimals(),
           collateral.symbol(),
           amm.getPoolBalances(),
-          amm.getPremium(),
+          perpetual.oracle(),
         ]);
+
+      const oracle = getContract(oracleAddr, ORACLE_ABI, provider);
+      const oraclePrice = await oracle.getPrice();
+
+      let tokenPrice = 0;
+      try {
+        const price1Unit = await amm.getBuyPrice(BigInt(1e18));
+        const rawPrice = Number(price1Unit);
+        tokenPrice = rawPrice > 0 && rawPrice < 1e12
+          ? rawPrice / 1e6
+          : rawPrice / 1e18;
+      } catch { /* use 0 */ }
+
+      let premiumPercent = 0;
+      const oraclePriceNum = Number(oraclePrice) / 1e18;
+      if (oraclePriceNum > 0 && tokenPrice > 0) {
+        premiumPercent = ((tokenPrice - oraclePriceNum) / oraclePriceNum) * 100;
+      }
 
       if (!userAddress) {
         return {
           position: null,
-          unrealizedPnL: BigInt(0),
           equity: BigInt(0),
           deposits: BigInt(0),
-          markPrice,
           collateralDecimals: Number(collateralDecimals),
           collateralSymbol,
           isLiquidatable: false,
           status: Number(status),
           initialMarginRate,
           maintenanceMarginRate,
-          marginRatio: BigInt(0),
           maintenanceMargin: BigInt(0),
-          notionalValue: BigInt(0),
           poolMargin: poolBalances.margin,
           poolPosition: poolBalances.position,
-          premium,
+          oraclePrice,
+          tokenPrice,
+          premiumPercent,
           loading: false,
         };
       }
 
-      const [position, unrealizedPnL, equity, deposits, isLiquidatable, marginRatio, maintenanceMargin, notionalValue] =
+      const [position, equity, deposits, isLiquidatable, maintenanceMargin] =
         await Promise.all([
           perpetual.getPosition(userAddress),
-          perpetual.getUnrealizedPnL(userAddress),
           perpetual.getEquity(userAddress),
           perpetual.getDeposits(userAddress),
           perpetual.isLiquidatable(userAddress),
-          perpetual.getMarginRatio(userAddress),
           perpetual.getMaintenanceMargin(userAddress),
-          perpetual.getNotionalValue(userAddress),
         ]);
 
       return {
@@ -110,22 +120,20 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
           socialLoss: position.socialLoss,
           fundingLoss: position.fundingLoss,
         },
-        unrealizedPnL,
         equity,
         deposits,
-        markPrice,
         collateralDecimals: Number(collateralDecimals),
         collateralSymbol,
         isLiquidatable,
         status: Number(status),
         initialMarginRate,
         maintenanceMarginRate,
-        marginRatio,
         maintenanceMargin,
-        notionalValue,
         poolMargin: poolBalances.margin,
         poolPosition: poolBalances.position,
-        premium,
+        oraclePrice,
+        tokenPrice,
+        premiumPercent,
         loading: false,
       };
     },
@@ -133,16 +141,22 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
   );
 
   const fetchExecutionPrice = useCallback(
-    async (provider: ethers.Provider, side: 'long' | 'short', size: bigint): Promise<bigint> => {
+    async (provider: ethers.Provider, side: 'long' | 'short', size: bigint): Promise<number> => {
       const perpetual = getContract(perpetualAddress, PERPETUAL_ABI, provider);
       const ammAddr = await perpetual.amm();
       const amm = getContract(ammAddr, AMM_ABI, provider);
 
+      let price: bigint;
       if (side === 'long') {
-        return await amm.getBuyPrice(size);
+        price = await amm.getBuyPrice(size);
       } else {
-        return await amm.getSellPrice(size);
+        price = await amm.getSellPrice(size);
       }
+
+      const rawPrice = Number(price);
+      return rawPrice > 0 && rawPrice < 1e12
+        ? rawPrice / 1e6
+        : rawPrice / 1e18;
     },
     [perpetualAddress, getContract]
   );

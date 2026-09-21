@@ -53,6 +53,10 @@ export const ERC20_ABI = [
   'function symbol() view returns (string)',
 ] as const;
 
+export const ORACLE_ABI = [
+  'function getPrice() view returns (uint256)',
+] as const;
+
 export interface PreIpoAsset {
   name: string;
   symbol: string;

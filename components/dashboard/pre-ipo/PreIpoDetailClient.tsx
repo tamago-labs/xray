@@ -13,15 +13,16 @@ import FundPanel from '@/components/pre-ipo/FundPanel';
 import TradePanel from '@/components/pre-ipo/TradePanel';
 import PositionsTable from '@/components/pre-ipo/PositionCard';
 import PriceChart from '@/components/pre-ipo/PriceChart';
-import AccountStats from '@/components/pre-ipo/AccountStats';
-import PoolStats from '@/components/pre-ipo/PoolStats';
+import MarketStats from '@/components/pre-ipo/MarketStats';
 
 const client = generateClient<Schema>();
 
-interface Snapshot {
-  createdAt?: string;
-  markPrice: number;
-}
+  interface Snapshot {
+    createdAt?: string;
+    markPrice: number;
+    markValuation: number;
+    impliedValuation: number;
+  }
 
 export default function PreIpoDetailClient({ slug }: { slug: string }) {
   const asset = getAssetBySlug(slug);
@@ -31,6 +32,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
 
   const {
     fetchState,
+    fetchExecutionPrice,
     deposit,
     withdraw,
     openPosition,
@@ -41,22 +43,20 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
 
   const [state, setState] = useState<{
     position: { collateral: bigint; side: number; size: bigint; entryValue: bigint; socialLoss: bigint; fundingLoss: bigint } | null;
-    unrealizedPnL: bigint;
     equity: bigint;
     deposits: bigint;
-    markPrice: bigint;
     collateralDecimals: number;
     collateralSymbol: string;
     isLiquidatable: boolean;
     status: number;
     initialMarginRate: bigint;
     maintenanceMarginRate: bigint;
-    marginRatio: bigint;
     maintenanceMargin: bigint;
-    notionalValue: bigint;
     poolMargin: bigint;
     poolPosition: bigint;
-    premium: bigint;
+    oraclePrice: bigint;
+    tokenPrice: number;
+    premiumPercent: number;
     loading: boolean;
   } | null>(null);
 
@@ -71,6 +71,8 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
         setSnapshots(data.map((s) => ({
           createdAt: s.createdAt ?? undefined,
           markPrice: s.markPrice,
+          markValuation: s.markValuation,
+          impliedValuation: s.impliedValuation,
         })));
       } catch (err) {
         console.error('[PreIpoDetail] fetch error:', err);
@@ -112,6 +114,12 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
   }
 
   const hasPosition = state?.position && state.position.size > BigInt(0);
+  const latestSnapshot = snapshots[snapshots.length - 1];
+  const dbMarkPrice = latestSnapshot?.markPrice ?? 0;
+  const tokenPrice = state?.tokenPrice ?? 0;
+  const displayPremium = dbMarkPrice > 0 && tokenPrice > 0
+    ? ((tokenPrice - dbMarkPrice) / dbMarkPrice) * 100
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -145,23 +153,24 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             {asset.employees && (
               <span className="text-[12px] text-white/30">{asset.employees} employees</span>
             )}
-            {state && (
-              <span className="text-[13px] text-white/60">
-                ${Number(state.markPrice) / 1e18 > 0
-                  ? (Number(state.markPrice) / 1e18).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                  : '—'}
-              </span>
-            )}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
           <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Mark Price</p>
           <p className="text-[18px] font-semibold text-white/90">
-            {state?.markPrice && state.markPrice > BigInt(0)
-              ? `$${(Number(state.markPrice) / 1e18).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            {dbMarkPrice > 0
+              ? `$${dbMarkPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : '—'}
+          </p>
+        </div>
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Token Price</p>
+          <p className="text-[18px] font-semibold text-white/90">
+            {state?.tokenPrice && state.tokenPrice > 0
+              ? `$${state.tokenPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
               : '—'}
           </p>
         </div>
@@ -182,13 +191,10 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
           <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Premium</p>
           <p className={`text-[18px] font-semibold ${
-            state && state.premium !== BigInt(0)
-              ? state.premium > BigInt(0) ? 'text-accent2' : 'text-warn2'
-              : 'text-white/40'
+            !state ? 'text-white/20' :
+            displayPremium > 0 ? 'text-warn2' : displayPremium < 0 ? 'text-accent2' : 'text-white/40'
           }`}>
-            {state && state.premium !== BigInt(0)
-              ? `${state.premium > BigInt(0) ? '+' : ''}${(Number(state.premium) / 1e18).toFixed(4)}%`
-              : '—'}
+            {!state ? '...' : `${displayPremium > 0 ? '+' : ''}${displayPremium.toFixed(4)}%`}
           </p>
         </div>
       </div>
@@ -208,39 +214,36 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
           />
 
           <TradePanel
-            markPrice={state?.markPrice ?? BigInt(0)}
+            markPrice={dbMarkPrice}
             collateralSymbol={state?.collateralSymbol ?? 'USDC'}
             initialMarginRate={state?.initialMarginRate ?? BigInt(0)}
             onOpenPosition={openPosition}
+            getExecutionPrice={(side, size) => fetchExecutionPrice(provider!, side, size)}
             loading={contractLoading}
             status={state?.status ?? 0}
-            notionalValue={state?.notionalValue ?? BigInt(0)}
           />
 
-          <AccountStats
+          <MarketStats
             equity={state?.equity ?? BigInt(0)}
             deposits={state?.deposits ?? BigInt(0)}
-            marginRatio={state?.marginRatio ?? BigInt(0)}
             maintenanceMargin={state?.maintenanceMargin ?? BigInt(0)}
-            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
+            poolMargin={state?.poolMargin ?? BigInt(0)}
+            poolPosition={state?.poolPosition ?? BigInt(0)}
+            markPrice={dbMarkPrice}
+            markValuation={latestSnapshot?.markValuation ?? 0}
+            impliedValuation={latestSnapshot?.impliedValuation ?? 0}
+            collateralSymbol={state?.collateralSymbol ?? 'USDC'}
             hasPosition={!!hasPosition}
+            positionSize={state?.position?.size ?? BigInt(0)}
           />
         </div>
         <div className="col-span-3 space-y-4">
           <PositionsTable
             position={state?.position ?? null}
-            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
-            markPrice={state?.markPrice ?? BigInt(0)}
+            markPrice={dbMarkPrice}
             loading={!state}
             onClosePosition={handleClosePosition}
             txPending={txPending}
-          />
-
-          <PoolStats
-            poolMargin={state?.poolMargin ?? BigInt(0)}
-            poolPosition={state?.poolPosition ?? BigInt(0)}
-            premium={state?.premium ?? BigInt(0)}
-            collateralSymbol={state?.collateralSymbol ?? 'USDC'}
           />
 
           <PriceChart symbol={asset.symbol} data={snapshots} interval="1h" />

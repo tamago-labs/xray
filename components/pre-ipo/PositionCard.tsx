@@ -5,8 +5,7 @@ import type { Position } from '@/hooks/usePreIpoContract';
 
 interface PositionsTableProps {
   position: Position | null;
-  unrealizedPnL: bigint;
-  markPrice: bigint;
+  markPrice: number;
   loading: boolean;
   onClosePosition: () => void;
   txPending: boolean;
@@ -14,20 +13,11 @@ interface PositionsTableProps {
 
 export default function PositionsTable({
   position,
-  unrealizedPnL,
   markPrice,
   loading,
   onClosePosition,
   txPending,
 }: PositionsTableProps) {
-  const pnlNum = useMemo(() => {
-    const raw = Number(unrealizedPnL);
-    const sign = raw >= 0 ? 1 : -1;
-    const absValBigInt = raw >= 0 ? unrealizedPnL : -unrealizedPnL;
-    const intPart = Number(absValBigInt / BigInt(1e18));
-    const fracPart = Number(absValBigInt % BigInt(1e18)) / 1e18;
-    return sign * (intPart + fracPart);
-  }, [unrealizedPnL]);
 
   if (loading) {
     return (
@@ -49,10 +39,12 @@ export default function PositionsTable({
 
   const isLong = position.side === 1;
   const sizeNum = Number(position.size) / 1e18;
-  const entryPrice = position.entryValue > BigInt(0) && position.size > BigInt(0)
-    ? Number(position.entryValue) / Number(position.size) / 1e18
+  const entryPrice = position.entryValue > BigInt(0)
+    ? Number(position.entryValue) / 1e18
     : 0;
-  const markPriceNum = Number(markPrice) / 1e18;
+  const markPriceNum = markPrice;
+
+  const pnlNum = (markPriceNum - entryPrice) * sizeNum;
   const pnlIsPositive = pnlNum >= 0;
 
   const pnlPercent = entryPrice > 0

@@ -7,27 +7,29 @@ import { useWallet } from '@/components/app/WalletContext';
 import { SIDE } from '@/lib/pre-ipo/contracts';
 
 interface TradePanelProps {
-  markPrice: bigint;
+  markPrice: number;
   collateralSymbol: string;
   initialMarginRate: bigint;
   onOpenPosition: (signer: ethers.Signer, side: 'long' | 'short', size: bigint) => Promise<string>;
+  getExecutionPrice: (side: 'long' | 'short', size: bigint) => Promise<number>;
   loading: boolean;
   status: number;
-  notionalValue?: bigint;
 }
 
-const LEVERAGE_OPTIONS = [1, 2, 3, 5, 10];
+const LEVERAGE_OPTIONS = [1, 2, 3, 5];
 
 export default function TradePanel({
   markPrice,
   collateralSymbol,
   initialMarginRate,
   onOpenPosition,
+  getExecutionPrice,
   loading,
   status,
 }: TradePanelProps) {
   const [executionPrice, setExecutionPrice] = useState<number | null>(null);
   const [slippage, setSlippage] = useState<number | null>(null);
+  const [priceLoading, setPriceLoading] = useState(false);
   const { isConnected, signer, isCorrectChain, switchChain } = useWallet();
   const [side, setSide] = useState<'long' | 'short'>('long');
   const [sizeInput, setSizeInput] = useState('');
@@ -35,9 +37,7 @@ export default function TradePanel({
   const [txPending, setTxPending] = useState(false);
   const [txError, setTxError] = useState<string | null>(null);
 
-  const markPriceNum = useMemo(() => {
-    return Number(markPrice) / 1e18;
-  }, [markPrice]);
+  const markPriceNum = markPrice;
 
   const marginRate = useMemo(() => {
     return Number(initialMarginRate) / 1e18;
@@ -49,15 +49,23 @@ export default function TradePanel({
 
   useEffect(() => {
     if (sizeNum > 0 && markPriceNum > 0) {
-      const estPrice = notionalValue / sizeNum;
-      setExecutionPrice(estPrice);
-      const slippagePercent = ((estPrice - markPriceNum) / markPriceNum) * 100;
-      setSlippage(slippagePercent);
+      setPriceLoading(true);
+      const size = ethers.parseUnits(sizeInput, 18);
+      getExecutionPrice(side, size)
+        .then((price) => {
+          setExecutionPrice(price);
+          setSlippage(((price - markPriceNum) / markPriceNum) * 100);
+        })
+        .catch(() => {
+          setExecutionPrice(null);
+          setSlippage(null);
+        })
+        .finally(() => setPriceLoading(false));
     } else {
       setExecutionPrice(null);
       setSlippage(null);
     }
-  }, [sizeInput, sizeNum, markPriceNum, notionalValue]);
+  }, [sizeInput, sizeNum, side, markPriceNum, getExecutionPrice]);
 
   const handleOpenPosition = async () => {
     if (!sizeInput || !signer) return;
@@ -178,7 +186,14 @@ export default function TradePanel({
         </div>
       </div>
 
-      {executionPrice !== null && (
+      {priceLoading ? (
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3">
+          <div className="flex items-center gap-2 text-[12px] text-white/40">
+            <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
+            Fetching price...
+          </div>
+        </div>
+      ) : executionPrice !== null ? (
         <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 space-y-1.5">
           <div className="flex justify-between text-[12px]">
             <span className="text-white/40">Est. Price</span>
@@ -191,7 +206,7 @@ export default function TradePanel({
             </span>
           </div>
         </div>
-      )}
+      ) : null}
 
       <button
         onClick={handleOpenPosition}
