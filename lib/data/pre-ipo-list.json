@@ -3,7 +3,7 @@
   "count": 5,
   "assets": [
     {
-      "name": "Anduril PreStocks",
+      "name": "Anduril Pre-IPO",
       "symbol": "ANDURIL",
       "slug": "anduril",
       "website": "https://www.anduril.com",
@@ -16,7 +16,7 @@
       "perpetual": "0x285946aDE58B2265EBe206834dDF461e5BeE2e3d"
     },
     {
-      "name": "Anthropic PreStocks",
+      "name": "Anthropic Pre-IPO",
       "symbol": "ANTHROPIC",
       "slug": "anthropic",
       "website": "https://www.anthropic.com",
@@ -29,7 +29,7 @@
       "perpetual": "0xD1AA8df2E2836E28796DB9b684B4EC2F82e4083E"
     },
     {
-      "name": "Kalshi PreStocks",
+      "name": "Kalshi Pre-IPO",
       "symbol": "KALSHI",
       "slug": "kalshi",
       "website": "https://kalshi.com",
@@ -42,7 +42,7 @@
       "perpetual": "0xBD7a39619d12d4c6781c2fc211A78bE19d750DD4"
     },
     {
-      "name": "Neuralink PreStocks",
+      "name": "Neuralink Pre-IPO",
       "symbol": "NEURALINK",
       "slug": "neuralink",
       "website": "https://neuralink.com",
@@ -55,7 +55,7 @@
       "perpetual": "0x7dd76e01D574d54Fe64adCaaC32F838B434Aa615"
     },
     {
-      "name": "OpenAI PreStocks",
+      "name": "OpenAI Pre-IPO",
       "symbol": "OPENAI",
       "slug": "openai",
       "website": "https://openai.com",
