@@ -12,6 +12,7 @@ interface TradePanelProps {
   initialMarginRate: bigint;
   onOpenPosition: (signer: ethers.Signer, side: 'long' | 'short', size: bigint) => Promise<string>;
   getExecutionPrice: (side: 'long' | 'short', size: bigint) => Promise<number>;
+  hasPosition: boolean;
   loading: boolean;
   status: number;
 }
@@ -24,6 +25,7 @@ export default function TradePanel({
   initialMarginRate,
   onOpenPosition,
   getExecutionPrice,
+  hasPosition,
   loading,
   status,
 }: TradePanelProps) {
@@ -168,6 +170,14 @@ export default function TradePanel({
           ))}
         </div>
       </div>
+
+      {hasPosition && (
+        <div className="bg-warn2/10 border border-warn2/20 rounded-xl p-3">
+          <p className="text-[12px] text-warn2/80">
+            You have an open position. Close it before opening a new one.
+          </p>
+        </div>
+      )}
 
       <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-3 space-y-1.5">
         <div className="flex justify-between text-[12px]">

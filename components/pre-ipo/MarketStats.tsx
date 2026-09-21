@@ -21,6 +21,7 @@ interface MarketStatsProps {
   collateralSymbol: string;
   hasPosition: boolean;
   positionSize: bigint;
+  maintenanceMarginRate: number;
 }
 
 export default function MarketStats({
@@ -35,12 +36,13 @@ export default function MarketStats({
   collateralSymbol,
   hasPosition,
   positionSize,
+  maintenanceMarginRate,
 }: MarketStatsProps) {
   const collateralDecimals = 6;
   const decimals = Math.pow(10, collateralDecimals);
   const equityNum = Number(equity) / decimals;
   const depositsNum = Number(deposits) / decimals;
-  const maintMarginNum = Number(maintenanceMargin) / decimals;
+  const maintMarginNum = Number(maintenanceMargin) / 1e18;
   const poolMarginNum = Number(poolMargin) / decimals;
   const poolPositionNum = Number(poolPosition) / 1e18;
 
@@ -52,11 +54,12 @@ export default function MarketStats({
 
   const riskLevel = useMemo(() => {
     if (!hasPosition) return { label: 'None', color: 'text-white/30' };
-    if (marginRatioPercent > 0.5) return { label: 'Low', color: 'text-accent2' };
-    if (marginRatioPercent > 0.25) return { label: 'Medium', color: 'text-yellow-400' };
-    if (marginRatioPercent > 0.15) return { label: 'High', color: 'text-orange-400' };
+    const distanceFromMaintenance = marginRatioPercent - maintenanceMarginRate;
+    if (distanceFromMaintenance > 0.10) return { label: 'Low', color: 'text-accent2' };
+    if (distanceFromMaintenance > 0.05) return { label: 'Medium', color: 'text-yellow-400' };
+    if (distanceFromMaintenance > 0.02) return { label: 'High', color: 'text-orange-400' };
     return { label: 'Danger', color: 'text-warn2' };
-  }, [hasPosition, marginRatioPercent]);
+  }, [hasPosition, marginRatioPercent, maintenanceMarginRate]);
 
   return (
     <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4">
@@ -91,11 +94,11 @@ export default function MarketStats({
               <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
-                    marginRatioPercent > 0.5 ? 'bg-accent2' :
-                    marginRatioPercent > 0.25 ? 'bg-yellow-400' :
-                    marginRatioPercent > 0.15 ? 'bg-orange-400' : 'bg-warn2'
+                    riskLevel.label === 'Low' ? 'bg-accent2' :
+                    riskLevel.label === 'Medium' ? 'bg-yellow-400' :
+                    riskLevel.label === 'High' ? 'bg-orange-400' : 'bg-warn2'
                   }`}
-                  style={{ width: `${Math.min(marginRatioPercent * 100, 100)}%` }}
+                  style={{ width: `${Math.min((marginRatioPercent / 0.15) * 100, 100)}%` }}
                 />
               </div>
             </div>

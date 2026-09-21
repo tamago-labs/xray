@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 import { getAssetBySlug } from '@/lib/pre-ipo/contracts';
@@ -16,6 +17,7 @@ import PriceChart from '@/components/pre-ipo/PriceChart';
 import MarketStats from '@/components/pre-ipo/MarketStats';
 
 const client = generateClient<Schema>();
+const READONLY_PROVIDER = new ethers.JsonRpcProvider('https://testrpc.xlayer.tech');
 
   interface Snapshot {
     createdAt?: string;
@@ -26,7 +28,7 @@ const client = generateClient<Schema>();
 
 export default function PreIpoDetailClient({ slug }: { slug: string }) {
   const asset = getAssetBySlug(slug);
-  const { address, provider, signer } = useWallet();
+  const { address, provider, signer, isConnected } = useWallet();
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [txPending, setTxPending] = useState(false);
 
@@ -82,9 +84,9 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
   }, [asset]);
 
   useEffect(() => {
-    if (!provider || !asset) return;
+    if (!asset) return;
     const load = async () => {
-      const s = await fetchState(provider);
+      const s = await fetchState(provider || READONLY_PROVIDER);
       setState(s);
     };
     load();
@@ -207,7 +209,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             hasPosition={!!hasPosition}
             onDeposit={deposit}
             onWithdraw={withdraw}
-            onSuccess={() => fetchState(provider!).then(setState)}
+            onSuccess={() => fetchState(provider || READONLY_PROVIDER).then(setState)}
             loading={contractLoading}
             status={state?.status ?? 0}
             deposits={state?.deposits ?? BigInt(0)}
@@ -218,7 +220,8 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             collateralSymbol={state?.collateralSymbol ?? 'USDC'}
             initialMarginRate={state?.initialMarginRate ?? BigInt(0)}
             onOpenPosition={openPosition}
-            getExecutionPrice={(side, size) => fetchExecutionPrice(provider!, side, size)}
+            getExecutionPrice={(side, size) => fetchExecutionPrice(provider || READONLY_PROVIDER, side, size)}
+            hasPosition={!!hasPosition}
             loading={contractLoading}
             status={state?.status ?? 0}
           />
@@ -235,16 +238,23 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             collateralSymbol={state?.collateralSymbol ?? 'USDC'}
             hasPosition={!!hasPosition}
             positionSize={state?.position?.size ?? BigInt(0)}
+            maintenanceMarginRate={Number(state?.maintenanceMarginRate ?? 0) / 1e18}
           />
         </div>
         <div className="col-span-3 space-y-4">
-          <PositionsTable
-            position={state?.position ?? null}
-            markPrice={dbMarkPrice}
-            loading={!state}
-            onClosePosition={handleClosePosition}
-            txPending={txPending}
-          />
+          {isConnected ? (
+            <PositionsTable
+              position={state?.position ?? null}
+              markPrice={dbMarkPrice}
+              loading={!state}
+              onClosePosition={handleClosePosition}
+              txPending={txPending}
+            />
+          ) : (
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-5">
+              <p className="text-[13px] text-white/40 text-center py-4">Connect wallet to view your positions</p>
+            </div>
+          )}
 
           <PriceChart symbol={asset.symbol} data={snapshots} interval="1h" />
 
@@ -254,7 +264,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
               <ReactMarkdown>{asset.description}</ReactMarkdown>
             </div>
           </div>
-          {asset.website && (
+          {/*{asset.website && (
             <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
               <a
                 href={asset.website}
@@ -268,7 +278,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
                 Visit Website
               </a>
             </div>
-          )}
+          )}*/}
         </div>
       </div>
 

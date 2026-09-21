@@ -52,16 +52,19 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
       const collateral = getContract(collateralTokenAddr, ERC20_ABI, provider);
       const amm = getContract(ammAddr, AMM_ABI, provider);
 
-      const [status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol, poolBalances, oracleAddr] =
+      const [status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol] =
         await Promise.all([
           perpetual.getStatus(),
           perpetual.initialMarginRate(),
           perpetual.maintenanceMarginRate(),
           collateral.decimals(),
           collateral.symbol(),
-          amm.getPoolBalances(),
-          perpetual.oracle(),
         ]);
+
+      const [poolBalances, oracleAddr] = await Promise.all([
+        amm.getPoolBalances(),
+        perpetual.oracle(),
+      ]);
 
       const oracle = getContract(oracleAddr, ORACLE_ABI, provider);
       const oraclePrice = await oracle.getPrice();

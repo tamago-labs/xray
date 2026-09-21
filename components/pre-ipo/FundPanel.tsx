@@ -96,13 +96,11 @@ export default function FundPanel({
         {(['deposit', 'withdraw'] as const).map((t) => (
           <button
             key={t}
-            onClick={() => !(t === 'withdraw' && hasPosition) && setFundTab(t)}
+            onClick={() => setFundTab(t)}
             className={`flex-1 py-1.5 rounded-lg text-[12px] font-medium transition-all relative ${
-              t === 'withdraw' && hasPosition
-                ? 'text-white/20 cursor-not-allowed'
-                : fundTab === t
-                  ? 'text-white'
-                  : 'text-white/30 hover:text-white/50'
+              fundTab === t
+                ? 'text-white'
+                : 'text-white/30 hover:text-white/50'
             }`}
           >
             {fundTab === t && (
@@ -120,7 +118,7 @@ export default function FundPanel({
       {fundTab === 'withdraw' && hasPosition ? (
         <div className="bg-warn2/10 border border-warn2/20 rounded-xl p-3">
           <p className="text-[12px] text-warn2/80">
-            Close your open position before withdrawing margin.
+            Cannot withdraw while position is open. Close your position first.
           </p>
         </div>
       ) : (
