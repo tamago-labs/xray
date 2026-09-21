@@ -1,18 +1,29 @@
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-export default function PreIpoDetail() {
-  return (
-    <div className="h-[calc(100vh-3.5rem)] flex flex-col items-center justify-center px-6">
-      <div className="text-center max-w-md">
-        <p className="text-[11px] text-white/30 uppercase tracking-wider mb-3">Coming Soon</p>
-        <h1 className="font-display text-2xl md:text-3xl font-semibold text-white/80 mb-4">
-          Pre-IPO Trading
-        </h1>
-        <p className="text-[13px] text-white/40 leading-relaxed">
-          Trade pre-IPO tokens with up to 10x leverage. Deposit USDC, open long or short positions,
-          and settle at IPO price.
-        </p>
+import PreIpoDetailClient from '@/components/pre-ipo/PreIpoDetailClient';
+import { getAssetBySlug, type PreIpoAsset } from '@/lib/pre-ipo/contracts';
+import Link from 'next/link';
+
+export default async function PreIpoDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const asset = getAssetBySlug(slug);
+
+  if (!asset) {
+    return (
+      <div className="h-[calc(100vh-3.5rem)] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white/40 text-lg">Asset not found</p>
+          <Link href="/dashboard/pre-ipo" className="text-accent text-sm mt-2 inline-block hover:underline">
+            Back to Markets
+          </Link>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return <PreIpoDetailClient asset={asset} />;
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 import preIpoData from '@/lib/data/pre-ipo-list.json';
+import Link from 'next/link';
 
 const client = generateClient<Schema>();
 
@@ -84,9 +85,9 @@ export default function PreIpoList() {
           slug: a.slug,
           image: a.image,
           description: a.description,
-          markPrice: a.markPrice,
-          markValuation: a.markValuation,
-          impliedValuation: a.impliedValuation,
+          markPrice: 0,
+          markValuation: 0,
+          impliedValuation: 0,
           change24h: 0,
         })));
       } finally {
@@ -108,7 +109,7 @@ export default function PreIpoList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {markets.map((market) => (
-        <a
+        <Link
           key={market.symbol}
           href={`/dashboard/pre-ipo/${market.slug}`}
           className="group bg-surface border border-border3/50 rounded-xl p-5 hover:border-accent/30 transition-all"
@@ -155,7 +156,7 @@ export default function PreIpoList() {
               Trade →
             </span>
           </div>
-        </a>
+        </Link>
       ))}
     </div>
   );
