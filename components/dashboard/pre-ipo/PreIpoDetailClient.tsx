@@ -1,17 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
-import { getAssetBySlug, PRE_IPO_ASSETS } from '@/lib/pre-ipo/contracts';
+import { getAssetBySlug } from '@/lib/pre-ipo/contracts';
 import preIpoData from '@/lib/data/pre-ipo-list.json';
 import ReactMarkdown from 'react-markdown';
+import Link from 'next/link';
 import { usePreIpoContract } from '@/hooks/usePreIpoContract';
 import { useWallet } from '@/components/app/WalletContext';
+import FundPanel from '@/components/pre-ipo/FundPanel';
 import TradePanel from '@/components/pre-ipo/TradePanel';
-import PositionCard from '@/components/pre-ipo/PositionCard';
+import PositionsTable from '@/components/pre-ipo/PositionCard';
 import PriceChart from '@/components/pre-ipo/PriceChart';
+import AccountStats from '@/components/pre-ipo/AccountStats';
+import PoolStats from '@/components/pre-ipo/PoolStats';
 
 const client = generateClient<Schema>();
 
@@ -24,27 +27,17 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
   const asset = getAssetBySlug(slug);
   const { address, provider, signer } = useWallet();
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
-  const [depositInput, setDepositInput] = useState('');
+  const [txPending, setTxPending] = useState(false);
 
   const {
     fetchState,
     deposit,
+    withdraw,
     openPosition,
     closePosition,
     loading: contractLoading,
     error: contractError,
   } = usePreIpoContract(asset?.perpetual ?? '', address ?? null);
-
-  const handleDeposit = async () => {
-    if (!depositInput || !signer) return;
-    try {
-      const amount = ethers.parseUnits(depositInput, state?.collateralDecimals ?? 6);
-      await deposit(signer, amount);
-      setDepositInput('');
-    } catch (err) {
-      console.error('[PreIpoDetail] deposit error:', err);
-    }
-  };
 
   const [state, setState] = useState<{
     position: { collateral: bigint; side: number; size: bigint; entryValue: bigint; socialLoss: bigint; fundingLoss: bigint } | null;
@@ -52,13 +45,18 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
     equity: bigint;
     deposits: bigint;
     markPrice: bigint;
-    impliedValuation?: bigint;
     collateralDecimals: number;
     collateralSymbol: string;
     isLiquidatable: boolean;
     status: number;
     initialMarginRate: bigint;
     maintenanceMarginRate: bigint;
+    marginRatio: bigint;
+    maintenanceMargin: bigint;
+    notionalValue: bigint;
+    poolMargin: bigint;
+    poolPosition: bigint;
+    premium: bigint;
     loading: boolean;
   } | null>(null);
 
@@ -90,10 +88,25 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
     load();
   }, [provider, asset, fetchState]);
 
+  const handleClosePosition = async () => {
+    if (!signer) return;
+    setTxPending(true);
+    try {
+      await closePosition(signer);
+    } catch (err) {
+      console.error('[PreIpoDetail] close error:', err);
+    } finally {
+      setTxPending(false);
+    }
+  };
+
   if (!asset) {
     return (
       <div className="h-[calc(100vh-6.5rem)] flex flex-col items-center justify-center px-6">
         <p className="text-white/40">Market not found</p>
+        <Link href="/dashboard/pre-ipo" className="text-accent text-sm mt-2 hover:underline">
+          Back to Markets
+        </Link>
       </div>
     );
   }
@@ -144,7 +157,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <div className="bg-surface border border-border3/50 rounded-xl p-4">
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
           <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Mark Price</p>
           <p className="text-[18px] font-semibold text-white/90">
             {state?.markPrice && state.markPrice > BigInt(0)
@@ -152,7 +165,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
               : '—'}
           </p>
         </div>
-        <div className="bg-surface border border-border3/50 rounded-xl p-4">
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
           <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">24h Change</p>
           <p className={`text-[18px] font-semibold ${
             snapshots.length >= 2
@@ -166,86 +179,72 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
               : '—'}
           </p>
         </div>
-        <div className="bg-surface border border-border3/50 rounded-xl p-4">
-          <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Implied Valuation</p>
-          <p className="text-[18px] font-semibold text-white/90">
-            {state?.impliedValuation && state.impliedValuation > BigInt(0)
-              ? `$${(Number(state.impliedValuation) / 1e9).toFixed(2)}B`
+        <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <p className="text-[11px] text-white/30 uppercase tracking-wider mb-1">Premium</p>
+          <p className={`text-[18px] font-semibold ${
+            state && state.premium !== BigInt(0)
+              ? state.premium > BigInt(0) ? 'text-accent2' : 'text-warn2'
+              : 'text-white/40'
+          }`}>
+            {state && state.premium !== BigInt(0)
+              ? `${state.premium > BigInt(0) ? '+' : ''}${(Number(state.premium) / 1e18).toFixed(4)}%`
               : '—'}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-5 gap-6">
-        <div className="col-span-2 space-y-6">
-          <PositionCard
-            position={state?.position ?? null}
-            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
-            markPrice={state?.markPrice ?? BigInt(0)}
-            entryPrice={state?.position ? Number(state.position.entryValue) / 1e18 : null}
-            loading={contractLoading || !state}
-          />
-
-          <div className="bg-surface border border-border3/50 rounded-xl p-4 space-y-3">
-            <div className="flex justify-between text-[12px]">
-              <span className="text-white/40">Deposited</span>
-              <span className="text-white/70">
-                {state?.deposits && state.deposits > BigInt(0)
-                  ? `$${(Number(state.deposits) / 1e6).toFixed(2)}`
-                  : '—'}
-              </span>
-            </div>
-            <div className="flex justify-between text-[12px]">
-              <span className="text-white/40">Market Status</span>
-              <span className={`font-medium ${
-                (state?.status ?? 0) === 0 ? 'text-accent2' : (state?.status ?? 0) === 1 ? 'text-warn2' : 'text-white/40'
-              }`}>
-                {(state?.status ?? 0) === 0 ? 'Active' : (state?.status ?? 0) === 1 ? 'Emergency' : 'Settled'}
-              </span>
-            </div>
-            <div className="pt-2 border-t border-border3/30">
-              <label className="text-[11px] text-white/40 uppercase tracking-wider block mb-2">
-                Deposit Margin ({state?.collateralSymbol ?? 'USDC'})
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  value={depositInput}
-                  onChange={(e) => setDepositInput(e.target.value)}
-                  placeholder="0.00"
-                  className="flex-1 bg-white/5 border border-border3/50 rounded-lg px-3 py-2 text-[13px] text-white placeholder:text-white/20 outline-none focus:border-accent/50"
-                />
-                <button
-                  onClick={handleDeposit}
-                  disabled={!depositInput || contractLoading}
-                  className="px-4 py-2 rounded-lg bg-white/10 text-white/70 text-[13px] font-medium hover:bg-white/15 disabled:opacity-40 transition-colors"
-                >
-                  {contractLoading ? '...' : 'Deposit'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <TradePanel
-            perpetualAddress={asset.perpetual}
-            collateralAddress=""
-            markPrice={state?.markPrice ?? BigInt(0)}
+        <div className="col-span-2 space-y-4">
+          <FundPanel
             collateralDecimals={state?.collateralDecimals ?? 6}
             collateralSymbol={state?.collateralSymbol ?? 'USDC'}
-            initialMarginRate={state?.initialMarginRate ?? BigInt(0)}
             hasPosition={!!hasPosition}
             onDeposit={deposit}
-            onOpenPosition={openPosition}
-            onClosePosition={closePosition}
+            onWithdraw={withdraw}
+            onSuccess={() => fetchState(provider!).then(setState)}
             loading={contractLoading}
             status={state?.status ?? 0}
-            position={state?.position ?? null}
-            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
             deposits={state?.deposits ?? BigInt(0)}
           />
+
+          <TradePanel
+            markPrice={state?.markPrice ?? BigInt(0)}
+            collateralSymbol={state?.collateralSymbol ?? 'USDC'}
+            initialMarginRate={state?.initialMarginRate ?? BigInt(0)}
+            onOpenPosition={openPosition}
+            loading={contractLoading}
+            status={state?.status ?? 0}
+            notionalValue={state?.notionalValue ?? BigInt(0)}
+          />
+
+          <AccountStats
+            equity={state?.equity ?? BigInt(0)}
+            deposits={state?.deposits ?? BigInt(0)}
+            marginRatio={state?.marginRatio ?? BigInt(0)}
+            maintenanceMargin={state?.maintenanceMargin ?? BigInt(0)}
+            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
+            hasPosition={!!hasPosition}
+          />
         </div>
-        <div className="col-span-3 space-y-6">
+        <div className="col-span-3 space-y-4">
+          <PositionsTable
+            position={state?.position ?? null}
+            unrealizedPnL={state?.unrealizedPnL ?? BigInt(0)}
+            markPrice={state?.markPrice ?? BigInt(0)}
+            loading={!state}
+            onClosePosition={handleClosePosition}
+            txPending={txPending}
+          />
+
+          <PoolStats
+            poolMargin={state?.poolMargin ?? BigInt(0)}
+            poolPosition={state?.poolPosition ?? BigInt(0)}
+            premium={state?.premium ?? BigInt(0)}
+            collateralSymbol={state?.collateralSymbol ?? 'USDC'}
+          />
+
           <PriceChart symbol={asset.symbol} data={snapshots} interval="1h" />
+
           <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4">
             <h3 className="text-[15px] font-semibold text-white/90 mb-3">About {asset.name}</h3>
             <div className="text-[13px] text-white/50 leading-relaxed max-h-64 overflow-y-auto pr-2 prose prose-invert prose-sm">
@@ -253,7 +252,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             </div>
           </div>
           {asset.website && (
-            <div className="bg-surface border border-border3/50 rounded-xl p-4">
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
               <a
                 href={asset.website}
                 target="_blank"
@@ -277,10 +276,10 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             .filter((a) => a.slug !== slug)
             .map((other) => {
               return (
-                <a
+                <Link
                   key={other.slug}
                   href={`/dashboard/pre-ipo/${other.slug}`}
-                  className="group bg-surface border border-border3/50 rounded-xl p-4 hover:border-accent/30 transition-all"
+                  className="group bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 hover:border-accent/30 transition-all"
                 >
                   <div className="flex items-center gap-3">
                     <img
@@ -293,7 +292,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
                       <p className="text-[11px] text-white/40">{other.symbol}</p>
                     </div>
                   </div>
-                </a>
+                </Link>
               );
             })}
         </div>

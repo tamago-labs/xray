@@ -3,20 +3,23 @@
 import { useMemo } from 'react';
 import type { Position } from '@/hooks/usePreIpoContract';
 
-interface PositionCardProps {
+interface PositionsTableProps {
   position: Position | null;
   unrealizedPnL: bigint;
   markPrice: bigint;
-  entryPrice: number | null;
   loading: boolean;
+  onClosePosition: () => void;
+  txPending: boolean;
 }
 
-export default function PositionCard({
+export default function PositionsTable({
   position,
   unrealizedPnL,
-  entryPrice,
+  markPrice,
   loading,
-}: PositionCardProps) {
+  onClosePosition,
+  txPending,
+}: PositionsTableProps) {
   const pnlNum = useMemo(() => {
     const raw = Number(unrealizedPnL);
     const sign = raw >= 0 ? 1 : -1;
@@ -26,16 +29,10 @@ export default function PositionCard({
     return sign * (intPart + fracPart);
   }, [unrealizedPnL]);
 
-  const pnlPercent = useMemo(() => {
-    if (!position || entryPrice === null || entryPrice === 0) return 0;
-    const currentPrice = entryPrice + pnlNum / (Number(position.size) / 1e18);
-    return ((currentPrice - entryPrice) / entryPrice) * 100;
-  }, [position, entryPrice, pnlNum]);
-
   if (loading) {
     return (
       <div className="bg-surface border border-border3/50 rounded-xl p-5">
-        <div className="flex items-center justify-center py-4">
+        <div className="flex items-center justify-center py-8">
           <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
@@ -45,64 +42,76 @@ export default function PositionCard({
   if (!position || position.size === BigInt(0)) {
     return (
       <div className="bg-surface border border-border3/50 rounded-xl p-5">
-        <p className="text-[13px] text-white/40 text-center py-4">No open position</p>
+        <p className="text-[13px] text-white/40 text-center py-4">No open positions</p>
       </div>
     );
   }
 
-  const isLong = position.side === 0;
+  const isLong = position.side === 1;
   const sizeNum = Number(position.size) / 1e18;
-  const collateralNum = Number(position.collateral) / 1e6;
+  const entryPrice = position.entryValue > BigInt(0) && position.size > BigInt(0)
+    ? Number(position.entryValue) / Number(position.size) / 1e18
+    : 0;
+  const markPriceNum = Number(markPrice) / 1e18;
   const pnlIsPositive = pnlNum >= 0;
 
+  const pnlPercent = entryPrice > 0
+    ? isLong
+      ? ((markPriceNum - entryPrice) / entryPrice) * 100
+      : ((entryPrice - markPriceNum) / entryPrice) * 100
+    : 0;
+
   return (
-    <div className="bg-surface border border-border3/50 rounded-xl p-5 space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-[13px] font-medium text-white/70">Position</span>
-        <span
-          className={`text-[12px] font-medium px-2 py-0.5 rounded-full ${
-            isLong ? 'bg-accent2/15 text-accent2' : 'bg-warn2/15 text-warn2'
-          }`}
-        >
-          {isLong ? 'LONG' : 'SHORT'}
-        </span>
+    <div className="bg-surface border border-border3/50 rounded-xl overflow-hidden">
+      <div className="px-4 py-3 border-b border-border3/30">
+        <h3 className="text-[13px] font-medium text-white/70">Your Positions</h3>
       </div>
-
-      <div className="space-y-2">
-        <div className="flex justify-between text-[12px]">
-          <span className="text-white/40">Size</span>
-          <span className="text-white/80">{sizeNum.toFixed(4)} units</span>
-        </div>
-        <div className="flex justify-between text-[12px]">
-          <span className="text-white/40">Entry Price</span>
-          <span className="text-white/80">
-            {entryPrice !== null ? `$${entryPrice.toFixed(2)}` : '—'}
-          </span>
-        </div>
-        <div className="flex justify-between text-[12px]">
-          <span className="text-white/40">Collateral</span>
-          <span className="text-white/80">${collateralNum.toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div className="border-t border-border3/30 pt-3">
-        <div className="flex justify-between items-baseline">
-          <span className="text-[12px] text-white/40">Unrealized PnL</span>
-          <span
-            className={`text-[15px] font-semibold ${
-              pnlIsPositive ? 'text-accent2' : 'text-warn2'
-            }`}
-          >
-            {pnlIsPositive ? '+' : ''}${pnlNum.toFixed(2)}
-          </span>
-        </div>
-        <div className="text-[11px] text-right mt-0.5">
-          <span className={pnlIsPositive ? 'text-accent2/60' : 'text-warn2/60'}>
-            {pnlIsPositive ? '+' : ''}{pnlPercent.toFixed(2)}%
-          </span>
-        </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-[12px]">
+          <thead>
+            <tr className="text-white/30 border-b border-border3/20">
+              <th className="text-left px-4 py-2 font-medium">Side</th>
+              <th className="text-right px-4 py-2 font-medium">Size</th>
+              <th className="text-right px-4 py-2 font-medium">Entry</th>
+              <th className="text-right px-4 py-2 font-medium">Mark</th>
+              <th className="text-right px-4 py-2 font-medium">PnL</th>
+              <th className="text-right px-4 py-2 font-medium"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="border-b border-border3/10 hover:bg-white/[0.02]">
+              <td className="px-4 py-3">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                  isLong ? 'bg-accent2/15 text-accent2' : 'bg-warn2/15 text-warn2'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isLong ? 'bg-accent2' : 'bg-warn2'}`} />
+                  {isLong ? 'LONG' : 'SHORT'}
+                </span>
+              </td>
+              <td className="px-4 py-3 text-right text-white/80">{sizeNum.toFixed(4)}</td>
+              <td className="px-4 py-3 text-right text-white/60">${entryPrice.toFixed(2)}</td>
+              <td className="px-4 py-3 text-right text-white/60">${markPriceNum.toFixed(2)}</td>
+              <td className="px-4 py-3 text-right">
+                <div className={`font-medium ${pnlIsPositive ? 'text-accent2' : 'text-warn2'}`}>
+                  {pnlIsPositive ? '+' : ''}${pnlNum.toFixed(2)}
+                </div>
+                <div className={`text-[10px] ${pnlIsPositive ? 'text-accent2/60' : 'text-warn2/60'}`}>
+                  {pnlIsPositive ? '+' : ''}{pnlPercent.toFixed(2)}%
+                </div>
+              </td>
+              <td className="px-4 py-3 text-right">
+                <button
+                  onClick={onClosePosition}
+                  disabled={txPending}
+                  className="px-3 py-1.5 rounded-md bg-warn2/10 text-warn2 text-[11px] font-medium hover:bg-warn2/20 disabled:opacity-40 transition-colors"
+                >
+                  {txPending ? '...' : 'Close'}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
 }
-

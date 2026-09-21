@@ -12,8 +12,10 @@ export const PERPETUAL_ABI = [
   'function getDeposits(address trader) view returns (uint256)',
   'function getNotionalValue(address trader) view returns (uint256)',
   'function getMaintenanceMargin(address trader) view returns (uint256)',
+  'function getMarginRatio(address trader) view returns (uint256)',
   'function getMarkPrice() view returns (uint256)',
   'function getPoolBalances() view returns (uint256 margin, uint256 position)',
+  'function getPremium() view returns (int256)',
   'function collateralToken() view returns (address)',
   'function collateralDecimals() view returns (uint8)',
   'function name() view returns (string)',
@@ -32,6 +34,15 @@ export const PERPETUAL_ABI = [
   'event Withdrawn(address indexed trader, uint256 amount)',
   'event Liquidated(address indexed trader, address indexed liquidator, uint256 penalty)',
   'event Settled(uint256 settlementPrice)',
+] as const;
+
+export const AMM_ABI = [
+  'function getBuyPrice(uint256 size) view returns (uint256)',
+  'function getSellPrice(uint256 size) view returns (uint256)',
+  'function getPoolBalances() view returns (uint256 margin, uint256 position)',
+  'function getPremium() view returns (int256)',
+  'function marginRate() view returns (uint256)',
+  'function netPosition() view returns (int256)',
 ] as const;
 
 export const ERC20_ABI = [

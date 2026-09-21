@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { ethers } from 'ethers';
-import { PERPETUAL_ABI, ERC20_ABI, SIDE } from '@/lib/pre-ipo/contracts';
+import { PERPETUAL_ABI, ERC20_ABI, AMM_ABI, SIDE } from '@/lib/pre-ipo/contracts';
 
 export interface Position {
   collateral: bigint;
@@ -25,6 +25,12 @@ export interface PreIpoContractState {
   status: number;
   initialMarginRate: bigint;
   maintenanceMarginRate: bigint;
+  marginRatio: bigint;
+  maintenanceMargin: bigint;
+  notionalValue: bigint;
+  poolMargin: bigint;
+  poolPosition: bigint;
+  premium: bigint;
   loading: boolean;
 }
 
@@ -44,9 +50,11 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
       const perpetual = getContract(perpetualAddress, PERPETUAL_ABI, provider);
 
       const collateralTokenAddr = await perpetual.collateralToken();
+      const ammAddr = await perpetual.amm();
       const collateral = getContract(collateralTokenAddr, ERC20_ABI, provider);
+      const amm = getContract(ammAddr, AMM_ABI, provider);
 
-      const [markPrice, status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol] =
+      const [markPrice, status, initialMarginRate, maintenanceMarginRate, collateralDecimals, collateralSymbol, poolBalances, premium] =
         await Promise.all([
           perpetual.getMarkPrice(),
           perpetual.getStatus(),
@@ -54,6 +62,8 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
           perpetual.maintenanceMarginRate(),
           collateral.decimals(),
           collateral.symbol(),
+          amm.getPoolBalances(),
+          amm.getPremium(),
         ]);
 
       if (!userAddress) {
@@ -69,17 +79,27 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
           status: Number(status),
           initialMarginRate,
           maintenanceMarginRate,
+          marginRatio: BigInt(0),
+          maintenanceMargin: BigInt(0),
+          notionalValue: BigInt(0),
+          poolMargin: poolBalances.margin,
+          poolPosition: poolBalances.position,
+          premium,
           loading: false,
         };
       }
 
-      const [position, unrealizedPnL, equity, deposits, isLiquidatable] = await Promise.all([
-        perpetual.getPosition(userAddress),
-        perpetual.getUnrealizedPnL(userAddress),
-        perpetual.getEquity(userAddress),
-        perpetual.getDeposits(userAddress),
-        perpetual.isLiquidatable(userAddress),
-      ]);
+      const [position, unrealizedPnL, equity, deposits, isLiquidatable, marginRatio, maintenanceMargin, notionalValue] =
+        await Promise.all([
+          perpetual.getPosition(userAddress),
+          perpetual.getUnrealizedPnL(userAddress),
+          perpetual.getEquity(userAddress),
+          perpetual.getDeposits(userAddress),
+          perpetual.isLiquidatable(userAddress),
+          perpetual.getMarginRatio(userAddress),
+          perpetual.getMaintenanceMargin(userAddress),
+          perpetual.getNotionalValue(userAddress),
+        ]);
 
       return {
         position: {
@@ -100,10 +120,31 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
         status: Number(status),
         initialMarginRate,
         maintenanceMarginRate,
+        marginRatio,
+        maintenanceMargin,
+        notionalValue,
+        poolMargin: poolBalances.margin,
+        poolPosition: poolBalances.position,
+        premium,
         loading: false,
       };
     },
     [perpetualAddress, userAddress, getContract]
+  );
+
+  const fetchExecutionPrice = useCallback(
+    async (provider: ethers.Provider, side: 'long' | 'short', size: bigint): Promise<bigint> => {
+      const perpetual = getContract(perpetualAddress, PERPETUAL_ABI, provider);
+      const ammAddr = await perpetual.amm();
+      const amm = getContract(ammAddr, AMM_ABI, provider);
+
+      if (side === 'long') {
+        return await amm.getBuyPrice(size);
+      } else {
+        return await amm.getSellPrice(size);
+      }
+    },
+    [perpetualAddress, getContract]
   );
 
   const deposit = useCallback(
@@ -114,7 +155,6 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
         const perpetual = getContract(perpetualAddress, PERPETUAL_ABI, signer);
         const collateralTokenAddr = await perpetual.collateralToken();
         const collateral = getContract(collateralTokenAddr, ERC20_ABI, signer);
-        const decimals = await collateral.decimals();
 
         const allowance = await collateral.allowance(await signer.getAddress(), perpetualAddress);
         if (allowance < amount) {
@@ -127,6 +167,26 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
         return tx.hash;
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Deposit failed';
+        setError(message);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [perpetualAddress, getContract]
+  );
+
+  const withdraw = useCallback(
+    async (signer: ethers.Signer, amount: bigint) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const perpetual = getContract(perpetualAddress, PERPETUAL_ABI, signer);
+        const tx = await perpetual.withdraw(amount);
+        await tx.wait();
+        return tx.hash;
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Withdraw failed';
         setError(message);
         throw err;
       } finally {
@@ -179,7 +239,9 @@ export function usePreIpoContract(perpetualAddress: string, userAddress: string 
 
   return {
     fetchState,
+    fetchExecutionPrice,
     deposit,
+    withdraw,
     openPosition,
     closePosition,
     loading,
