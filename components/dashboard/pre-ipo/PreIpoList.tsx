@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Info, ArrowRight } from 'lucide-react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 import preIpoData from '@/lib/data/pre-ipo-list.json';
@@ -76,7 +77,7 @@ export default function PreIpoList() {
           };
         });
 
-        setMarkets(marketData);
+        setMarkets(marketData.sort((a, b) => b.impliedValuation - a.impliedValuation));
       } catch (err) {
         console.error('[PreIpoList] fetch error:', err);
         setMarkets(preIpoData.assets.map((a) => ({
@@ -130,7 +131,25 @@ export default function PreIpoList() {
 
           <div className="space-y-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-[11px] text-white/30 uppercase tracking-wider">Mark Price</span>
+              <span className="text-[11px] text-white/30 uppercase tracking-wider flex items-center gap-1">
+                Mark Price
+                <span
+                  className="relative"
+                  onMouseEnter={(e) => {
+                    const tooltip = e.currentTarget.querySelector('.tooltip');
+                    if (tooltip) tooltip.classList.remove('opacity-0');
+                  }}
+                  onMouseLeave={(e) => {
+                    const tooltip = e.currentTarget.querySelector('.tooltip');
+                    if (tooltip) tooltip.classList.add('opacity-0');
+                  }}
+                >
+                  <Info className="w-3 h-3 text-white/20 hover:text-white/40 transition-colors cursor-help" />
+                  <span className="tooltip absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 text-[10px] text-white/70 bg-black/90 rounded whitespace-nowrap opacity-0 transition-opacity pointer-events-none">
+                    Average price per share from reputable secondary market data source
+                  </span>
+                </span>
+              </span>
               <span className="text-[18px] font-semibold text-white/90">
                 {market.markPrice > 0 ? `$${market.markPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}
               </span>
@@ -146,16 +165,21 @@ export default function PreIpoList() {
             <div className="flex items-baseline justify-between">
               <span className="text-[11px] text-white/30 uppercase tracking-wider">Implied Valuation</span>
               <span className="text-[13px] text-white/60">
-                {market.impliedValuation > 0 ? `$${(market.impliedValuation / 1e9).toFixed(2)}B` : '—'}
+                {market.impliedValuation > 0
+                  ? market.impliedValuation >= 1e12
+                    ? `$${(market.impliedValuation / 1e12).toFixed(2)}T`
+                    : `$${(market.impliedValuation / 1e9).toFixed(2)}B`
+                  : '—'}
               </span>
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-border3/30">
-            <span className="text-[12px] text-accent group-hover:text-accent/80 transition-colors">
-              Trade →
-            </span>
-          </div>
+            <div className="mt-4 pt-3 border-t border-border3/30">
+              <span className="text-[12px] text-accent group-hover:text-accent/80 transition-colors flex items-center gap-1">
+                Trade
+                <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
         </Link>
       ))}
     </div>
