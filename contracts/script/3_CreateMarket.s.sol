@@ -15,8 +15,8 @@ contract CreateMarket is Script {
         address usdcAddr = vm.envAddress("USDC_ADDRESS");
         address oracleAddr = vm.envAddress("ORACLE_ADDRESS");
 
-        string memory name = "OpenAI Pre-IPO Xray";
-        string memory symbol = "OpenAI";
+        string memory name = "KALSHI Pre-IPO Xray";
+        string memory symbol = "KALSHI";
         uint256 initialMargin = 0.1e18;
         uint256 maintenanceMargin = 0.05e18;
         uint256 liquidationPenalty = 0.005e18;

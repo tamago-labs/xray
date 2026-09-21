@@ -11,7 +11,7 @@ contract DeployOracle is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         address deployer = vm.addr(deployerPrivateKey);
 
-        uint256 initialPrice = 990e18;
+        uint256 initialPrice = 895e18;
         uint256 staleness = type(uint256).max;
         uint256 updateDelay = 300;
 
@@ -27,8 +27,8 @@ contract DeployOracle is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         PriceOracle oracle = new PriceOracle(
-            "OpenAI Pre-IPO",
-            "OpenAI",
+            "Kalshi Pre-IPO",
+            "KALSHI",
             initialPrice,
             staleness,
             updateDelay
