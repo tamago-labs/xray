@@ -18,6 +18,14 @@ interface TradePanelProps {
   onClosePosition: (signer: ethers.Signer) => Promise<string>;
   loading: boolean;
   status: number;
+  position?: {
+    collateral: bigint;
+    side: number;
+    size: bigint;
+    entryValue: bigint;
+  } | null;
+  unrealizedPnL?: bigint;
+  deposits?: bigint;
 }
 
 const LEVERAGE_OPTIONS = [1, 2, 3, 5, 10];
@@ -33,6 +41,9 @@ export default function TradePanel({
   onClosePosition,
   loading,
   status,
+  position,
+  unrealizedPnL,
+  deposits,
 }: TradePanelProps) {
   const { isConnected, address, signer, isCorrectChain, switchChain } = useWallet();
   const [side, setSide] = useState<'long' | 'short'>('long');
@@ -129,28 +140,6 @@ export default function TradePanel({
 
   return (
     <div className="bg-surface border border-border3/50 rounded-xl p-5 space-y-4">
-      <div>
-        <label className="text-[11px] text-white/40 uppercase tracking-wider block mb-2">
-          Deposit Margin ({collateralSymbol})
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            value={depositInput}
-            onChange={(e) => setDepositInput(e.target.value)}
-            placeholder="0.00"
-            className="flex-1 bg-white/5 border border-border3/50 rounded-lg px-3 py-2 text-[13px] text-white placeholder:text-white/20 outline-none focus:border-accent/50"
-          />
-          <button
-            onClick={handleDeposit}
-            disabled={txPending || !depositInput}
-            className="px-4 py-2 rounded-lg bg-white/10 text-white/70 text-[13px] font-medium hover:bg-white/15 disabled:opacity-40 transition-colors"
-          >
-            {txPending ? '...' : 'Deposit'}
-          </button>
-        </div>
-      </div>
-
       {hasPosition ? (
         <button
           onClick={handleClosePosition}

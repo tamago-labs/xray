@@ -89,7 +89,7 @@ export default function PriceChart({ data, interval }: PriceChartProps) {
     <div className="bg-surface border border-border3/50 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[13px] font-medium text-white/70">
-          {interval === '4h' ? '4-Hour' : '1-Hour'} Mark Price
+          Price History
         </h3>
         <span className="text-[11px] text-white/30">{data.length} data points</span>
       </div>
