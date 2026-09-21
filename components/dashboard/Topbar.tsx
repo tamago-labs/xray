@@ -35,8 +35,8 @@ const dataClient = generateClient<Schema>();
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard/portfolio": "Your AI-Powered Portfolio",
-  "/dashboard/explore": "Explore Tokenized Stocks",
-  "/dashboard/pre-ipo": "Pre-IPO Tokenized Stocks",
+  "/dashboard/explore": "Explore X Layer Tokenized Stocks",
+  "/dashboard/pre-ipo": "Trade Pre-IPO Perpetuals on Xray",
   "/dashboard/alerts": "Stay Notified",
 };
 
