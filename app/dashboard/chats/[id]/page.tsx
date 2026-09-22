@@ -126,7 +126,7 @@ export default function ChatSession() {
     const message = input.trim();
     setInput('');
     setError('');
-    setMessages((prev) => [...prev, { role: 'user', content: message }, { role: 'ai', content: '' }]);
+    setMessages((prev) => [...prev, { role: 'user', content: message }]);
     setLoading(true);
 
     try {

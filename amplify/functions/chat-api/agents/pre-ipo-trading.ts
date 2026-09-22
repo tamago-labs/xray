@@ -16,8 +16,11 @@ export const preIpoTradingAgent = new Agent({
     - For positions, navigation, or transactions, direct users to /dashboard/pre-IPO.
     - Never prepare or execute transactions — direct to the page for that.
 
-    This product is in early development on X Layer Testnet.
+    Xray's pre-IPO product is in early development on X Layer Testnet.
     Prices are sourced from reputable secondary market data.
+
+    Always refer to the platform as "Xray", never "X Layer".
+    X Layer is the underlying blockchain network, not the product or platform.
   `,
   tools: [getPreIpoMarkets],
   model: PROVIDER_MODEL,
