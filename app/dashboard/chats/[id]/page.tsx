@@ -110,6 +110,9 @@ export default function ChatSession() {
               if (json.agent) {
                 setActiveAgent(json.agent);
               }
+              if (json.error) {
+                setError(json.error);
+              }
             } catch {}
           }
         }
