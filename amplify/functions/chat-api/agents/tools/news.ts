@@ -1,41 +1,142 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
+import { env } from "$amplify/env/chat-api";
+import type { Schema } from "../../../../data/resource";
 
-const mockNews = [
-  { id: 1, title: "Apple Reports Record Q4 Revenue on iPhone 17 Demand", source: "Bloomberg", timestamp: "2026-09-18T08:30:00Z", sentiment: "positive", affectedTokens: ["xAAPL", "xNVDA"], summary: "Apple beat revenue estimates by 12% driven by strong iPhone 17 Pro sales." },
-  { id: 2, title: "Tesla FSD v14 Rollout Faces Regulatory Scrutiny", source: "Reuters", timestamp: "2026-09-17T14:22:00Z", sentiment: "neutral", affectedTokens: ["xTSLA"], summary: "NHTSA requests additional data before approving wider FSD deployment." },
-  { id: 3, title: "Microsoft Azure AI Revenue Grows 45% YoY", source: "CNBC", timestamp: "2026-09-17T09:15:00Z", sentiment: "positive", affectedTokens: ["xMSFT"], summary: "Enterprise AI adoption drives Azure growth above expectations." },
-  { id: 4, title: "Federal Reserve Signals Rate Cut in October", source: "WSJ", timestamp: "2026-09-18T11:00:00Z", sentiment: "positive", affectedTokens: ["xMSTR", "xCOIN"], summary: "Fed chair hints at 25bp cut amid cooling inflation data." },
-  { id: 5, title: "NVIDIA Supply Constraints Limit H200 Shipments", source: "TechCrunch", timestamp: "2026-09-16T16:45:00Z", sentiment: "negative", affectedTokens: ["xNVDA", "xGOOG"], summary: "TSMC capacity shortage may delay next-gen GPU availability until Q1 2027." },
-  { id: 6, title: "Amazon Expands Same-Day Delivery to 40 New Cities", source: "Bloomberg", timestamp: "2026-09-17T07:30:00Z", sentiment: "positive", affectedTokens: ["xAMZN"], summary: "Logistics investment pays off as delivery speeds improve customer retention." },
-  { id: 7, title: "Bitcoin Surges Past $105K as ETF Inflows Hit Record", source: "CoinDesk", timestamp: "2026-09-18T06:00:00Z", sentiment: "positive", affectedTokens: ["xMSTR", "xCOIN"], summary: "Spot Bitcoin ETFs see $2.1B in daily inflows, pushing BTC to new all-time high." },
-];
+async function getClient() {
+  const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
+  Amplify.configure(resourceConfig, libraryOptions);
+  return generateClient<Schema>();
+}
+
+function parseRSS(xml: string): { title: string; link: string; pubDate: string; source: string }[] {
+  const items: { title: string; link: string; pubDate: string; source: string }[] = [];
+  const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+  let match;
+  while ((match = itemRegex.exec(xml)) !== null) {
+    const item = match[1];
+    const title = item.match(/<title>(.*?)<\/title>/)?.[1]?.trim() ?? "";
+    const link = item.match(/<link>(.*?)<\/link>/)?.[1]?.trim() ?? "";
+    const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1]?.trim() ?? "";
+    const source = item.match(/<source[^>]*>(.*?)<\/source>/)?.[1]?.trim() ?? "";
+    if (title) items.push({ title, link, pubDate, source });
+  }
+  return items;
+}
+
+async function fetchGoogleNewsRSS(query: string): Promise<{ title: string; link: string; pubDate: string; source: string }[]> {
+  try {
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    return parseRSS(xml).map((item) => ({ ...item, source: item.source || "Google News" }));
+  } catch {
+    return [];
+  }
+}
+
+async function fetchYahooFinanceRSS(ticker: string): Promise<{ title: string; link: string; pubDate: string; source: string }[]> {
+  try {
+    const url = `https://feeds.finance.yahoo.com/rss/2.0/headline?s=${encodeURIComponent(ticker)}&region=US&lang=en-US`;
+    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    return parseRSS(xml).map((item) => ({ ...item, source: item.source || "Yahoo Finance" }));
+  } catch {
+    return [];
+  }
+}
+
+function deduplicate(items: { title: string; link: string; pubDate: string; source: string }[]): typeof items {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const key = item.title.toLowerCase().slice(0, 80);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function isTicker(query: string): boolean {
+  return /^[A-Z]{1,5}(\.[A-Z])?$/.test(query.trim());
+}
 
 export const searchNews = tool({
   name: "search_news",
-  description: "Search market news by keyword, token symbol, or topic. Returns articles with sentiment and affected tokens.",
+  description: "Search market news by keyword, stock ticker, or topic. Combines results from DB, Google News RSS, and Yahoo Finance RSS.",
   parameters: z.object({
-    query: z.string().describe("Search query (token symbol, company name, or topic)"),
+    query: z.string().describe("Search query (stock ticker, company name, or topic)"),
   }),
   execute: async ({ query }: { query: string }) => {
-    const q = query.toLowerCase();
-    const results = mockNews.filter(
-      (n) =>
-        n.title.toLowerCase().includes(q) ||
-        n.affectedTokens.some((t) => t.toLowerCase().includes(q)) ||
-        n.summary.toLowerCase().includes(q)
-    );
-    return JSON.stringify(results.length ? results : mockNews.slice(0, 3));
+    const client = await getClient();
+
+    const dbPromise = client.models.NewsArticle.list({ limit: 100 });
+    const googlePromise = fetchGoogleNewsRSS(query);
+    const yahooPromise = isTicker(query) ? fetchYahooFinanceRSS(query.trim()) : Promise.resolve([]);
+
+    const [dbRes, googleItems, yahooItems] = await Promise.allSettled([dbPromise, googlePromise, yahooPromise]);
+
+    const combined: { title: string; link: string; pubDate: string; source: string }[] = [];
+
+    if (dbRes.status === "fulfilled" && dbRes.value.data) {
+      for (const article of dbRes.value.data) {
+        combined.push({
+          title: article.title,
+          link: article.url ?? "",
+          pubDate: article.publishedAt ?? "",
+          source: article.source,
+        });
+      }
+    }
+
+    if (googleItems.status === "fulfilled") combined.push(...googleItems.value);
+    if (yahooItems.status === "fulfilled") combined.push(...yahooItems.value);
+
+    const results = deduplicate(combined)
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, 20);
+
+    return JSON.stringify(results);
   },
 });
 
 export const getLatestNews = tool({
   name: "get_latest_news",
-  description: "Get the latest market news feed.",
+  description: "Get the latest market news feed from all sources.",
   parameters: z.object({
-    limit: z.number().optional().describe("Number of articles to return (default 5)"),
+    limit: z.number().optional().describe("Number of articles to return (default 10)"),
   }),
-  execute: async ({ limit = 5 }: { limit?: number }) => {
-    return JSON.stringify(mockNews.slice(0, limit));
+  execute: async ({ limit = 10 }: { limit?: number }) => {
+    const client = await getClient();
+
+    const dbPromise = client.models.NewsArticle.list({ limit: 100 });
+    const googlePromise = fetchGoogleNewsRSS("stock market OR crypto OR tokenized");
+
+    const [dbRes, googleItems] = await Promise.allSettled([dbPromise, googlePromise]);
+
+    const combined: { title: string; link: string; pubDate: string; source: string }[] = [];
+
+    if (dbRes.status === "fulfilled" && dbRes.value.data) {
+      for (const article of dbRes.value.data) {
+        combined.push({
+          title: article.title,
+          link: article.url ?? "",
+          pubDate: article.publishedAt ?? "",
+          source: article.source,
+        });
+      }
+    }
+
+    if (googleItems.status === "fulfilled") combined.push(...googleItems.value);
+
+    const results = deduplicate(combined)
+      .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime())
+      .slice(0, limit);
+
+    return JSON.stringify(results);
   },
 });
