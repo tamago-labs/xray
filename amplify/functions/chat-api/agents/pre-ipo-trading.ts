@@ -1,6 +1,6 @@
 import { Agent } from "@openai/agents";
 import { PROVIDER_MODEL } from "../provider";
-import { getPreIpoMarkets, getPreIpoMarketDetails } from "./tools/pre-ipo";
+import { getPreIpoMarkets } from "./tools/pre-ipo";
 
 export const preIpoTradingAgent = new Agent({
   name: "Pre-IPO Trading Agent",
@@ -19,6 +19,6 @@ export const preIpoTradingAgent = new Agent({
     This product is in early development on X Layer Testnet.
     Prices are sourced from reputable secondary market data.
   `,
-  tools: [getPreIpoMarkets, getPreIpoMarketDetails],
+  tools: [getPreIpoMarkets],
   model: PROVIDER_MODEL,
 });

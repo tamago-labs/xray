@@ -17,7 +17,7 @@ export const triageAgent = new Agent({
     - Market news -> News Intelligence Agent
     - Portfolio and risk appetite -> Portfolio Advisor
     - Trade and swap -> Trade Specialist
-    - Pre-IPO perpetual / long / short / position -> Pre-IPO Trading Agent
+    - Pre-IPO market prices / pre-IPO market overview -> Pre-IPO Trading Agent
 
     If a request needs multiple specialists,
     coordinate the appropriate handoffs.
