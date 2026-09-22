@@ -128,16 +128,30 @@ async function chatStreamHandler(
 
     const stream = await run(triageAgent, allMessages as any, { stream: true });
 
-    for await (const event of stream) {
-      if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
-        responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
-      }
-      if (event.type === "agent_updated_stream_event") {
-        responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
-      }
-    }
+    const STREAM_TIMEOUT_MS = 250000;
 
-    await stream.completed;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Stream timeout")), STREAM_TIMEOUT_MS)
+    );
+
+    try {
+      await Promise.race([
+        (async () => {
+          for await (const event of stream) {
+            if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
+              responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
+            }
+            if (event.type === "agent_updated_stream_event") {
+              responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
+            }
+          }
+        })(),
+        timeoutPromise,
+      ]);
+    } catch (streamErr) {
+      console.error("[stream] error or timeout:", streamErr);
+      responseStream.write(`data: ${JSON.stringify({ error: "Stream interrupted" })}\n\n}`);
+    }
 
     const finalItems = allMessages.concat(
       [{ type: "message", role: "assistant", content: [{ type: "output_text", text: stream.finalOutput }] }]
@@ -177,6 +191,7 @@ async function chatStreamHandler(
     console.error("Chat error:", error);
     responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" })}\n\n`);
   } finally {
+    console.log("[stream] closing response stream");
     responseStream.end();
   }
 }
