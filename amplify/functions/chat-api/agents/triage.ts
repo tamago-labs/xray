@@ -4,6 +4,7 @@ import { marketResearchAgent } from "./market-research";
 import { newsIntelligenceAgent } from "./news-intelligence";
 import { portfolioAdvisorAgent } from "./portfolio-advisor";
 import { tradeSpecialistAgent } from "./trade-specialist";
+import { preIpoTradingAgent } from "./pre-ipo-trading";
 
 export const triageAgent = new Agent({
   name: "Xray Triage",
@@ -16,6 +17,7 @@ export const triageAgent = new Agent({
     - Market news -> News Intelligence Agent
     - Portfolio and risk appetite -> Portfolio Advisor
     - Trade and swap -> Trade Specialist
+    - Pre-IPO perpetual / long / short / position -> Pre-IPO Trading Agent
 
     If a request needs multiple specialists,
     coordinate the appropriate handoffs.
@@ -25,6 +27,7 @@ export const triageAgent = new Agent({
     newsIntelligenceAgent,
     portfolioAdvisorAgent,
     tradeSpecialistAgent,
+    preIpoTradingAgent,
   ],
   model: PROVIDER_MODEL,
 });
