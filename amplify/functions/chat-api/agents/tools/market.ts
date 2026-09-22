@@ -1,49 +1,116 @@
 import { tool } from "@openai/agents";
 import { z } from "zod";
+import { Amplify } from "aws-amplify";
+import { generateClient } from "aws-amplify/data";
+import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
+import { env } from "$amplify/env/chat-api";
+import type { Schema } from "../../../../data/resource";
+import { getAssetBySymbol, getAssetByTokenSymbol, searchAssets, getAllTokenSymbols } from "./market-config";
 
-const mockTokens = [
-  { symbol: "xAAPL", name: "xApple", price: 198.45, mcap: 3120000000, volume24h: 89000000, change24h: 2.3, sector: "Technology" },
-  { symbol: "xTSLA", name: "xTesla", price: 248.12, mcap: 7890000000, volume24h: 156000000, change24h: -1.8, sector: "Automotive" },
-  { symbol: "xMSFT", name: "xMicrosoft", price: 432.67, mcap: 3210000000, volume24h: 67000000, change24h: 1.1, sector: "Technology" },
-  { symbol: "xGOOG", name: "xGoogle", price: 176.23, mcap: 2180000000, volume24h: 45000000, change24h: 0.8, sector: "Technology" },
-  { symbol: "xAMZN", name: "xAmazon", price: 192.54, mcap: 2050000000, volume24h: 52000000, change24h: 1.5, sector: "E-Commerce" },
-  { symbol: "xNVDA", name: "xNVIDIA", price: 875.30, mcap: 2150000000, volume24h: 234000000, change24h: 4.7, sector: "Technology" },
-  { symbol: "xCOIN", name: "xCoinbase", price: 185.22, mcap: 450000000, volume24h: 31000000, change24h: -3.2, sector: "Crypto" },
-  { symbol: "xMSTR", name: "xMicroStrategy", price: 412.88, mcap: 820000000, volume24h: 28000000, change24h: -2.1, sector: "Finance" },
-];
+async function getClient() {
+  const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
+  Amplify.configure(resourceConfig, libraryOptions);
+  return generateClient<Schema>();
+}
+
+function mergeWithConfig(token_symbol: string, snapshot: any) {
+  const asset = getAssetByTokenSymbol(token_symbol);
+  return {
+    symbol: asset?.symbol ?? snapshot.symbol ?? null,
+    name: asset?.name ?? snapshot.token_symbol,
+    logo: asset?.logo ?? null,
+    industry: asset?.industry ?? null,
+    token_symbol: snapshot.token_symbol,
+    price: snapshot.price ?? null,
+    market_cap: snapshot.market_cap ?? null,
+    volume_24h: snapshot.volume_24h ?? null,
+    percent_1h: snapshot.percent_1h ?? null,
+    percent_24h: snapshot.percent_24h ?? null,
+    percent_7d: snapshot.percent_7d ?? null,
+    percent_30d: snapshot.percent_30d ?? null,
+    circulating_supply: snapshot.circulating_supply ?? null,
+    total_supply: snapshot.total_supply ?? null,
+  };
+}
 
 export const searchTokens = tool({
   name: "search_tokens",
-  description: "Search tokenized stocks by name or symbol. Returns matching tokens with price, market cap, and volume.",
+  description: "Search tokenized stocks by stock name, stock ticker, or token symbol. Returns matching assets with price, market cap, and volume.",
   parameters: z.object({
-    query: z.string().describe("Search query (name or symbol)"),
+    query: z.string().describe("Search query (stock name, ticker, or token symbol)"),
   }),
   execute: async ({ query }: { query: string }) => {
-    const q = query.toLowerCase();
-    const results = mockTokens.filter(
-      (t) => t.name.toLowerCase().includes(q) || t.symbol.toLowerCase().includes(q)
-    );
-    return JSON.stringify(results.length ? results : mockTokens.slice(0, 3));
+    const client = await getClient();
+    const assets = searchAssets(query);
+
+    if (assets.length === 0) {
+      return JSON.stringify([]);
+    }
+
+    const tokenSymbols = assets.flatMap((a) => a.tokens.map((t) => t.token_symbol));
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify([]);
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      if (!tokenSymbols.includes(s.token_symbol)) continue;
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
+    const results = assets.map((asset) => ({
+      symbol: asset.symbol,
+      name: asset.name,
+      logo: asset.logo,
+      industry: asset.industry,
+      tokens: asset.tokens.map((t) => {
+        const snap = latestByToken.get(t.token_symbol);
+        return snap ? mergeWithConfig(t.token_symbol, snap) : { token_symbol: t.token_symbol, price: null };
+      }),
+    }));
+
+    return JSON.stringify(results);
   },
 });
 
 export const getTokenDetails = tool({
   name: "get_token_details",
-  description: "Get detailed information for a specific token including OHLCV data and fundamentals.",
+  description: "Get detailed information for a specific tokenized stock including price, market data, and fundamentals.",
   parameters: z.object({
-    symbol: z.string().describe("Token symbol (e.g., xAAPL)"),
+    symbol: z.string().describe("Stock ticker (e.g., TSLA) or token symbol (e.g., WTSLAX)"),
   }),
   execute: async ({ symbol }: { symbol: string }) => {
-    const token = mockTokens.find((t) => t.symbol.toLowerCase() === symbol.toLowerCase());
-    if (!token) return JSON.stringify({ error: `Token ${symbol} not found` });
+    const client = await getClient();
+
+    const asset = getAssetBySymbol(symbol) ?? getAssetByTokenSymbol(symbol);
+    if (!asset) return JSON.stringify({ error: `Token ${symbol} not found` });
+
+    const tokenSymbols = asset.tokens.map((t) => t.token_symbol);
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify({ error: "No price data available" });
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      if (!tokenSymbols.includes(s.token_symbol)) continue;
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
     return JSON.stringify({
-      ...token,
-      high24h: token.price * 1.03,
-      low24h: token.price * 0.97,
-      open24h: token.price * (1 + token.change24h / 100),
-      pe_ratio: Math.round(20 + Math.random() * 30),
-      dividend_yield: (Math.random() * 2).toFixed(2) + "%",
-      next_earnings: "2026-10-28",
+      symbol: asset.symbol,
+      name: asset.name,
+      logo: asset.logo,
+      industry: asset.industry,
+      tokens: asset.tokens.map((t) => {
+        const snap = latestByToken.get(t.token_symbol);
+        return snap ? mergeWithConfig(t.token_symbol, snap) : { token_symbol: t.token_symbol, price: null };
+      }),
     });
   },
 });
@@ -53,7 +120,21 @@ export const getAllTokens = tool({
   description: "Get all available tokenized stocks with price, market cap, and volume.",
   parameters: z.object({}),
   execute: async () => {
-    return JSON.stringify(mockTokens);
+    const client = await getClient();
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify([]);
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
+    const results = Array.from(latestByToken.values()).map((s) => mergeWithConfig(s.token_symbol, s));
+    return JSON.stringify(results);
   },
 });
 
@@ -62,50 +143,95 @@ export const getMarketOverview = tool({
   description: "Get overall market summary including total market cap, volume, trending, and top movers.",
   parameters: z.object({}),
   execute: async () => {
-    const totalMcap = mockTokens.reduce((s, t) => s + t.mcap, 0);
-    const totalVolume = mockTokens.reduce((s, t) => s + t.volume24h, 0);
-    const sorted = [...mockTokens].sort((a, b) => b.change24h - a.change24h);
+    const client = await getClient();
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify({ error: "No data available" });
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
+    const tokens = Array.from(latestByToken.values()).map((s) => mergeWithConfig(s.token_symbol, s));
+    const totalMcap = tokens.reduce((sum, t) => sum + (t.market_cap ?? 0), 0);
+    const totalVolume = tokens.reduce((sum, t) => sum + (t.volume_24h ?? 0), 0);
+
+    const sortedByChange = [...tokens].sort((a, b) => (b.percent_24h ?? 0) - (a.percent_24h ?? 0));
+    const sortedByVolume = [...tokens].sort((a, b) => (b.volume_24h ?? 0) - (a.volume_24h ?? 0));
+
     return JSON.stringify({
       totalMarketCap: totalMcap,
       totalVolume24h: totalVolume,
-      gainers: sorted.slice(0, 3),
-      losers: sorted.slice(-3).reverse(),
-      trending: [...mockTokens].sort((a, b) => b.volume24h - a.volume24h).slice(0, 3),
-      btcDominance: "52.3%",
-      fearGreedIndex: 68,
+      tokenCount: tokens.length,
+      gainers: sortedByChange.slice(0, 3),
+      losers: sortedByChange.slice(-3).reverse(),
+      trending: sortedByVolume.slice(0, 5),
     });
   },
 });
 
 export const compareTokens = tool({
   name: "compare_tokens",
-  description: "Compare multiple tokens side by side on price, market cap, volume, and fundamentals.",
+  description: "Compare multiple tokenized stocks side by side on price, market cap, volume, and fundamentals.",
   parameters: z.object({
-    symbols: z.array(z.string()).describe("Array of token symbols to compare"),
+    symbols: z.array(z.string()).describe("Array of stock tickers or token symbols to compare"),
   }),
   execute: async ({ symbols }: { symbols: string[] }) => {
+    const client = await getClient();
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify([]);
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
+    const allTokens = Array.from(latestByToken.values()).map((s) => mergeWithConfig(s.token_symbol, s));
+
     const results = symbols
-      .map((s) => mockTokens.find((t) => t.symbol.toLowerCase() === s.toLowerCase()))
+      .map((sym) => {
+        const s = sym.toUpperCase();
+        return allTokens.find((t) => t.symbol === s || t.token_symbol.toUpperCase() === s);
+      })
       .filter(Boolean);
+
     return JSON.stringify(results);
   },
 });
 
 export const getTrendingTokens = tool({
   name: "get_trending_tokens",
-  description: "Get the most trending tokenized stocks by volume, social mentions, and recent price action.",
+  description: "Get the most trending tokenized stocks by volume and recent price action.",
   parameters: z.object({
     limit: z.number().optional().describe("Number of trending tokens to return (default 5)"),
   }),
   execute: async ({ limit = 5 }: { limit?: number }) => {
-    const trending = [...mockTokens]
-      .sort((a, b) => b.volume24h - a.volume24h)
-      .slice(0, limit)
-      .map((t) => ({
-        ...t,
-        trendScore: Math.floor(Math.random() * 100 + 50),
-        socialMentions: Math.floor(Math.random() * 5000 + 500),
-      }));
-    return JSON.stringify(trending);
+    const client = await getClient();
+    const { data: snapshots } = await client.models.PriceSnapshot.list({ limit: 1000 });
+
+    if (!snapshots) return JSON.stringify([]);
+
+    const latestByToken = new Map<string, any>();
+    for (const s of snapshots) {
+      const existing = latestByToken.get(s.token_symbol);
+      if (!existing || (s.createdAt ?? "") > (existing.createdAt ?? "")) {
+        latestByToken.set(s.token_symbol, s);
+      }
+    }
+
+    const sorted = Array.from(latestByToken.values())
+      .map((s) => mergeWithConfig(s.token_symbol, s))
+      .sort((a, b) => (b.volume_24h ?? 0) - (a.volume_24h ?? 0))
+      .slice(0, limit);
+
+    return JSON.stringify(sorted);
   },
 });
