@@ -1,1 +1,1 @@
-export { triageAgent } from "./triage";
+export { createTriageAgent } from "./triage";

@@ -7,7 +7,7 @@ import { env } from "$amplify/env/chat-api";
 import { Amplify } from "aws-amplify";
 import { getAmplifyDataClientConfig } from "@aws-amplify/backend/function/runtime";
 import { PROVIDER_BASE_URL, PROVIDER_MODEL } from "./provider";
-import { triageAgent } from "./agents";
+import { createTriageAgent } from "./agents/triage";
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
 
@@ -130,6 +130,7 @@ async function chatStreamHandler(
       { type: "message" as const, role: "user" as const, content: [{ type: "input_text" as const, text: message }] },
     ];
 
+    const triageAgent = createTriageAgent(walletAddress);
     const stream = await run(triageAgent, allMessages as any, { stream: true, maxTurns: 20 });
 
     const STREAM_TIMEOUT_MS = 250000;
@@ -158,7 +159,19 @@ async function chatStreamHandler(
                   const toolName = item.name ?? item.rawItem?.name ?? item.rawItem?.function?.name ?? "";
                   if (toolName.includes("prepare_trade")) {
                     try {
-                      const raw = item.output ?? item.rawItem?.output ?? item.result;
+                      const candidates = [
+                        item.output,
+                        item.rawItem?.output,
+                        item.rawItem?.content?.[0]?.text,
+                        item.rawItem?.content,
+                        item.output?.output,
+                        item.result,
+                      ];
+                      const raw = candidates.find((v) => v != null);
+                      if (raw == null) {
+                        console.log("[stream] trade output not found, keys:", Object.keys(item).join(","), "rawKeys:", item.rawItem ? Object.keys(item.rawItem).join(",") : "none");
+                        return;
+                      }
                       const output = typeof raw === "string" ? raw : JSON.stringify(raw);
                       const parsed = JSON.parse(output);
                       if (!parsed.error) {
