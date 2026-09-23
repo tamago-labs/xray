@@ -154,34 +154,25 @@ async function chatStreamHandler(
               }
               if (event.type === "run_item_stream_event") {
                 const item = event.item as any;
-                const itemType = item.type ?? item.rawItem?.type ?? "";
-                if (itemType === "tool_call_output_item" || itemType === "tool_call_item" || itemType === "function_call_output") {
-                  const toolName = item.name ?? item.rawItem?.name ?? item.rawItem?.function?.name ?? "";
-                  if (toolName.includes("prepare_trade")) {
+                const itemType = item.type ?? "";
+                const rawType = item.rawItem?.type ?? "";
+                const toolName = item.rawItem?.name ?? item.name ?? "";
+                console.log("[stream] itemType:", itemType, "rawType:", rawType, "toolName:", toolName, "rawKeys:", item.rawItem ? Object.keys(item.rawItem).join(",") : "none", "keys:", Object.keys(item).join(","));
+                if (toolName.includes("prepare_trade") || itemType.includes("prepare_trade")) {
+                  if (rawType === "function_call_output" || itemType === "tool_call_output_item") {
                     try {
-                      const candidates = [
-                        item.output,
-                        item.rawItem?.output,
-                        item.rawItem?.content?.[0]?.text,
-                        item.rawItem?.content,
-                        item.output?.output,
-                        item.result,
-                      ];
-                      const raw = candidates.find((v) => v != null);
-                      if (raw == null) {
-                        console.log("[stream] trade output not found, keys:", Object.keys(item).join(","), "rawKeys:", item.rawItem ? Object.keys(item.rawItem).join(",") : "none");
-                        return;
-                      }
-                      const output = typeof raw === "string" ? raw : JSON.stringify(raw);
-                      const parsed = JSON.parse(output);
-                      if (!parsed.error) {
-                        const trade = {
-                          ...parsed,
-                          status: "pending",
-                          createdAt: new Date().toISOString(),
-                        };
-                        newTrades.push(trade);
-                        responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
+                      const raw = item.rawItem?.output ?? item.output ?? item.rawItem?.result ?? item.result;
+                      if (raw != null) {
+                        const output = typeof raw === "string" ? raw : JSON.stringify(raw);
+                        const parsed = JSON.parse(output);
+                        if (!parsed.error) {
+                          const trade = { ...parsed, status: "pending", createdAt: new Date().toISOString() };
+                          newTrades.push(trade);
+                          responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
+                          console.log("[stream] trade sent");
+                        }
+                      } else {
+                        console.log("[stream] trade output is null, rawItem:", JSON.stringify(item.rawItem)?.slice(0, 300));
                       }
                     } catch (e) {
                       console.log("[stream] trade parse error:", e);
