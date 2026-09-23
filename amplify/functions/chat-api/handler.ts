@@ -153,21 +153,23 @@ async function chatStreamHandler(
               }
               if (event.type === "run_item_stream_event") {
                 const item = event.item as any;
-                console.log("[stream] run_item type:", item.type, "name:", item.name, "rawItem:", JSON.stringify(item.rawItem)?.slice(0, 200));
-                if (item.type === "tool_call_output_item") {
-                  const toolName = item.name ?? item.rawItem?.name ?? item.rawItem?.function?.name ?? item.rawItem?.arguments?.name ?? "unknown";
-                  console.log("[stream] tool_call_output:", toolName);
-                  if (toolName === "prepare_trade") {
+                const itemType = item.type ?? item.rawItem?.type ?? "";
+                if (itemType === "tool_call_output_item" || itemType === "tool_call_item" || itemType === "function_call_output") {
+                  const toolName = item.name ?? item.rawItem?.name ?? item.rawItem?.function?.name ?? "";
+                  if (toolName.includes("prepare_trade")) {
                     try {
-                      const output = typeof item.output === "string" ? item.output : JSON.stringify(item.output);
+                      const raw = item.output ?? item.rawItem?.output ?? item.result;
+                      const output = typeof raw === "string" ? raw : JSON.stringify(raw);
                       const parsed = JSON.parse(output);
-                      const trade = {
-                        ...parsed,
-                        status: "pending",
-                        createdAt: new Date().toISOString(),
-                      };
-                      newTrades.push(trade);
-                      responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
+                      if (!parsed.error) {
+                        const trade = {
+                          ...parsed,
+                          status: "pending",
+                          createdAt: new Date().toISOString(),
+                        };
+                        newTrades.push(trade);
+                        responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
+                      }
                     } catch (e) {
                       console.log("[stream] trade parse error:", e);
                     }
