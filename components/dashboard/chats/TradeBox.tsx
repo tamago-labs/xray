@@ -4,8 +4,19 @@ import { useState } from 'react';
 import { Loader2, ExternalLink } from 'lucide-react';
 import listData from '@/lib/data/rwa-v1-list.json';
 
+const BASE_TOKENS: Record<string, { contractAddress: string; decimals: number }> = {
+  USDG: { contractAddress: "0x4ae46a509f6b1d9056937ba4500cb143933d2dc8", decimals: 6 },
+  USDT: { contractAddress: "0x779ded0c9e1022225f8e0630b35a9b54be713736", decimals: 6 },
+  USDC: { contractAddress: "0xb6ceceab302e2e4948951ee7843fc24e92933061", decimals: 6 },
+  ETH: { contractAddress: "0xe7b000003a45145decf8a28fc755ad5ec5ea025a", decimals: 18 },
+  SOL: { contractAddress: "0x505000008de8748dbd4422ff4687a4fc9beba15b", decimals: 9 },
+  OKB: { contractAddress: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", decimals: 18 },
+};
+
 function getTokenBySymbol(symbol: string): { contractAddress: string; decimals: number } | null {
   const sym = symbol.toUpperCase();
+  const base = BASE_TOKENS[sym];
+  if (base) return base;
   for (const asset of (listData as any).assets) {
     for (const token of asset.tokens ?? []) {
       if (token.symbol.toUpperCase() === sym) {
