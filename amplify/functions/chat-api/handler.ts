@@ -153,8 +153,10 @@ async function chatStreamHandler(
               }
               if (event.type === "run_item_stream_event") {
                 const item = event.item as any;
+                console.log("[stream] run_item type:", item.type, "name:", item.name, "rawItem:", JSON.stringify(item.rawItem)?.slice(0, 200));
                 if (item.type === "tool_call_output_item") {
-                  const toolName = item.name ?? item.rawItem?.name ?? "unknown";
+                  const toolName = item.name ?? item.rawItem?.name ?? item.rawItem?.function?.name ?? item.rawItem?.arguments?.name ?? "unknown";
+                  console.log("[stream] tool_call_output:", toolName);
                   if (toolName === "prepare_trade") {
                     try {
                       const output = typeof item.output === "string" ? item.output : JSON.stringify(item.output);
