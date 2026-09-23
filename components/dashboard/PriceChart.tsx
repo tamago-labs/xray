@@ -14,12 +14,19 @@ const timeframes: { key: Timeframe; label: string; hours: number; interval: stri
 
 export default function PriceChart({ token }: { token: Token }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const fetchedRef = useRef("");
   const [timeframe, setTimeframe] = useState<Timeframe>("30D");
   const [candles, setCandles] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
+    const key = token.crypto_id + ":" + timeframe;
+    const isReFetch = fetchedRef.current === key;
+    fetchedRef.current = key;
+
+    if (isReFetch) return;
+
+    const controller = new AbortController();
     setLoading(true);
 
     const tf = timeframes.find((t) => t.key === timeframe)!;
@@ -27,19 +34,23 @@ export default function PriceChart({ token }: { token: Token }) {
     const start = new Date(end.getTime() - tf.hours * 60 * 60 * 1000);
     const url = `/api/ohlcv?crypto_id=${token.crypto_id}&interval=${tf.interval}&time_start=${encodeURIComponent(start.toISOString())}&time_end=${encodeURIComponent(end.toISOString())}`;
 
-    fetch(url)
+    fetch(url, { signal: controller.signal })
       .then((r) => r.json())
       .then((json) => {
-        if (!cancelled) setCandles(json.data ?? []);
+        setCandles(json.data ?? []);
       })
-      .catch(() => {
-        if (!cancelled) setCandles([]);
+      .catch((err) => {
+        if (err.name !== "AbortError") {
+          setCandles([]);
+        }
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       });
 
-    return () => { cancelled = true; };
+    return () => {
+      if (fetchedRef.current !== key) controller.abort();
+    };
   }, [timeframe, token.crypto_id]);
 
   useEffect(() => {
