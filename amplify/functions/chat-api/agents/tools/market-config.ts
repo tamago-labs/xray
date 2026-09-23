@@ -2,6 +2,7 @@ export interface TokenMeta {
   token_symbol: string;
   crypto_id: number;
   contract_address: string | null;
+  decimals?: number;
 }
 
 export interface AssetMeta {
@@ -82,3 +83,32 @@ export const searchAssets = (query: string): AssetMeta[] => {
 
 export const getAllTokenSymbols = (): string[] =>
   rwaAssetConfig.flatMap((a) => a.tokens.map((t) => t.token_symbol));
+
+const BASE_TOKENS = [
+  { symbol: "USDG", decimals: 6, contract_address: "0x4ae46a509f6b1d9056937ba4500cb143933d2dc8" },
+  { symbol: "USDT", decimals: 6, contract_address: "0x779ded0c9e1022225f8e0630b35a9b54be713736" },
+  { symbol: "USDC", decimals: 6, contract_address: "0xb6ceceab302e2e4948951ee7843fc24e92933061" },
+  { symbol: "ETH", decimals: 18, contract_address: "0xe7b000003a45145decf8a28fc755ad5ec5ea025a" },
+  { symbol: "SOL", decimals: 9, contract_address: "0x505000008de8748dbd4422ff4687a4fc9beba15b" },
+  { symbol: "OKB", decimals: 18, contract_address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE" },
+];
+
+export const getAssetByInput = (input: string): AssetMeta | undefined => {
+  const upper = input.toUpperCase();
+  const rwa = rwaAssetConfig.find((a) =>
+    a.symbol.toUpperCase() === upper ||
+    a.tokens.some((t) => t.token_symbol.toUpperCase() === upper)
+  );
+  if (rwa) return rwa;
+  const base = BASE_TOKENS.find((t) => t.symbol.toUpperCase() === upper);
+  if (base) {
+    return {
+      symbol: base.symbol,
+      name: base.symbol,
+      logo: null,
+      industry: null,
+      tokens: [{ token_symbol: base.symbol, crypto_id: 0, contract_address: base.contract_address, decimals: base.decimals }],
+    };
+  }
+  return undefined;
+};

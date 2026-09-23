@@ -35,8 +35,8 @@ export const getSwapRoute = tool({
         return JSON.stringify({ error: `Unknown token: ${!fromAddr || fromAddr === tokenIn ? fromSymbol : toSymbol}` });
       }
 
-      const fromDecimals = 18;
-      const toDecimals = 18;
+      const fromDecimals = fromAsset?.tokens[0]?.decimals ?? 18;
+      const toDecimals = toAsset?.tokens[0]?.decimals ?? 18;
       const rawAmount = Math.round(amount * Math.pow(10, fromDecimals)).toString();
 
       const url = new URL("https://web3.okx.com/api/v6/dex/aggregator/quote");
