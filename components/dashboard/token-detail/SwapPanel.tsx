@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Token, Asset } from "@/lib/types/token";
 import { ArrowRight, ChevronDown, X, Loader2, RefreshCw } from "lucide-react";
 import { BASE_TOKENS, type BaseToken } from "@/lib/tokens/base-tokens";
 import { formatTokenAmount } from "@/lib/utils/format";
 import RouteVisualization from "./RouteVisualization";
+import { useWallet } from "@/components/app/WalletContext";
+import { formatUnits } from "ethers";
 
 type Tab = "Buy" | "Sell";
 
@@ -33,6 +35,7 @@ interface Quote {
 }
 
 export default function SwapPanel({ token, asset }: { token: Token; asset: Asset }) {
+  const { address, provider } = useWallet();
   const [tab, setTab] = useState<Tab>("Buy");
   const [fromAmount, setFromAmount] = useState("");
   const [baseToken, setBaseToken] = useState<BaseToken>(BASE_TOKENS[5]);
@@ -43,6 +46,32 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [amountEdited, setAmountEdited] = useState(false);
+  const [balance, setBalance] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!address || !provider) { setBalance(null); return; }
+    const tokenAddr = tab === "Buy" ? baseToken.address : token.contractAddress;
+    const decimals = tab === "Buy" ? baseToken.decimals : token.decimals ?? 18;
+    if (!tokenAddr) { setBalance(null); return; }
+
+    const erc20Abi = ["function balanceOf(address) view returns (uint256)"];
+    const isNative = tokenAddr === "0x0000000000000000000000000000000000000000" || tokenAddr === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+
+    (async () => {
+      try {
+        if (isNative) {
+          const bal = await provider.getBalance(address);
+          setBalance(formatUnits(bal, decimals));
+        } else {
+          const contract = new (await import("ethers")).Contract(tokenAddr, erc20Abi, provider);
+          const bal = await contract.balanceOf(address);
+          setBalance(formatUnits(bal, decimals));
+        }
+      } catch {
+        setBalance(null);
+      }
+    })();
+  }, [address, provider, tab, baseToken.address, token.contractAddress]);
 
   async function fetchQuote(amount: string) {
     setLoading(true);
@@ -156,22 +185,11 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
       </div>
 
       <div className="mt-3 pt-3 border-t border-white/[0.06]">
-        <div className="flex items-center justify-between text-[11px] mb-3">
-          <span className="text-white/50 flex items-center gap-1.5">
-            Best price via{" "}
-            <img src="https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png" alt="OKX" className="w-3.5 h-3.5 rounded-full inline-block" />{" "}
-            OKX DEX Router
-          </span>
-          {tab === "Sell" && (
-            <button
-              onClick={() => setTokenModalOpen(true)}
-              className="flex items-center gap-1 bg-white/[0.04] px-2 py-1 rounded-lg hover:bg-white/[0.08] transition-colors"
-            >
-              <span className="text-[11px] text-white/40">→</span>
-              <img src={baseToken.logo} alt={baseToken.symbol} className="w-3.5 h-3.5 rounded-full" />
-              <span className="text-[11px] font-medium text-white/60">{baseToken.symbol}</span>
-              <ChevronDown className="w-2.5 h-2.5 text-white/30" />
-            </button>
+        <div className="text-[11px] text-white/40 mb-3">
+          {balance !== null ? (
+            <span>Balance: <span className="text-white/60">{Number(balance).toFixed(4)} {tab === "Buy" ? baseToken.symbol : token.symbol}</span></span>
+          ) : (
+            <span className="text-white/20">—</span>
           )}
         </div>
         <button
@@ -181,6 +199,11 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
         >
           Get Quote <ArrowRight className="w-4 h-4" />
         </button>
+        <div className="text-[10px] text-white/25 text-center mt-2 flex items-center justify-center gap-1">
+          Best price via{" "}
+          <img src="https://s2.coinmarketcap.com/static/img/exchanges/64x64/294.png" alt="OKX" className="w-3 h-3 rounded-full" />{" "}
+          OKX DEX Router
+        </div>
       </div>
 
       {/* Token Selector Modal */}
