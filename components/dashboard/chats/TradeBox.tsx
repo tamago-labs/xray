@@ -57,7 +57,6 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
   const [executing, setExecuting] = useState(false);
 
   const handleConfirm = async () => {
-    console.log("[TradeBox] confirm clicked", { provider: !!provider, address, trade });
     if (!provider || !address) {
       onError('Wallet not connected');
       return;
@@ -67,7 +66,6 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
     try {
       const fromToken = getTokenBySymbol(trade.tokenIn);
       const toToken = getTokenBySymbol(trade.tokenOut);
-      console.log("[TradeBox] tokens:", fromToken, toToken);
 
       if (!fromToken || !toToken) {
         onError('Unknown token');
@@ -88,10 +86,8 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
         slippagePercent: '0.5',
       });
 
-      console.log("[TradeBox] fetching swap", `/api/swap?${params}`);
       const res = await fetch(`/api/swap?${params}`);
       const json = await res.json();
-      console.log("[TradeBox] swap response", json);
 
       if (!res.ok || json.error) {
         onError(json.error ?? 'Failed to get swap data');
@@ -112,7 +108,6 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
         }
       }
 
-      console.log("[TradeBox] sending tx");
       const tx = await signer.sendTransaction({
         to: swapData.tx.to,
         data: swapData.tx.data,
@@ -121,7 +116,6 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
       });
 
       const receipt = await tx.wait();
-      console.log("[TradeBox] receipt", receipt?.status);
 
       if (receipt?.status === 1) {
         onExecuted(receipt.hash);
@@ -129,7 +123,6 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
         onError('Transaction failed');
       }
     } catch (err: any) {
-      console.error("[TradeBox] error:", err);
       onError(err instanceof Error ? err.message : 'Trade failed');
     } finally {
       setExecuting(false);

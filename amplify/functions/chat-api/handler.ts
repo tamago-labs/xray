@@ -173,7 +173,6 @@ async function chatStreamHandler(
                           const trade = { ...parsed, status: "pending", createdAt: new Date().toISOString() };
                           newTrades.push(trade);
                           responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
-                          console.log("[stream] trade sent");
                         }
                       }
                     } catch (e) {
