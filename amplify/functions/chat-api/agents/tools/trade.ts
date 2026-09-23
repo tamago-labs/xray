@@ -102,22 +102,22 @@ export const prepareTrade = tool({
   }),
   execute: async ({ tokenIn, tokenOut, amountIn }: { tokenIn: string; tokenOut: string; amountIn: number }) => {
     try {
-      const { getAssetByTokenSymbol } = await import("./market-config");
-      const fromAsset = getAssetByTokenSymbol(tokenIn);
-      const toAsset = getAssetByTokenSymbol(tokenOut);
+      const { getAssetByInput } = await import("./market-config");
+      const fromAsset = getAssetByInput(tokenIn);
+      const toAsset = getAssetByInput(tokenOut);
 
       const fromSymbol = tokenIn.toUpperCase();
       const toSymbol = tokenOut.toUpperCase();
 
-      const fromAddr = fromAsset?.tokens[0]?.token_symbol ?? tokenIn;
-      const toAddr = toAsset?.tokens[0]?.token_symbol ?? tokenOut;
+      const fromAddr = fromAsset?.tokens[0]?.contract_address ?? tokenIn;
+      const toAddr = toAsset?.tokens[0]?.contract_address ?? tokenOut;
 
-      if (!fromAddr || !toAddr) {
-        return JSON.stringify({ error: `Unknown token: ${!fromAddr ? fromSymbol : toSymbol}` });
+      if (!fromAddr || !toAddr || fromAddr === tokenIn || toAddr === tokenOut) {
+        return JSON.stringify({ error: `Unknown token: ${!fromAddr || fromAddr === tokenIn ? fromSymbol : toSymbol}` });
       }
 
-      const fromDecimals = 18;
-      const toDecimals = 18;
+      const fromDecimals = fromAsset?.tokens[0]?.decimals ?? 18;
+      const toDecimals = toAsset?.tokens[0]?.decimals ?? 18;
       const rawAmount = Math.round(amountIn * Math.pow(10, fromDecimals)).toString();
 
       const url = new URL("https://web3.okx.com/api/v6/dex/aggregator/quote");
