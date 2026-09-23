@@ -21,18 +21,18 @@ export const getSwapRoute = tool({
   }),
   execute: async ({ tokenIn, tokenOut, amount }: { tokenIn: string; tokenOut: string; amount: number }) => {
     try {
-      const { getAssetByTokenSymbol } = await import("./market-config");
-      const fromAsset = getAssetByTokenSymbol(tokenIn);
-      const toAsset = getAssetByTokenSymbol(tokenOut);
+      const { getAssetByInput } = await import("./market-config");
+      const fromAsset = getAssetByInput(tokenIn);
+      const toAsset = getAssetByInput(tokenOut);
 
       const fromSymbol = tokenIn.toUpperCase();
       const toSymbol = tokenOut.toUpperCase();
 
-      const fromAddr = fromAsset?.tokens[0]?.token_symbol ?? tokenIn;
-      const toAddr = toAsset?.tokens[0]?.token_symbol ?? tokenOut;
+      const fromAddr = fromAsset?.tokens[0]?.contract_address ?? tokenIn;
+      const toAddr = toAsset?.tokens[0]?.contract_address ?? tokenOut;
 
-      if (!fromAddr || !toAddr) {
-        return JSON.stringify({ error: `Unknown token: ${!fromAddr ? fromSymbol : toSymbol}` });
+      if (!fromAddr || !toAddr || fromAddr === tokenIn || toAddr === tokenOut) {
+        return JSON.stringify({ error: `Unknown token: ${!fromAddr || fromAddr === tokenIn ? fromSymbol : toSymbol}` });
       }
 
       const fromDecimals = 18;

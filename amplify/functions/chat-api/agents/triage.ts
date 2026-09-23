@@ -15,7 +15,7 @@ export const triageAgent = new Agent({
     Route requests:
     - Token research -> Market Research Agent
     - Market news -> News Intelligence Agent
-    - Trade and swap -> Trade Specialist
+    - Trade / swap / quote -> Trade Specialist
     - Pre-IPO market prices / pre-IPO market overview -> Pre-IPO Trading Agent
 
     If a request needs multiple specialists,
