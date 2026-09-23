@@ -115,11 +115,15 @@ async function chatStreamHandler(
     setDefaultOpenAIClient(client);
     setTracingDisabled(true);
 
-    const historyMessages = sessionItems.map((item: any) => ({
-      type: item.type ?? "message",
-      role: item.role ?? "user",
-      content: item.content ?? "",
-    }));
+    const historyMessages = sessionItems.map((item: any) => {
+      const role = item.role ?? "user";
+      let content = item.content ?? "";
+      if (typeof content === "string") {
+        const contentType = role === "assistant" ? "output_text" : "input_text";
+        content = [{ type: contentType, text: content }];
+      }
+      return { type: item.type ?? "message", role, content };
+    });
 
     const allMessages = [
       ...historyMessages,
@@ -134,15 +138,42 @@ async function chatStreamHandler(
       setTimeout(() => reject(new Error("Stream timeout")), STREAM_TIMEOUT_MS)
     );
 
+    const newTrades: any[] = [];
+
     try {
       await Promise.race([
         (async () => {
           for await (const event of stream) {
-            if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
-              responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
-            }
-            if (event.type === "agent_updated_stream_event") {
-              responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
+            try {
+              if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
+                responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
+              }
+              if (event.type === "agent_updated_stream_event") {
+                responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
+              }
+              if (event.type === "run_item_stream_event") {
+                const item = event.item as any;
+                if (item.type === "tool_call_output_item") {
+                  const toolName = item.name ?? item.rawItem?.name ?? "unknown";
+                  if (toolName === "prepare_trade") {
+                    try {
+                      const output = typeof item.output === "string" ? item.output : JSON.stringify(item.output);
+                      const parsed = JSON.parse(output);
+                      const trade = {
+                        ...parsed,
+                        status: "pending",
+                        createdAt: new Date().toISOString(),
+                      };
+                      newTrades.push(trade);
+                      responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
+                    } catch (e) {
+                      console.log("[stream] trade parse error:", e);
+                    }
+                  }
+                }
+              }
+            } catch (eventErr) {
+              console.error("[stream] event error:", eventErr);
             }
           }
         })(),
@@ -157,7 +188,7 @@ async function chatStreamHandler(
     }
 
     const finalItems = allMessages.concat(
-      [{ type: "message", role: "assistant", content: [{ type: "output_text", text: stream.finalOutput }] }]
+      [{ type: "message", role: "assistant", content: [{ type: "output_text", text: stream.finalOutput ?? "" }] }]
     );
 
     if (currentSessionId) {
@@ -165,6 +196,20 @@ async function chatStreamHandler(
         id: currentSessionId,
         items: JSON.stringify(finalItems),
       });
+    }
+
+    if (currentSessionId && newTrades.length > 0) {
+      try {
+        const { data: session } = await dataClient.models.AgentSession.get({ id: currentSessionId });
+        const existingTransactions = session?.transactions ? JSON.parse(session.transactions as string) : [];
+        const updatedTransactions = [...existingTransactions, ...newTrades];
+        await dataClient.models.AgentSession.update({
+          id: currentSessionId,
+          transactions: JSON.stringify(updatedTransactions),
+        });
+      } catch (tradeErr) {
+        console.error("[trades] failed to save:", tradeErr);
+      }
     }
 
     const inputTokens = estimateTokens(message);

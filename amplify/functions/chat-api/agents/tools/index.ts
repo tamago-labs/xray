@@ -1,4 +1,4 @@
 export { searchTokens, getTokenDetails, getAllTokens, getMarketOverview, compareTokens, getTrendingTokens } from "./market";
 export { searchNews, getLatestNews } from "./news";
-export { getSwapRoute, estimateGas, prepareTrade } from "./trade";
+export { getSwapRoute, prepareTrade } from "./trade";
 export { getPreIpoMarkets } from "./pre-ipo";

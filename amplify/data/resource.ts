@@ -45,6 +45,7 @@ const schema = a.schema({
       walletAddress: a.string().required(),
       sessionName: a.string().required(),
       items: a.json().required(),
+      transactions: a.json(),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
     .secondaryIndexes((index) => [

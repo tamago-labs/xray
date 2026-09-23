@@ -2,14 +2,16 @@
 
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
-import { Send, MoreVertical, Trash2 } from 'lucide-react';
-import { useWallet } from '@/components/app/WalletContext';
+import { Send, MoreVertical, Trash2, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
+import TradeBox, { TradeData } from '@/components/dashboard/chats/TradeBox';
+import { useWallet } from '@/components/app/WalletContext';
 
 const dataClient = generateClient<Schema>();
 const MIN_CREDITS = 1;
@@ -22,9 +24,10 @@ interface Message {
 export default function ChatSession() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const { address } = useWallet();
+  const { address, provider } = useWallet();
   const id = params.id as string;
   const [messages, setMessages] = useState<Message[]>([]);
+  const [trades, setTrades] = useState<TradeData[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeAgent, setActiveAgent] = useState<string | null>(null);
@@ -113,6 +116,9 @@ export default function ChatSession() {
               if (json.error) {
                 setError(json.error);
               }
+              if (json.trade) {
+                setTrades((prev) => [...prev, json.trade as TradeData]);
+              }
             } catch {}
           }
         }
@@ -131,6 +137,7 @@ export default function ChatSession() {
     setError('');
     setMessages((prev) => [...prev, { role: 'user', content: message }]);
     setLoading(true);
+    setActiveAgent(null);
 
     try {
       const res = await fetch(process.env.NEXT_PUBLIC_CHAT_API_URL || '', {
@@ -150,7 +157,6 @@ export default function ChatSession() {
 
       const decoder = new TextDecoder();
       let aiContent = '';
-      setActiveAgent(null);
 
       setMessages((prev) => [...prev, { role: 'ai', content: '' }]);
 
@@ -172,6 +178,9 @@ export default function ChatSession() {
             }
             if (json.agent) {
               setActiveAgent(json.agent);
+            }
+            if (json.trade) {
+              setTrades((prev) => [...prev, json.trade as TradeData]);
             }
           } catch {}
         }
@@ -251,6 +260,57 @@ export default function ChatSession() {
           );
         })}
       </div>
+
+      <AnimatePresence>
+        {trades.filter((t) => t.status === 'pending').length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setTrades((prev) => prev.map((t) => ({ ...t, status: 'cancelled' })))}
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-md rounded-2xl border border-border3/50 bg-surface p-6 shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[14px] font-semibold text-white/90">Confirm Trade</h3>
+                <button
+                  onClick={() => setTrades((prev) => prev.map((t) => ({ ...t, status: 'cancelled' })))}
+                  className="p-1 rounded-lg text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              {trades.filter((t) => t.status === 'pending').map((trade, i) => (
+                <TradeBox
+                  key={i}
+                  trade={trade}
+                  provider={provider}
+                  address={address}
+                  onExecuted={(sig) => {
+                    setTrades((prev) => prev.map((t, j) => j === i ? { ...t, status: 'executed', signature: sig } : t));
+                  }}
+                  onError={setError}
+                  onCancel={() => {
+                    setTrades((prev) => prev.map((t, j) => j === i ? { ...t, status: 'cancelled' } : t));
+                  }}
+                />
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="border-t border-border3/50 px-6 py-4">
         <div className="flex items-center gap-3">
