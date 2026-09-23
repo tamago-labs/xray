@@ -165,6 +165,7 @@ async function chatStreamHandler(
                       if (raw != null) {
                         const output = typeof raw === "string" ? raw : JSON.stringify(raw);
                         const parsed = JSON.parse(output);
+                        console.log("[stream] trade parsed:", JSON.stringify(parsed)?.slice(0, 300));
                         if (!parsed.error) {
                           const trade = { ...parsed, status: "pending", createdAt: new Date().toISOString() };
                           newTrades.push(trade);

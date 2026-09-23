@@ -132,15 +132,15 @@ export default function TradeBox({ trade, onExecuted, onError, onCancel, provide
         <div className="text-center">
           <p className="text-[11px] text-white/40 mb-0.5">You receive</p>
           <p className="text-[14px] font-medium text-white/90">
-            {trade.estimatedOutput.toLocaleString(undefined, { maximumFractionDigits: 6 })} {trade.tokenOut}
+            {trade.estimatedOutput?.toLocaleString(undefined, { maximumFractionDigits: 6 }) ?? "—"} {trade.tokenOut}
           </p>
         </div>
       </div>
       <div className="flex items-center justify-between text-[11px] text-white/40 mb-3">
         <span>
-          Price: {trade.price < 1 ? trade.price.toFixed(6) : trade.price.toFixed(2)} {trade.tokenOut}/{trade.tokenIn}
+          Price: {trade.price != null && trade.price < 1 ? trade.price.toFixed(6) : trade.price?.toFixed(2) ?? "—"} {trade.tokenOut}/{trade.tokenIn}
         </span>
-        <span>Impact: {trade.priceImpact}%</span>
+        <span>Impact: {trade.priceImpact ?? "—"}%</span>
       </div>
       {trade.status === 'executed' && trade.signature ? (
         <div className="flex items-center gap-2 text-[12px] text-green-400">
