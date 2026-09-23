@@ -262,7 +262,7 @@ export default function ChatSession() {
       </div>
 
       <AnimatePresence>
-        {trades.filter((t) => t.status === 'pending').length > 0 && (
+        {trades.filter((t) => t.status === 'pending' && t.tokenIn && t.tokenOut && t.estimatedOutput != null).length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
