@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Token, Asset } from "@/lib/types/token";
-import { ArrowRight, ChevronDown, X, Loader2, RefreshCw } from "lucide-react";
+import { ArrowRight, ChevronDown, X, Loader2, RefreshCw, ExternalLink } from "lucide-react";
 import { BASE_TOKENS, type BaseToken } from "@/lib/tokens/base-tokens";
 import { formatTokenAmount } from "@/lib/utils/format";
 import RouteVisualization from "./RouteVisualization";
@@ -47,6 +47,8 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
   const [error, setError] = useState("");
   const [amountEdited, setAmountEdited] = useState(false);
   const [balance, setBalance] = useState<string | null>(null);
+  const [swapStatus, setSwapStatus] = useState<"idle" | "swapping" | "success" | "failed">("idle");
+  const [txHash, setTxHash] = useState("");
 
   useEffect(() => {
     if (!address || !provider) { setBalance(null); return; }
@@ -121,8 +123,72 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
     fetchQuote(quoteAmount);
   }
 
-  function handleSwap() {
-    console.log("Swap:", quote?.quoteId, quoteAmount);
+  function resetSwap() {
+    setSwapStatus("idle");
+    setTxHash("");
+    setError("");
+  }
+
+  async function handleSwap() {
+    if (!quote || !quoteAmount || !provider || !address) return;
+
+    const decimals = tab === "Buy" ? baseToken.decimals : token.decimals ?? 18;
+    const rawAmount = (Number(quoteAmount) * Math.pow(10, decimals)).toString();
+    const fromAddr = tab === "Buy" ? baseToken.address : (token.contractAddress ?? "");
+    const toAddr = tab === "Buy" ? (token.contractAddress ?? "") : baseToken.address;
+
+    setSwapStatus("swapping");
+    setTxHash("");
+    setError("");
+
+    try {
+      const params = new URLSearchParams({
+        fromTokenAddress: fromAddr,
+        toTokenAddress: toAddr,
+        amount: rawAmount,
+        userWalletAddress: address,
+        slippagePercent: "0.5",
+      });
+      const res = await fetch(`/api/swap?${params}`);
+      const json = await res.json();
+
+      if (!res.ok || json.error) {
+        throw new Error(json.error ?? "Failed to get swap data");
+      }
+
+      const signer = await provider.getSigner();
+      const swapData = json.swap;
+
+      if (swapData.signatureData && swapData.signatureData.length > 0) {
+        for (const sig of swapData.signatureData) {
+          const approveTx = await signer.sendTransaction({
+            to: sig.approveContract ?? swapData.tx.to,
+            data: sig.approveTxCalldata ?? swapData.tx.data,
+          });
+          await approveTx.wait();
+        }
+      }
+
+      const tx = await signer.sendTransaction({
+        to: swapData.tx.to,
+        data: swapData.tx.data,
+        value: swapData.tx.value || "0x0",
+        gasLimit: swapData.tx.gas ? BigInt(swapData.tx.gas) : undefined,
+      });
+
+      const receipt = await tx.wait();
+
+      if (receipt?.status === 1) {
+        setTxHash(receipt.hash);
+        setSwapStatus("success");
+      } else {
+        throw new Error("Transaction failed");
+      }
+    } catch (err: any) {
+      console.error("[swap] error:", err?.message);
+      setError(err.message ?? "Swap failed");
+      setSwapStatus("failed");
+    }
   }
 
   return (
@@ -398,7 +464,34 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
                     </div>
 
                     {/* Action Button */}
-                    {amountEdited ? (
+                    {swapStatus === "success" ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[12px] text-green-400 bg-green-400/10 rounded-lg px-3 py-2">
+                          <span>Swap confirmed</span>
+                          <a
+                            href={`https://web3.okx.com/explorer/x-layer/tx/${txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-accent hover:underline"
+                          >
+                            View <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                        <button
+                          onClick={() => { setQuoteModalOpen(false); resetSwap(); }}
+                          className="w-full py-2 rounded-xl bg-white/[0.06] text-[12px] text-white/60 hover:text-white/80 transition-colors"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    ) : swapStatus === "swapping" ? (
+                      <button
+                        disabled
+                        className="w-full py-2.5 rounded-xl bg-accent text-sm font-medium text-white flex items-center justify-center gap-2 opacity-80"
+                      >
+                        <Loader2 className="w-4 h-4 animate-spin" /> Swapping…
+                      </button>
+                    ) : amountEdited ? (
                       <button
                         onClick={handleRefetch}
                         className="w-full py-2.5 rounded-xl bg-accent text-sm font-medium text-white hover:bg-accent/80 transition-colors flex items-center justify-center gap-2"
@@ -408,10 +501,23 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
                     ) : (
                       <button
                         onClick={handleSwap}
-                        className="w-full py-2.5 rounded-xl bg-accent text-sm font-medium text-white hover:bg-accent/80 transition-colors flex items-center justify-center gap-2"
+                        disabled={!provider}
+                        className="w-full py-2.5 rounded-xl bg-accent text-sm font-medium text-white hover:bg-accent/80 transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        Swap <ArrowRight className="w-4 h-4" />
+                        {!provider ? "Connect Wallet" : "Swap"} <ArrowRight className="w-4 h-4" />
                       </button>
+                    )}
+
+                    {swapStatus === "failed" && error && (
+                      <div className="text-center mt-2">
+                        <p className="text-[12px] text-red-400">{error}</p>
+                        <button
+                          onClick={resetSwap}
+                          className="mt-1 text-[11px] text-accent hover:underline"
+                        >
+                          Try again
+                        </button>
+                      </div>
                     )}
                   </>
                 )}
