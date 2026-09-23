@@ -157,23 +157,24 @@ async function chatStreamHandler(
                 const itemType = item.type ?? "";
                 const rawType = item.rawItem?.type ?? "";
                 const toolName = item.rawItem?.name ?? item.name ?? "";
-                console.log("[stream] itemType:", itemType, "rawType:", rawType, "toolName:", toolName, "rawKeys:", item.rawItem ? Object.keys(item.rawItem).join(",") : "none", "keys:", Object.keys(item).join(","));
-                if (toolName.includes("prepare_trade") || itemType.includes("prepare_trade")) {
-                  if (rawType === "function_call_output" || itemType === "tool_call_output_item") {
+                if (toolName.includes("prepare_trade")) {
+                  if (rawType === "function_call_result" || itemType === "tool_call_output_item") {
                     try {
-                      const raw = item.rawItem?.output ?? item.output ?? item.rawItem?.result ?? item.result;
+                      const raw = item.output ?? item.rawItem?.output;
                       if (raw != null) {
                         const output = typeof raw === "string" ? raw : JSON.stringify(raw);
-                        const parsed = JSON.parse(output);
-                        console.log("[stream] trade parsed:", JSON.stringify(parsed)?.slice(0, 300));
-                        if (!parsed.error) {
+                        let parsed = JSON.parse(output);
+                        if (parsed.type === "text" && parsed.text) {
+                          parsed = JSON.parse(parsed.text);
+                        }
+                        if (parsed.error) {
+                          console.log("[stream] trade error:", parsed.error);
+                        } else {
                           const trade = { ...parsed, status: "pending", createdAt: new Date().toISOString() };
                           newTrades.push(trade);
                           responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
                           console.log("[stream] trade sent");
                         }
-                      } else {
-                        console.log("[stream] trade output is null, rawItem:", JSON.stringify(item.rawItem)?.slice(0, 300));
                       }
                     } catch (e) {
                       console.log("[stream] trade parse error:", e);
