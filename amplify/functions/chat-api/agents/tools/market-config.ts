@@ -63,14 +63,6 @@ export const getAssetBySymbol = (symbol: string): AssetMeta | undefined =>
 export const getAssetByTokenSymbol = (tokenSymbol: string): AssetMeta | undefined =>
   rwaAssetConfig.find((a) => a.tokens.some((t) => t.token_symbol.toLowerCase() === tokenSymbol.toLowerCase()));
 
-export const getAssetByInput = (input: string): AssetMeta | undefined => {
-  const upper = input.toUpperCase();
-  return rwaAssetConfig.find((a) =>
-    a.symbol.toUpperCase() === upper ||
-    a.tokens.some((t) => t.token_symbol.toUpperCase() === upper)
-  );
-};
-
 export const searchAssets = (query: string): AssetMeta[] => {
   const q = query.toLowerCase();
   return rwaAssetConfig.filter(
