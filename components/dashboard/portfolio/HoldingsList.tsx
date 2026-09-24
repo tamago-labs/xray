@@ -11,19 +11,21 @@ export default function HoldingsList() {
   const { balances, loading } = useTokenBalances(address ?? undefined, chainId ?? undefined);
   const { getPrice, getChange24h, loading: pricesLoading } = useBaseTokenPrices();
 
-  const holdings = tokens.map((token) => {
-    const balance = parseFloat(balances[token.symbol] ?? '0');
-    const price = getPrice(token.symbol);
-    return {
-      symbol: token.symbol,
-      name: token.name,
-      logo: token.logo,
-      balance,
-      value: balance * price,
-      price,
-      change: getChange24h(token.symbol),
-    };
-  });
+   const allHoldings = tokens.map((token) => {
+     const balance = parseFloat(balances[token.symbol] ?? '0');
+     const price = getPrice(token.symbol);
+     return {
+       symbol: token.symbol,
+       name: token.name,
+       logo: token.logo,
+       balance,
+       value: balance * price,
+       price,
+       change: getChange24h(token.symbol),
+     };
+   });
+
+   const holdings = address ? allHoldings.filter((h) => h.balance > 0) : allHoldings;
 
   if (loading || pricesLoading) {
     return (
