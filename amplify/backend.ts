@@ -6,12 +6,14 @@ import { data } from "./data/resource";
 import { priceTracker } from "./functions/price-tracker/resource";
 import { chatApiFunction } from "./functions/chat-api/resource";
 import { preIpoTracker } from "./functions/pre-ipo-tracker/resource";
+import { evaluateRiskFunction } from "./functions/evaluate-risk/resource";
 
 const backend = defineBackend({
   data,
   priceTracker,
   chatApiFunction,
   preIpoTracker,
+  evaluateRiskFunction,
 });
 
 const lambdaFunction = backend.chatApiFunction.resources.lambda as LambdaFunction;

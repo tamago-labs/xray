@@ -2,6 +2,7 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { priceTracker } from "../functions/price-tracker/resource";
 import { chatApiFunction } from "../functions/chat-api/resource";
 import { preIpoTracker } from "../functions/pre-ipo-tracker/resource";
+import { evaluateRiskFunction } from "../functions/evaluate-risk/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -87,6 +88,36 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "update"])]),
 
+  RiskReportType: a.customType({
+    overallScore: a.integer(),
+    overallLabel: a.string(),
+    overallDescription: a.string(),
+    concentration: a.json(),
+    marketRisk: a.json(),
+    tokenRisk: a.json(),
+    rebalanceSuggestions: a.json(),
+  }),
+
+  evaluateRisk: a
+    .mutation()
+    .arguments({
+      walletAddress: a.string(),
+      holdings: a.string(),
+      portfolioValue: a.float(),
+    })
+    .returns(a.ref("RiskReportType"))
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(a.handler.function(evaluateRiskFunction)),
+
+  RiskEvaluation: a
+    .model({
+      id: a.string().required(),
+      report: a.string().required(),
+      overallScore: a.integer().required(),
+      rebalanceSuggestions: a.string(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])]),
+
   NewsArticle: a
     .model({
       title: a.string().required(),
@@ -106,6 +137,7 @@ const schema = a.schema({
   allow.resource(priceTracker),
   allow.resource(chatApiFunction),
   allow.resource(preIpoTracker),
+  allow.resource(evaluateRiskFunction),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;
