@@ -165,7 +165,7 @@ export default function PortfolioStats() {
   const sectorMap = new Map<string, number>();
   for (const t of RWA_TOKENS.filter((t) => rwaConfig.trackedSymbols.includes(t.symbol))) {
     const priceData = rwaPriceMap.get(t.symbol);
-    if (priceData && rwaConfig.trackedSymbols.includes(t.symbol)) {
+    if (priceData) {
       let balance: number;
       if (rwaConfig.useMockValue) {
         balance = rwaConfig.mockValues[t.symbol] ?? 0;
@@ -176,8 +176,7 @@ export default function PortfolioStats() {
       }
       const value = balance * (priceData?.price ?? 0);
       if (value > 0) {
-        const meta = (priceData as any)?.sector || 'Other';
-        sectorMap.set(meta, (sectorMap.get(meta) ?? 0) + value);
+        sectorMap.set(t.industry, (sectorMap.get(t.industry) ?? 0) + value);
       }
     }
   }

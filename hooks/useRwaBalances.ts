@@ -4,13 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import rwaList from '@/lib/data/rwa-v1-list.json';
 
-export const RWA_TOKENS: { symbol: string; name: string; contractAddress: string; decimals: number; logo: string }[] =
+export const RWA_TOKENS: { symbol: string; name: string; contractAddress: string; decimals: number; logo: string; industry: string }[] =
   (rwaList as any).assets.map((a: any) => ({
     symbol: a.tokens[0].symbol,
     name: a.tokens[0].name,
     contractAddress: a.tokens[0].contractAddress,
     decimals: a.tokens[0].decimals,
     logo: a.tokens[0].logo,
+    industry: a.industry ?? 'Other',
   }));
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
