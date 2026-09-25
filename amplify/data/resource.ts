@@ -3,6 +3,7 @@ import { priceTracker } from "../functions/price-tracker/resource";
 import { chatApiFunction } from "../functions/chat-api/resource";
 import { preIpoTracker } from "../functions/pre-ipo-tracker/resource";
 import { evaluateRiskFunction } from "../functions/evaluate-risk/resource";
+import { ohlcvFetcherFunction } from "../functions/ohlcv-fetcher/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -118,6 +119,18 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])]),
 
+  ohlcvFetcher: a
+    .query()
+    .arguments({
+      cryptoId: a.string(),
+      interval: a.string(),
+      timeStart: a.string(),
+      timeEnd: a.string(),
+    })
+    .returns(a.json())
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(a.handler.function(ohlcvFetcherFunction)),
+
   NewsArticle: a
     .model({
       title: a.string().required(),
@@ -138,6 +151,7 @@ const schema = a.schema({
   allow.resource(chatApiFunction),
   allow.resource(preIpoTracker),
   allow.resource(evaluateRiskFunction),
+  allow.resource(ohlcvFetcherFunction),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;
