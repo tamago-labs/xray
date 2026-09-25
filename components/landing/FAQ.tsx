@@ -11,20 +11,33 @@ const faqs = [
   },
   {
     question: 'How does Xray work?',
-    answer: 'Simply tell Xray what you are looking for. Our multi-agent system researches the market, analyzes tokenized stocks, scans news, and explains opportunities in plain language. You can also compare assets, assess portfolio risk, and prepare trades through OKX DEX Router.',
+    answer: 'Simply tell Xray what you are looking for. Our multi-agent system researches the market, analyzes tokenized stocks, scans news, and explains opportunities in plain language. You can also evaluate portfolio risk, get AI rebalance suggestions, and swap tokens through OKX DEX Router — all from the same chat interface.',
   },
   {
     question: 'What are tokenized stocks (xStocks)?',
     answer: 'Tokenized stocks are blockchain-based tokens that represent real-world equity shares. They offer 24/7 trading, global access, and fractional ownership. Xray focuses on tokenized stocks available on X Layer, backed by real-time data and liquidity from OKX.',
   },
   {
+    question: 'What are Pre-IPO perpetuals?',
+    answer: 'Pre-IPO perpetuals let you trade tokenized pre-IPO equity (like OpenAI, Anthropic, Stripe) with a counter-party AMM mechanism on X Layer. You can open long/short positions, manage collateral, and track mark prices in real-time.',
+  },
+  {
+    question: 'How does portfolio risk analysis work?',
+    answer: 'Xray evaluates your portfolio using two AI agents. The first analyzes concentration, market risk, and token liquidity. The second provides actionable rebalance suggestions — telling you exactly which tokens to reduce or add, with target allocations. Risk scores range from 0-100 based on your actual holdings and real-time market data from CoinMarketCap.',
+  },
+  {
+    question: 'What are rebalance suggestions?',
+    answer: 'After a risk evaluation, Xray generates specific recommendations to improve your portfolio\'s risk profile. Each suggestion includes an action (reduce, add, diversify, or hedge), the token involved, a reason based on your concentration and sector exposure, and a suggested target allocation percentage.',
+  },
+  {
+    question: 'Can I swap tokens directly on Xray?',
+    answer: 'Yes. Xray integrates with OKX DEX Router to find the best swap route on X Layer. You can review the quote (price, price impact, route) and execute the swap directly — including token approval and transaction broadcast — all from the chat interface or swap panel.',
+  },
+  {
     question: 'How does the credit system work?',
     answer: 'Each AI interaction consumes credits based on response length. New users receive free credits to get started. Additional credits can be purchased through the platform. Complex queries that use multiple agents or tools may consume more credits.',
   },
-  {
-    question: 'How do I get started?',
-    answer: 'Connect your wallet, tell Xray what you are looking for, and let the agents do the research. No sign-up forms, no lengthy onboarding. Your wallet is your identity, and your chat history is stored on-chain for full transparency.',
-  },
+
 ];
 
 export default function FAQ() {
