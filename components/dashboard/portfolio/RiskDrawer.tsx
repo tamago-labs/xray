@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, TrendingUp, Coins, BarChart3 } from 'lucide-react';
+import { X, TrendingUp, Coins, BarChart3, Loader2 } from 'lucide-react';
 
 interface RiskReport {
   overallScore: number;
@@ -63,7 +64,46 @@ function SectionTitle({ icon: Icon, title }: { icon: any; title: string }) {
 }
 
 export default function RiskDrawer({ open, onClose, report, loading, evalError, onEvaluate }: RiskDrawerProps) {
+  const [showEvalModal, setShowEvalModal] = useState(false);
+
+  const handleEvaluate = () => {
+    setShowEvalModal(true);
+    onEvaluate?.();
+  };
+
   return (
+    <>
+      <AnimatePresence>
+        {showEvalModal && (
+          <motion.div
+            className="fixed inset-0 z-[60] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowEvalModal(false)} />
+            <motion.div
+              className="relative bg-surface border border-border3/50 rounded-2xl p-6 max-w-sm mx-4 text-center shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            >
+              <Loader2 className="w-8 h-8 text-accent animate-spin mx-auto mb-4" />
+              <h3 className="text-[15px] font-semibold text-white/90 mb-2">Evaluation Started</h3>
+              <p className="text-[13px] text-white/50 leading-relaxed mb-4">
+                Your portfolio is being analyzed. Check back in 2-3 minutes for updated risk insights.
+              </p>
+              <button
+                onClick={() => setShowEvalModal(false)}
+                className="px-4 py-2 rounded-lg text-[13px] font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+              >
+                Got it
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     <AnimatePresence>
       {open && (
         <motion.div
@@ -93,7 +133,7 @@ export default function RiskDrawer({ open, onClose, report, loading, evalError, 
               {report && (
                 <div className="flex items-center justify-between mb-4">
                   <button
-                    onClick={onEvaluate}
+                    onClick={handleEvaluate}
                     className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-accent text-white hover:bg-accent/80 transition-colors"
                   >
                     Evaluate Again
@@ -192,6 +232,7 @@ export default function RiskDrawer({ open, onClose, report, loading, evalError, 
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }

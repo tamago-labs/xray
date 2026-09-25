@@ -157,17 +157,7 @@ Your suggestions must be:
 - Practical: suggest concrete allocation targets
 - Concise: 2-4 suggestions, each 1-2 sentences
 
-You MUST respond with ONLY valid JSON in this format:
-{
-  "suggestions": [
-    {
-      "action": "reduce" | "add" | "diversify" | "hedge",
-      "symbol": "TOKEN",
-      "reason": "why this suggestion",
-      "suggestedAllocation": number (percentage, 0-100)
-    }
-  ]
-}`;
+You MUST respond with ONLY valid JSON matching the requested schema. No markdown, no extra text, no code fences.`;
 
 function buildRebalancePrompt(
   holdings: Holding[],
@@ -355,6 +345,7 @@ export const handler: Schema["evaluateRisk"]["functionHandler"] = async (event) 
       { session, maxTurns: 30 },
     );
 
+    console.log("[evaluate-risk] risk result type:", typeof result.finalOutput);
     const report: RiskReport = { ...(result.finalOutput as RiskReport), updatedAt: new Date().toISOString() };
 
     let rebalanceSuggestions: RiskReport["rebalanceSuggestions"];
@@ -399,6 +390,7 @@ export const handler: Schema["evaluateRisk"]["functionHandler"] = async (event) 
         { session, maxTurns: 30 },
       );
 
+      console.log("[evaluate-risk] rebalance result type:", typeof rebalanceResult.finalOutput);
       const rebalanceOutput = rebalanceResult.finalOutput as any;
       if (rebalanceOutput?.suggestions) {
         rebalanceSuggestions = rebalanceOutput.suggestions;
