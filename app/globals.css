@@ -22,6 +22,17 @@ body {
   }
 }
 
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
 @layer utilities {
   .glow {
     box-shadow: 0 0 60px -20px rgba(108, 92, 231, 0.3);
@@ -44,5 +55,28 @@ body {
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .btn-gradient {
+    background: linear-gradient(90deg, #6C5CE7, #00D2A0, #3B82F6, #6C5CE7);
+    background-size: 300% 100%;
+    animation: gradient-shift 3s linear infinite;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-gradient:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 16px rgba(108, 92, 231, 0.4);
+  }
+  .btn-gradient:disabled {
+    opacity: 0.8;
+    cursor: wait;
+  }
+
+  .loading-dots::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    text-align: left;
+    animation: dots 1.4s infinite;
   }
 }

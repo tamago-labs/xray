@@ -232,7 +232,7 @@ export default function PortfolioStats() {
             </div>
           ) : (
             <p className="text-[11px] text-white/30 mt-1">
-              Evaluate your portfolio to see risk insights.
+              Evaluate your portfolio to see risk insights. Requires AI credits.
             </p>
           )}
         </div>
