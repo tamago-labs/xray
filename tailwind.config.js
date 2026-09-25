@@ -18,9 +18,9 @@ module.exports = {
         zenpurple: '#8B5CF6',
       },
       fontFamily: {
-        display: ['var(--font-display)', 'sans-serif'],
-        brand: ['var(--font-brand)', 'sans-serif'],
-        sans: ['var(--font-sans)', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'],
+        brand: ['Zen Tokyo Zoo', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
       },
       boxShadow: {
         glow: '0 0 60px -20px rgba(108, 92, 231, 0.3)',
