@@ -2,7 +2,6 @@ import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { priceTracker } from "../functions/price-tracker/resource";
 import { chatApiFunction } from "../functions/chat-api/resource";
 import { preIpoTracker } from "../functions/pre-ipo-tracker/resource";
-import { evaluateRiskFunction } from "../functions/evaluate-risk/resource";
 import { ohlcvFetcherFunction } from "../functions/ohlcv-fetcher/resource";
 
 const schema = a.schema({
@@ -105,36 +104,6 @@ const schema = a.schema({
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
     .secondaryIndexes((index) => [index("portfolioId").queryField("byPortfolio")]),
 
-  RiskReportType: a.customType({
-    overallScore: a.integer(),
-    overallLabel: a.string(),
-    overallDescription: a.string(),
-    concentration: a.json(),
-    marketRisk: a.json(),
-    tokenRisk: a.json(),
-    rebalanceSuggestions: a.json(),
-  }),
-
-  evaluateRisk: a
-    .mutation()
-    .arguments({
-      walletAddress: a.string(),
-      holdings: a.string(),
-      portfolioValue: a.float(),
-    })
-    .returns(a.ref("RiskReportType"))
-    .authorization((allow) => [allow.publicApiKey()])
-    .handler(a.handler.function(evaluateRiskFunction)),
-
-  RiskEvaluation: a
-    .model({
-      id: a.string().required(),
-      report: a.string().required(),
-      overallScore: a.integer().required(),
-      rebalanceSuggestions: a.string(),
-    })
-    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])]),
-
   ohlcvFetcher: a
     .query()
     .arguments({
@@ -166,7 +135,6 @@ const schema = a.schema({
   allow.resource(priceTracker),
   allow.resource(chatApiFunction),
   allow.resource(preIpoTracker),
-  allow.resource(evaluateRiskFunction),
   allow.resource(ohlcvFetcherFunction),
 ]);
 

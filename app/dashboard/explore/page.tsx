@@ -204,7 +204,7 @@ export default function Explore() {
             </thead>
             <tbody>
               {paginated.map((row) => (
-                <tr key={row.token_symbol} className="border-b border-border3/20 hover:bg-white/[0.02] transition-colors cursor-pointer"
+                <tr key={row.crypto_id} className="border-b border-border3/20 hover:bg-white/[0.02] transition-colors cursor-pointer"
                   onClick={() => router.push(`/dashboard/token/${row.slug}/${row.crypto_id}`)}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
