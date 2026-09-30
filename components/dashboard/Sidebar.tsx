@@ -3,17 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown } from 'lucide-react';
+import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
 import { useWallet } from '@/components/app/WalletContext';
 
 const navItems = [
-  { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
-  { href: '/dashboard', label: 'New Chat', icon: MessageSquare },
+  { href: '/dashboard', label: 'New Scan', icon: Plus },
   { href: '/dashboard/portfolio', label: 'Portfolio', icon: PieChart },
   { href: '/dashboard/explore', label: 'Explore', icon: Compass },
+  { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
   // { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
   { href: '/dashboard/top-news', label: 'Top News', icon: Newspaper },
 ];

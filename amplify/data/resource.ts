@@ -61,33 +61,49 @@ const schema = a.schema({
       experience: a.enum(["newcomer", "regular", "lite_degen", "full_degen"]),
       writingStyle: a.enum(["default", "journalist", "storytelling", "ct_vibes", "concise"]),
       sources: a.string().array(),
-      tokenRegistries: a.hasMany("UserTokenRegistry", "userProfileId"),
+      portfolios: a.hasMany("Portfolio", "userProfileId"),
+      reviews: a.hasMany("SavedReview", "userProfileId"),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
 
-  UserTokenRegistry: a
+  SavedReview: a
     .model({
       userProfileId: a.id().required(),
       userProfile: a.belongsTo("UserProfile", "userProfileId"),
-      contractAddress: a.string().required(),
-      symbol: a.string().required(),
-      name: a.string(),
-      decimals: a.integer(),
-      chainId: a.integer().required(),
-      addedAt: a.datetime(),
+      portfolioName: a.string().required(),
+      prompt: a.string().required(),
+      holdings: a.json().required(),
+      answers: a.json().required(),
+      report: a.json().required(),
+      overallScore: a.integer().required(),
+      overallLabel: a.string().required(),
+      chats: a.json().required(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
+    .secondaryIndexes((index) => [index("userProfileId").queryField("bySavedReviewUser")]),
+
+  Portfolio: a
+    .model({
+      userProfileId: a.id().required(),
+      userProfile: a.belongsTo("UserProfile", "userProfileId"),
+      name: a.string().required(),
+      tokens: a.hasMany("PortfolioToken", "portfolioId"),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
-    .secondaryIndexes((index) => [index("userProfileId").queryField("byUser")]),
+    .secondaryIndexes((index) => [index("userProfileId").queryField("byPortfolioOwner")]),
 
-  SystemStatus: a
+  PortfolioToken: a
     .model({
-      id: a.string().required(),
-      status: a.enum(["ready", "busy", "down"]),
-      activeUsers: a.integer().required(),
-      avgResponseMs: a.integer().required(),
+      portfolioId: a.id().required(),
+      portfolio: a.belongsTo("Portfolio", "portfolioId"),
+      symbol: a.string().required(),
+      name: a.string(),
+      cmcId: a.integer().required(),
+      customValue: a.float().required(),
     })
-    .authorization((allow) => [allow.publicApiKey().to(["read", "update"])]),
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
+    .secondaryIndexes((index) => [index("portfolioId").queryField("byPortfolio")]),
 
   RiskReportType: a.customType({
     overallScore: a.integer(),
