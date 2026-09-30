@@ -3,6 +3,7 @@ import { priceTracker } from "../functions/price-tracker/resource";
 import { chatApiFunction } from "../functions/chat-api/resource";
 import { preIpoTracker } from "../functions/pre-ipo-tracker/resource";
 import { ohlcvFetcherFunction } from "../functions/ohlcv-fetcher/resource";
+import { riskReviewFunction } from "../functions/risk-review/resource";
 
 const schema = a.schema({
   PriceSnapshot: a
@@ -104,6 +105,19 @@ const schema = a.schema({
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
     .secondaryIndexes((index) => [index("portfolioId").queryField("byPortfolio")]),
 
+  riskReview: a
+    .query()
+    .arguments({
+      action: a.string(),
+      userProfileId: a.string().required(),
+      prompt: a.string().required(),
+      holdings: a.string().required(),
+      answers: a.string(),
+    })
+    .returns(a.json())
+    .authorization((allow) => [allow.publicApiKey()])
+    .handler(a.handler.function(riskReviewFunction)),
+
   ohlcvFetcher: a
     .query()
     .arguments({
@@ -136,6 +150,7 @@ const schema = a.schema({
   allow.resource(chatApiFunction),
   allow.resource(preIpoTracker),
   allow.resource(ohlcvFetcherFunction),
+  allow.resource(riskReviewFunction),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;
