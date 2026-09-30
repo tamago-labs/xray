@@ -47,6 +47,7 @@ export default function Explore() {
   const router = useRouter();
   const { prices } = usePrices();
   const [search, setSearch] = useState("");
+  const [chainFilter, setChainFilter] = useState<"xlayer" | "all">("xlayer");
   const [sortKey, setSortKey] = useState<SortKey>("volume_24h");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
@@ -66,6 +67,7 @@ export default function Explore() {
     const result: TokenRow[] = [];
     for (const asset of (listData as any).assets) {
       for (const token of asset.tokens ?? []) {
+        if (chainFilter === "xlayer" && !token.contractAddress?.xlayer) continue;
         const price = priceMap.get(token.symbol);
         result.push({
           token_symbol: token.symbol,
@@ -73,7 +75,7 @@ export default function Explore() {
           name: asset.name,
           slug: asset.slug,
           crypto_id: token.crypto_id,
-          issuer: token.issuer_name === "Backed Assets" ? "xStock" : "Ondo",
+          issuer: token.issuer_name,
           logo: token.logo ?? null,
           industry: asset.industry ?? null,
           price: price?.price ?? null,
@@ -86,7 +88,7 @@ export default function Explore() {
       }
     }
     return result;
-  }, [priceMap]);
+  }, [priceMap, chainFilter]);
 
   const filtered = useMemo(() => {
     if (!search) return rows;
@@ -138,7 +140,7 @@ export default function Explore() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
           <input
@@ -148,6 +150,14 @@ export default function Explore() {
             className="w-full bg-surface border border-border3 rounded-lg pl-10 pr-4 py-2.5 text-[14px] text-white placeholder:text-white/25 outline-none focus:border-accent/50 transition-colors"
           />
         </div>
+        <select
+          value={chainFilter}
+          onChange={(e) => { setChainFilter(e.target.value as "xlayer" | "all"); setPage(1); }}
+          className="bg-surface border border-border3 rounded-lg px-3 py-2.5 text-[13px] text-white/60 outline-none focus:border-accent/50 transition-colors cursor-pointer"
+        >
+          <option value="xlayer">Only X Layer</option>
+          <option value="all">Show All Chains</option>
+        </select>
       </div>
 
       <div className="bg-surface border border-border3/50 rounded-xl overflow-hidden">

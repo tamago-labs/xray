@@ -15,8 +15,12 @@ const metrics: { key: SortMetric; label: string }[] = [
 ];
 
 const tokenMetaMap = new Map<string, { logo: string | null; name: string | null; symbol: string | null; slug: string; crypto_id: string }>();
+const xlayerSymbols = new Set<string>();
 for (const asset of (listData as any).assets) {
   for (const token of asset.tokens ?? []) {
+    if (token.contractAddress?.xlayer) {
+      xlayerSymbols.add(token.symbol);
+    }
     if (!tokenMetaMap.has(token.symbol)) {
       tokenMetaMap.set(token.symbol, {
         logo: token.logo ?? null,
@@ -36,6 +40,7 @@ export default function TokenShowcase() {
 
   const sorted = [...prices]
     .filter((p) => {
+      if (!xlayerSymbols.has(p.token_symbol)) return false;
       const m = metrics[metric].key;
       return p[m] != null;
     })

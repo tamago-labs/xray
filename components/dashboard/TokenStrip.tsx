@@ -27,8 +27,12 @@ const metricColors: Record<SortMetric, string> = {
 };
 
 const tokenMetaMap = new Map<string, { logo: string | null; name: string | null; slug: string; crypto_id: string }>();
+const xlayerSymbols = new Set<string>();
 for (const asset of (listData as any).assets) {
   for (const token of asset.tokens ?? []) {
+    if (token.contractAddress?.xlayer) {
+      xlayerSymbols.add(token.symbol);
+    }
     if (!tokenMetaMap.has(token.symbol)) {
       tokenMetaMap.set(token.symbol, {
         logo: token.logo ?? null,
@@ -49,7 +53,10 @@ export default function TokenStrip() {
   useEffect(() => { setMounted(true); }, []);
 
   const sorted = [...prices]
-    .filter((p) => p[metric] != null)
+    .filter((p) => {
+      if (!xlayerSymbols.has(p.token_symbol)) return false;
+      return p[metric] != null;
+    })
     .sort((a, b) => {
       if (metric === "percent_24h") return (b.percent_24h ?? 0) - (a.percent_24h ?? 0);
       if (metric === "volume_24h") return (b.volume_24h ?? 0) - (a.volume_24h ?? 0);

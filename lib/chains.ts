@@ -11,7 +11,7 @@ export type ChainConfig = {
 
 export const X_LAYER: ChainConfig = {
   id: 196,
-  name: "X Layer",
+  name: "X Layer Mainnet",
   shortName: "X Layer",
   rpcUrl: process.env.NEXT_PUBLIC_XLAYER_RPC_URL || "https://rpc.xlayer.tech",
   explorerUrl: "https://www.okx.com/web3/explorer/xlayer",
