@@ -14,7 +14,7 @@ export default function Problem() {
             </Section>
             <Section>
               <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
-                More tokenized stocks.<br />More decisions.
+                One Stock.<br />Too Many Tokens.
               </h2>
             </Section>
           </div>

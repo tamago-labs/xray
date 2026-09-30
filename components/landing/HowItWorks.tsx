@@ -5,40 +5,43 @@ import Section from './Section';
 const steps = [
   {
     num: '01',
-    title: 'Ask Xray',
+    title: 'Build Your Portfolio',
     description: (
       <>
-        Ask anything about tokenized stocks. <span className="text-white/70 font-medium">What should I buy? Why is a stock moving? Which stocks fit my goals and risk appetite?</span>
+        Connect your wallet to <span className="text-white/70 font-medium">analyze your real holdings</span>,
+        or create a simulated portfolio to explore different strategies.
       </>
     ),
     example: null,
   },
   {
     num: '02',
-    title: 'Get a personalized answer',
+    title: 'Tell Xray What You Need',
     description: (
       <>
-        Xray combines your preferences with market data to <span className="text-white/70 font-medium">rank, compare, and explain</span> the tokenized stocks that matter to you.
+        Ask a question or describe your goal. Xray learns your
+        <span className="text-white/70 font-medium"> risk preferences and what you want to achieve</span>.
       </>
     ),
     example: null,
   },
   {
     num: '03',
-    title: 'Find the best trade',
+    title: 'Uncover the Bigger Picture',
     description: (
       <>
-        When you&apos;re ready, Xray finds the <span className="text-white/70 font-medium">best available route</span> for your trade across X Layer liquidity through <span className="text-white/70 font-medium">OKX DEX Router</span>.
+        Xray combines your portfolio with market and asset data to
+        <span className="text-white/70 font-medium"> uncover risks, compare assets, and surface opportunities</span>.
       </>
     ),
     example: null,
   },
   {
     num: '04',
-    title: 'Trade on X Layer',
+    title: 'Chat Further & Take Action',
     description: (
       <>
-        Review the details and execute on <span className="text-white/70 font-medium">X Layer</span>. No fully autonomous agents — you approve what you trade.
+        Review AI risk score and insights, <span className="text-white/70 font-medium">chat with AI to explore more</span>, then rebalance or trade via OKX DEX Router.
       </>
     ),
     example: null,
@@ -57,7 +60,7 @@ export default function HowItWorks() {
 
         <Section>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-center tracking-tight mb-12">
-            Simple steps to your first trade
+            See what's hidden
           </h2>
         </Section>
 

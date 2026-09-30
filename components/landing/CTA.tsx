@@ -13,10 +13,10 @@ export default function CTA() {
             </div>
             <div className="relative bg-surface rounded-2xl p-10 text-center z-10">
               <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
-                Get in before the IPO
+                See what's coming next
               </h2>
               <p className="mt-4 text-[15px] text-white/45">
-                Your one-stop AI platform for tokenized stocks and pre-IPO markets. Trade tokens like OpenAI, Anthropic before they hit the market. Real pricing, settled on X Layer.
+                Xray doesn't stop at today's tokenized equities. Explore pre-IPO markets on Prep DEX and discover what's next on X Layer.
               </p>
               <div className="mt-8 flex items-center justify-center gap-4">
                 <Link

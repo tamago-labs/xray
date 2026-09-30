@@ -1,123 +1,71 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Send } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { examplePrompts, getRandomPrompt } from '@/lib/prompts';
+import { useState, useRef, useEffect } from 'react';
+import { ArrowRight, Plus } from 'lucide-react';
 
 export default function HeroPrompt() {
-  const router = useRouter();
-  const [inputValue, setInputValue] = useState('What are the most popular tokens on X Layer right now?');
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [mounted, setMounted] = useState(false);
-  const [animKey, setAnimKey] = useState(0);
+  const [inputValue, setInputValue] = useState('');
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setActiveIndex(Math.floor(Math.random() * examplePrompts.length));
-    setMounted(true);
+    const onClick = (e: MouseEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setPopoverOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => {
-        const next = getRandomPrompt(prev);
-        setAnimKey((k) => k + 1);
-        return next;
-      });
-    }, 20000);
-    return () => clearInterval(interval);
-  }, [mounted]);
-
-  const handleBadgeClick = () => {
-    setActiveIndex((prev) => {
-      const next = getRandomPrompt(prev);
-      setAnimKey((k) => k + 1);
-      return next;
-    });
-  };
-
-  const handlePromptClick = () => {
-    setInputValue(examplePrompts[activeIndex].text);
-  };
-
-  const handleSubmit = () => {
-    if (inputValue.trim()) {
-      router.push(`/dashboard?prompt=${encodeURIComponent(inputValue.trim())}`);
-    }
-  };
-
-  const current = examplePrompts[activeIndex];
-
   return (
-    <div className="flex flex-col">
-    <div className="bg-surface border border-border3 rounded-2xl shadow-2xl glow-blue overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-border3 bg-white/[0.02]">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-red-400/70" />
-          <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
-          <span className="w-3 h-3 rounded-full bg-green-400/70" />
-        </div>
-        <span className="text-[12px] text-white/60 font-medium">Xray AI</span>
-      </div>
-
-      <div className="p-5">
-        <div className="bg-white/[0.03] border border-border3 rounded-xl p-4">
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Ask Xray anything about the market…"
-            className="w-full bg-transparent text-[14px] text-white placeholder:text-white/25 outline-none resize-none min-h-[80px]"
-          />
+    <div className="flex flex-col w-full max-w-3xl mx-auto">
+      <div className="bg-surface border border-border3 rounded-2xl shadow-2xl glow-blue">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border3 bg-white/[0.02] rounded-t-2xl">
+          <div className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-full bg-red-400/70" />
+            <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
+            <span className="w-3 h-3 rounded-full bg-green-400/70" />
+          </div>
+          <span className="text-[12px] text-white/60 font-medium">Xray AI</span>
         </div>
 
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border3/50">
-          <button
-            onClick={handlePromptClick}
-            className="flex items-center gap-2 min-w-0 max-w-[70%]"
-          >
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={`badge-${animKey}`}
-                initial={{ opacity: 0, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(8px)' }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-                className={`shrink-0 inline-flex items-center text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded border ${current.color}`}
-                title="Click to change"
-              >
-                <span onClick={(e) => { e.stopPropagation(); handleBadgeClick(); }} className="cursor-pointer">
-                  {current.badge}
-                </span>
-              </motion.span>
-              <motion.span
-                key={`text-${animKey}`}
-                initial={{ opacity: 0, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, filter: 'blur(8px)' }}
-                transition={{ duration: 0.4, delay: 0.05, ease: 'easeOut' }}
-                className="text-[13px] text-white/60 font-medium truncate"
-                title={current.text}
-              >
-                {current.text}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+        <div className="p-5">
+          <div className="bg-white/[0.03] border border-border3 rounded-xl p-4">
+            <textarea
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Ask Xray anything about the market…"
+              className="w-full bg-transparent text-[14px] text-white placeholder:text-white/25 outline-none resize-none min-h-[32px]"
+            />
+            <div className="flex items-center justify-between mt-2">
+              <div ref={popoverRef} className="relative">
+                <button
+                  onClick={() => setPopoverOpen(!popoverOpen)}
+                  className="w-9 h-9 rounded-lg bg-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.1] border border-border3/50 flex items-center justify-center transition-colors"
+                  title="Attach portfolio"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
 
-          <button
-            onClick={handleSubmit}
-            className="h-9 px-4 rounded-lg bg-accent flex items-center justify-center gap-2 hover:bg-accent/80 transition-colors shrink-0"
-          >
-            <Send className="w-4 h-4 text-white" />
-            <span className="text-[13px] font-medium text-white">Ask Xray</span>
-          </button>
+                {popoverOpen && (
+                  <div className="absolute bottom-full left-0 mb-2 w-80 bg-surface border border-border3/60 rounded-xl shadow-2xl overflow-hidden z-50">
+                    <div className="px-3 py-2 border-b border-border3/40 text-[11px] font-semibold tracking-wider text-white/40">
+                      Choose a Demo Portfolio
+                    </div>
+                    <div className="px-3 py-4 text-[12px] text-white/40">
+                      Connect your wallet or use a simulated portfolio in the app
+                    </div>
+                  </div>
+                )}
+              </div>
+              <button className="w-9 h-9 rounded-lg bg-accent hover:bg-accent/80 flex items-center justify-center transition-colors shrink-0">
+                <ArrowRight className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <p className="text-[12px] text-white/30 mt-3 text-center">
-      Prompts are AI-generated. Rankings reflect what other traders find useful.
-    </p>
     </div>
   );
 }
