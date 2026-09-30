@@ -6,16 +6,16 @@ import { data } from "./data/resource";
 import { priceTracker } from "./functions/price-tracker/resource";
 import { chatApiFunction } from "./functions/chat-api/resource";
 import { preIpoTracker } from "./functions/pre-ipo-tracker/resource";
-import { evaluateRiskFunction } from "./functions/evaluate-risk/resource";
 import { ohlcvFetcherFunction } from "./functions/ohlcv-fetcher/resource";
+import { riskReviewFunction } from "./functions/risk-review/resource";
 
 const backend = defineBackend({
   data,
   priceTracker,
   chatApiFunction,
   preIpoTracker,
-  evaluateRiskFunction,
   ohlcvFetcherFunction,
+  riskReviewFunction,
 });
 
 const lambdaFunction = backend.chatApiFunction.resources.lambda as LambdaFunction;
