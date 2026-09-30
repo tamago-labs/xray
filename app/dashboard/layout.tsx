@@ -3,8 +3,6 @@
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Topbar from '@/components/dashboard/Topbar';
-import { WalletProvider } from "@/components/app/WalletContext";
-
 export default function DashboardLayout({
   children,
 }: {
@@ -15,14 +13,12 @@ export default function DashboardLayout({
   const isChatSession = pathname.startsWith('/dashboard/chats/');
 
   return (
-    <WalletProvider>
-      <div className="min-h-screen bg-dark">
-          <Sidebar />
-          <div className={`ml-56 flex flex-col ${isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
-            <Topbar />
-            <main className={isNewChat || isChatSession ? 'h-screen' : 'p-6'}>{children}</main>
-          </div>
-      </div>
-    </WalletProvider>
+    <div className="min-h-screen bg-dark">
+        <Sidebar />
+        <div className={`ml-56 flex flex-col ${isNewChat || isChatSession ? 'h-screen overflow-hidden' : 'min-h-screen'}`}>
+          <Topbar />
+          <main className={isNewChat || isChatSession ? 'h-screen' : 'p-6'}>{children}</main>
+        </div>
+    </div>
   );
 }

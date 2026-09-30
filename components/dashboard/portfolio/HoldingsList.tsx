@@ -6,7 +6,8 @@ import { useWallet } from '@/components/app/WalletContext';
 import { useTokenBalances } from '@/hooks/useTokenBalances';
 import { useBaseTokenPrices } from '@/app/contexts/BaseTokenPriceProvider';
 import { usePrices } from '@/app/contexts/PriceContext';
-import { RWA_TOKENS, loadRwaConfig, useRwaBalances } from '@/hooks/useRwaBalances';
+import { useRwaBalances } from '@/hooks/useRwaBalances';
+import { useTrackedTokens } from '@/hooks/useTrackedTokens';
 import { Plus } from 'lucide-react';
 import TokenSelectionModal from './TokenSelectionModal';
 
@@ -16,22 +17,16 @@ export default function HoldingsList() {
   const { balances, loading } = useTokenBalances(address ?? undefined, chainId ?? undefined);
   const { getPrice, getChange24h, loading: pricesLoading } = useBaseTokenPrices();
   const { prices } = usePrices();
-  const { balances: rwaBalances, loading: rwaLoading } = useRwaBalances(address ?? undefined, chainId ?? undefined);
-  const rwaConfig = loadRwaConfig();
+  const { tracked } = useTrackedTokens(address ?? undefined);
+  const trackedSymbols = tracked.map((t) => t.symbol);
+  const { balances: rwaBalances, loading: rwaLoading } = useRwaBalances(address ?? undefined, chainId ?? undefined, trackedSymbols);
   const [modalOpen, setModalOpen] = useState(false);
 
   const isMainnet = chainId === 196;
   const rwaPriceMap = new Map(prices.map((p) => [p.token_symbol, p]));
 
-  const rwaHoldings = RWA_TOKENS.filter((t) => rwaConfig.trackedSymbols.includes(t.symbol)).map((token) => {
-    let balance: number;
-    if (rwaConfig.useMockValue) {
-      balance = rwaConfig.mockValues[token.symbol] ?? 0;
-    } else if (isMainnet) {
-      balance = parseFloat(rwaBalances[token.symbol] ?? '0');
-    } else {
-      balance = 0;
-    }
+  const rwaHoldings = tracked.map((token) => {
+    const balance = isMainnet ? parseFloat(rwaBalances[token.symbol] ?? '0') : 0;
     const priceData = rwaPriceMap.get(token.symbol);
     const price = priceData?.price ?? 0;
     return {
@@ -62,7 +57,7 @@ export default function HoldingsList() {
   });
 
   const allHoldings = [...baseHoldings, ...rwaHoldings];
-  const holdings = address ? allHoldings.filter((h) => h.balance > 0) : allHoldings;
+  const holdings = allHoldings.filter((h) => h.balance > 0 || trackedSymbols.includes(h.symbol));
 
   if (loading || pricesLoading || rwaLoading) {
     return (
@@ -112,7 +107,13 @@ export default function HoldingsList() {
           ) : (
             holdings.map((h) => (
               <div key={h.symbol} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/[0.02] transition-colors">
-                <img src={h.logo} alt={h.name} className="w-8 h-8 rounded-full" />
+                {h.logo ? (
+                  <img src={h.logo} alt={h.name} className="w-8 h-8 rounded-full" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white/40">
+                    {h.symbol.slice(0, 2)}
+                  </div>
+                )}
                 <div className="min-w-0">
                   <p className="text-[13px] font-medium text-white/80">{h.symbol}</p>
                   <p className="text-[11px] text-white/40">{h.balance.toLocaleString()} {h.symbol}</p>

@@ -80,6 +80,7 @@ body {
     cursor: wait;
   }
 
+
   .loading-dots::after {
     content: '';
     display: inline-block;

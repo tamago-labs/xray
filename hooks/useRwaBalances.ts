@@ -4,47 +4,26 @@ import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import rwaList from '@/lib/data/rwa-v1-list.json';
 
-export const RWA_TOKENS: { symbol: string; name: string; contractAddress: string; decimals: number; logo: string; industry: string }[] =
-  (rwaList as any).assets.map((a: any) => ({
-    symbol: a.tokens[0].symbol,
-    name: a.tokens[0].name,
-    contractAddress: a.tokens[0].contractAddress,
-    decimals: a.tokens[0].decimals,
-    logo: a.tokens[0].logo,
-    industry: a.industry ?? 'Other',
-  }));
+export const RWA_TOKENS: { symbol: string; name: string; contractAddress: string | null; decimals: number; logo: string; industry: string }[] =
+  (rwaList as any).assets.flatMap((a: any) =>
+    (a.tokens ?? [])
+      .filter((t: any) => t.contractAddress?.xlayer)
+      .map((t: any) => ({
+        symbol: t.symbol,
+        name: t.name,
+        contractAddress: t.contractAddress?.xlayer ?? null,
+        decimals: t.decimals ?? 18,
+        logo: t.logo ?? '',
+        industry: a.industry ?? 'Other',
+      }))
+  );
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint256)'];
 
-
-
-const STORAGE_KEY = 'xray_rwa_portfolio';
-
-export interface RwaPortfolioConfig {
-  trackedSymbols: string[];
-  useMockValue: boolean;
-  mockValues: Record<string, number>;
-}
-
-export function loadRwaConfig(): RwaPortfolioConfig {
-  if (typeof window === 'undefined') return { trackedSymbols: [], useMockValue: true, mockValues: {} };
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { trackedSymbols: [], useMockValue: true, mockValues: {} };
-}
-
-export function saveRwaConfig(config: RwaPortfolioConfig) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-}
-
-export function useRwaBalances(address: string | undefined, chainId: number | undefined) {
+export function useRwaBalances(address: string | undefined, chainId: number | undefined, trackedSymbols: string[]) {
   const [balances, setBalances] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const config = loadRwaConfig();
-  const tracked = RWA_TOKENS.filter((t) => config.trackedSymbols.includes(t.symbol));
+  const tracked = RWA_TOKENS.filter((t) => trackedSymbols.includes(t.symbol));
 
   const fetchBalances = useCallback(async () => {
     if (!address || chainId !== 196 || tracked.length === 0) {
@@ -56,6 +35,10 @@ export function useRwaBalances(address: string | undefined, chainId: number | un
       const provider = new ethers.JsonRpcProvider('https://rpc.xlayer.tech');
       const result: Record<string, string> = {};
       for (const token of tracked) {
+        if (!token.contractAddress) {
+          result[token.symbol] = '0';
+          continue;
+        }
         try {
           const contract = new ethers.Contract(token.contractAddress, ERC20_ABI, provider);
           const balance = await contract.balanceOf(address);

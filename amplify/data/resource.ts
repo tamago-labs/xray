@@ -67,6 +67,17 @@ const schema = a.schema({
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update"])])
     .secondaryIndexes((index) => [index("walletAddress").queryField("byWallet")]),
 
+  TrackedToken: a
+    .model({
+      walletAddress: a.string().required(),
+      symbol: a.string().required(),
+      name: a.string(),
+      logo: a.string(),
+      contractAddress: a.json(),
+    })
+    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
+    .secondaryIndexes((index) => [index("walletAddress").queryField("byTrackedWallet")]),
+
   SavedReview: a
     .model({
       userProfileId: a.id().required(),

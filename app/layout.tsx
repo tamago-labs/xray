@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ConfigureAmplify from "@/components/ConfigureAmplify";
+import { WalletProvider } from "@/components/app/WalletContext";
 import { PriceProvider } from "./contexts/PriceContext";
 import { BaseTokenPriceProvider } from "./contexts/BaseTokenPriceProvider";
 import "./globals.css";
@@ -23,9 +24,11 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <ConfigureAmplify>
-          <PriceProvider>
-            <BaseTokenPriceProvider>{children}</BaseTokenPriceProvider>
-          </PriceProvider>
+          <WalletProvider>
+            <PriceProvider>
+              <BaseTokenPriceProvider>{children}</BaseTokenPriceProvider>
+            </PriceProvider>
+          </WalletProvider>
         </ConfigureAmplify>
       </body>
     </html>

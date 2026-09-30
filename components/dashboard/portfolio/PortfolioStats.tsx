@@ -5,7 +5,8 @@ import { useTokenBalances } from '@/hooks/useTokenBalances';
 import { useBaseTokenPrices } from '@/app/contexts/BaseTokenPriceProvider';
 import { usePrices } from '@/app/contexts/PriceContext';
 import { BASE_TOKENS, BASE_TOKENS_TESTNET } from '@/lib/tokens/base-tokens';
-import { RWA_TOKENS, loadRwaConfig, useRwaBalances } from '@/hooks/useRwaBalances';
+import { useRwaBalances } from '@/hooks/useRwaBalances';
+import { useTrackedTokens } from '@/hooks/useTrackedTokens';
 
 export default function PortfolioStats() {
   const { address, chainId } = useWallet();
@@ -13,8 +14,9 @@ export default function PortfolioStats() {
   const { balances } = useTokenBalances(address ?? undefined, chainId ?? undefined);
   const { getPrice, getChange24h } = useBaseTokenPrices();
   const { prices } = usePrices();
-  const { balances: rwaBalances } = useRwaBalances(address ?? undefined, chainId ?? undefined);
-  const rwaConfig = loadRwaConfig();
+  const { tracked } = useTrackedTokens(address ?? undefined);
+  const trackedSymbols = tracked.map((t) => t.symbol);
+  const { balances: rwaBalances } = useRwaBalances(address ?? undefined, chainId ?? undefined, trackedSymbols);
   const isMainnet = chainId === 196;
 
   const rwaPriceMap = new Map(prices.map((p) => [p.token_symbol, p]));
@@ -24,15 +26,8 @@ export default function PortfolioStats() {
     return sum + balance * getPrice(token.symbol);
   }, 0);
 
-  const rwaValue = RWA_TOKENS.filter((t) => rwaConfig.trackedSymbols.includes(t.symbol)).reduce((sum, token) => {
-    let balance: number;
-    if (rwaConfig.useMockValue) {
-      balance = rwaConfig.mockValues[token.symbol] ?? 0;
-    } else if (isMainnet) {
-      balance = parseFloat(rwaBalances[token.symbol] ?? '0');
-    } else {
-      balance = 0;
-    }
+  const rwaValue = tracked.reduce((sum, token) => {
+    const balance = isMainnet ? parseFloat(rwaBalances[token.symbol] ?? '0') : 0;
     const priceData = rwaPriceMap.get(token.symbol);
     return sum + balance * (priceData?.price ?? 0);
   }, 0);
@@ -44,15 +39,8 @@ export default function PortfolioStats() {
     return sum + balance * getChange24h(token.symbol);
   }, 0);
 
-  const rwaChangeSum = RWA_TOKENS.filter((t) => rwaConfig.trackedSymbols.includes(t.symbol)).reduce((sum, token) => {
-    let balance: number;
-    if (rwaConfig.useMockValue) {
-      balance = rwaConfig.mockValues[token.symbol] ?? 0;
-    } else if (isMainnet) {
-      balance = parseFloat(rwaBalances[token.symbol] ?? '0');
-    } else {
-      balance = 0;
-    }
+  const rwaChangeSum = tracked.reduce((sum, token) => {
+    const balance = isMainnet ? parseFloat(rwaBalances[token.symbol] ?? '0') : 0;
     const priceData = rwaPriceMap.get(token.symbol);
     return sum + balance * (priceData?.percent_24h ?? 0);
   }, 0);
@@ -60,17 +48,10 @@ export default function PortfolioStats() {
   const portfolioChange = totalValue > 0 ? (baseChangeSum + rwaChangeSum) / totalValue : 0;
 
   const sectorMap = new Map<string, number>();
-  for (const t of RWA_TOKENS.filter((t) => rwaConfig.trackedSymbols.includes(t.symbol))) {
+  for (const t of tracked) {
     const priceData = rwaPriceMap.get(t.symbol);
     if (priceData) {
-      let balance: number;
-      if (rwaConfig.useMockValue) {
-        balance = rwaConfig.mockValues[t.symbol] ?? 0;
-      } else if (isMainnet) {
-        balance = parseFloat(rwaBalances[t.symbol] ?? '0');
-      } else {
-        balance = 0;
-      }
+      const balance = isMainnet ? parseFloat(rwaBalances[t.symbol] ?? '0') : 0;
       const value = balance * (priceData?.price ?? 0);
       if (value > 0) {
         sectorMap.set(t.industry, (sectorMap.get(t.industry) ?? 0) + value);
