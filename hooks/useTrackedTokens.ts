@@ -12,6 +12,7 @@ interface TrackedToken {
   symbol: string;
   name: string;
   logo: string | null;
+  industry: string;
   contractAddress: string | null;
 }
 
@@ -34,6 +35,7 @@ export function useTrackedTokens(walletAddress: string | undefined) {
           symbol: t.symbol,
           name: t.name ?? t.symbol,
           logo: t.logo ?? null,
+          industry: t.industry ?? 'Other',
           contractAddress: t.contractAddress ? (t.contractAddress as any).xlayer ?? null : null,
         }))
       );
@@ -59,6 +61,7 @@ export function useTrackedTokens(walletAddress: string | undefined) {
           symbol,
           name: meta.name,
           logo: meta.logo || null,
+          industry: meta.industry,
           contractAddress: meta.contractAddress ? { xlayer: meta.contractAddress } : null,
         });
         await fetchTracked();

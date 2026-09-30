@@ -73,6 +73,7 @@ const schema = a.schema({
       symbol: a.string().required(),
       name: a.string(),
       logo: a.string(),
+      industry: a.string(),
       contractAddress: a.json(),
     })
     .authorization((allow) => [allow.publicApiKey().to(["read", "create", "delete"])])
