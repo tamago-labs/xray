@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import AgentStatus from '../dashboard/AgentStatus';
 
 export default function Header() {
   return (
@@ -23,9 +22,8 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <AgentStatus />
           <Link href="/dashboard" className="text-[13px] font-display font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/80 transition-colors">
-            Dashboard
+            Launch App
           </Link>
         </div>
       </div>
