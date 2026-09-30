@@ -36,7 +36,7 @@ export default function Portfolio() {
           setProfileId(profiles[0].id);
         } else {
           const { data: created } = await dataClient.models.UserProfile.create({
-            walletAddress,
+            walletAddress: address,
             credits: 1000,
           });
           if (!cancelled && created) setProfileId(created.id);
