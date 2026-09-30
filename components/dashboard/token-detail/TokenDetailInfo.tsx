@@ -23,20 +23,32 @@ export default function TokenDetailInfo({ token, asset, price }: { token: Token;
           <DetailRow label="Issuer" value={token.issuer_name} />
         </div>
         <div className="space-y-3">
-          <DetailRow label="Blockchain" value="X Layer" />
-          <DetailRow label="Decimals" value={token.decimals != null ? String(token.decimals) : "—"} />
+          <DetailRow label="Blockchain" value={token.contractAddress ? Object.entries(token.contractAddress).filter(([, addr]) => addr).map(([chain]) => chain.charAt(0).toUpperCase() + chain.slice(1)).join(", ") : "—"} />
           <DetailRow label="Circulating Supply" value={price?.circulating_supply != null ? price.circulating_supply.toLocaleString() : "—"} />
           <DetailRow label="Total Supply" value={price?.total_supply != null ? price.total_supply.toLocaleString() : "—"} />
           <DetailRow label="Market Cap" value={price?.market_cap != null ? formatNumber(price.market_cap, "$") : "—"} />
-          <DetailRow label="Verified" value={token.verified ? "Yes" : "No"} />
+          <DetailRow label="Volume (24h)" value={price?.volume_24h != null ? `$${(price.volume_24h / 1_000_000).toFixed(2)}M` : "—"} />
           <DetailRow label="Date Added" value={token.date_added ? new Date(token.date_added).toLocaleDateString() : "—"} />
-          <div className="flex items-center justify-between">
-            <span className="text-white/40">Contract</span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-mono text-white/70 text-xs">
-                {token.contractAddress ? `${token.contractAddress.slice(0, 8)}...${token.contractAddress.slice(-6)}` : "—"}
-              </span>
-              {token.contractAddress && <CopyButton text={token.contractAddress} />}
+          <div className="space-y-2">
+            <span className="text-white/40">Contracts</span>
+            <div className="space-y-1.5">
+              {token.contractAddress && Object.entries(token.contractAddress).some(([, v]) => v) ? (
+                Object.entries(token.contractAddress)
+                  .filter(([, addr]) => addr)
+                  .map(([chain, addr]) => (
+                    <div key={chain} className="flex items-center justify-between">
+                      <span className="text-[11px] text-white/40 capitalize">{chain}</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-white/70 text-xs">
+                          {(addr as string).slice(0, 8)}...{(addr as string).slice(-6)}
+                        </span>
+                        <CopyButton text={addr as string} />
+                      </div>
+                    </div>
+                  ))
+              ) : (
+                <span className="font-mono text-white/30 text-xs">—</span>
+              )}
             </div>
           </div>
         </div>

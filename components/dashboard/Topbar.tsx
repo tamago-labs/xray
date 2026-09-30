@@ -84,7 +84,7 @@ export default function Topbar() {
     name: tokenData.name,
     symbol: tokenData.symbol,
     rwaRank: assetData?.rwa_rank ?? null,
-    contractAddress: tokenData.contractAddress ?? null,
+    contractAddress: tokenData.contractAddress?.xlayer ?? null,
     assetSymbol: assetData?.symbol ?? null,
     assetSlug: assetData?.slug ?? null,
   } : null;
@@ -109,14 +109,6 @@ export default function Topbar() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex items-center gap-3 px-2 ml-5 overflow-hidden"
         >
-          {tokenMeta.logo ? (
-            <img src={tokenMeta.logo} alt="" className="w-7 h-7 rounded-full" />
-          ) : (
-            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white/40">
-              {tokenMeta.symbol?.slice(0, 2)}
-            </div>
-          )}
-          <span className="text-sm font-semibold text-white/90 cursor-default" title={tokenMeta.name}>{tokenMeta.symbol}</span>
           {tokenMeta.rwaRank != null && (
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/[0.06] text-white/40 cursor-default" title={`Ranked #${tokenMeta.rwaRank} by CoinMarketCap`}>
               #{tokenMeta.rwaRank}

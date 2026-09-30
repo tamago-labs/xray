@@ -27,7 +27,7 @@ export default function TokenDetailClient({
 
   return (
       <div className="space-y-6">
-        <TokenDetailHeader token={token} asset={asset} />
+         <TokenDetailHeader token={token} asset={asset} />
         <div className="grid grid-cols-5 gap-6">
            <div className="col-span-2 space-y-6">
             <TokenDetailStats token={token} price={price} />
