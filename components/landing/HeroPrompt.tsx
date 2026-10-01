@@ -1,14 +1,24 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { ArrowRight, Plus, X } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { ArrowRight, Plus, X, ChevronRight } from 'lucide-react';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '@/amplify/data/resource';
 import { usePrices } from '@/app/contexts/PriceContext';
 import { useBaseTokenPrices } from '@/app/contexts/BaseTokenPriceProvider';
+import { useWallet } from '@/components/app/WalletContext';
+import { useTokenBalances } from '@/hooks/useTokenBalances';
+import { useRwaBalances } from '@/hooks/useRwaBalances';
+import { useTrackedTokens } from '@/hooks/useTrackedTokens';
+import { BASE_TOKENS, BASE_TOKENS_TESTNET } from '@/lib/tokens/base-tokens';
 import rwaList from '@/lib/data/rwa-v1-list.json';
+
+const dataClient = generateClient<Schema>();
 
 interface DemoToken {
   symbol: string;
   name: string;
+  amount: number;
   logo: string | null;
 }
 
@@ -17,33 +27,40 @@ interface DemoPortfolio {
   tokens: DemoToken[];
 }
 
-const DEMO_PORTFOLIOS: DemoPortfolio[] = (() => {
-  const logoMap = new Map<string, string | null>();
-  for (const asset of (rwaList as any).assets ?? []) {
-    for (const token of asset.tokens ?? []) {
-      if (token.symbol && token.contractAddress?.xlayer && !logoMap.has(token.symbol)) {
-        logoMap.set(token.symbol, token.logo ?? null);
-      }
+const logoMap = new Map<string, string | null>();
+for (const asset of (rwaList as any).assets ?? []) {
+  for (const token of asset.tokens ?? []) {
+    if (token.symbol && token.contractAddress?.xlayer && !logoMap.has(token.symbol)) {
+      logoMap.set(token.symbol, token.logo ?? null);
     }
   }
-  const getLogo = (symbol: string) => logoMap.get(symbol) ?? null;
+}
+for (const bt of [...BASE_TOKENS, ...BASE_TOKENS_TESTNET]) {
+  if (!logoMap.has(bt.symbol)) {
+    logoMap.set(bt.symbol, bt.logo);
+  }
+}
+const getLogo = (symbol: string) => logoMap.get(symbol) ?? null;
+
+const DEMO_PORTFOLIOS: DemoPortfolio[] = (() => {
 
   return [
     {
-      name: 'Tech Giants',
+      name: 'High-Beta Growth',
       tokens: [
-        { symbol: 'TSLAX', name: 'Tesla', logo: getLogo('TSLAX') },
-        { symbol: 'NVDAX', name: 'NVIDIA', logo: getLogo('NVDAX') },
-        { symbol: 'GOOGLX', name: 'Google', logo: getLogo('GOOGLX') },
+        { symbol: 'USDT', name: 'Tether', amount: 5000, logo: getLogo('USDT') },
+        { symbol: 'TSLAX', name: 'Tesla', amount: 5, logo: getLogo('TSLAX') },
+        { symbol: 'NVDAX', name: 'NVIDIA', amount: 12, logo: getLogo('NVDAX') },
+        { symbol: 'GOOGLX', name: 'Google', amount: 8, logo: getLogo('GOOGLX') },
       ],
     },
     {
-      name: 'Mixed Holdings',
+      name: 'Large Cap Focus',
       tokens: [
-        { symbol: 'TSLAX', name: 'Tesla', logo: getLogo('TSLAX') },
-        { symbol: 'MSTRX', name: 'MicroStrategy', logo: getLogo('MSTRX') },
-        { symbol: 'CRCLX', name: 'Circle', logo: getLogo('CRCLX') },
-        { symbol: 'SPCXx', name: 'SpaceX', logo: getLogo('SPCXx') },
+        { symbol: 'TSLAX', name: 'Tesla', amount: 3, logo: getLogo('TSLAX') },
+        { symbol: 'MSTRX', name: 'MicroStrategy', amount: 20, logo: getLogo('MSTRX') },
+        { symbol: 'CRCLX', name: 'Circle', amount: 150, logo: getLogo('CRCLX') },
+        { symbol: 'SPCXx', name: 'SpaceX', amount: 2, logo: getLogo('SPCXx') },
       ],
     },
   ];
@@ -52,26 +69,100 @@ const DEMO_PORTFOLIOS: DemoPortfolio[] = (() => {
 export default function HeroPrompt() {
   const [inputValue, setInputValue] = useState('');
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [loadingDemo, setLoadingDemo] = useState(false);
   const [attached, setAttached] = useState<DemoPortfolio | null>(null);
+  const [expandedDemo, setExpandedDemo] = useState(false);
+  const [expandedWallet, setExpandedWallet] = useState(false);
+  const [userPortfolios, setUserPortfolios] = useState<{ id: string; name: string; tokens: DemoToken[] }[]>([]);
   const popoverRef = useRef<HTMLDivElement>(null);
   const { loading: rwaLoading } = usePrices();
   const { loading: baseLoading } = useBaseTokenPrices();
   const loading = rwaLoading || baseLoading;
+  const { address, isConnected, chainId } = useWallet();
+  const { balances: walletBalances } = useTokenBalances(address ?? undefined, chainId ?? undefined);
+  const { tracked } = useTrackedTokens(address ?? undefined);
+  const trackedSymbols = tracked.map((t) => t.symbol);
+  const { balances: rwaBalances } = useRwaBalances(address ?? undefined, chainId ?? undefined, trackedSymbols);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
         setPopoverOpen(false);
+        setExpandedDemo(false);
+        setExpandedWallet(false);
       }
     };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  const handleAttachClick = () => {
-    setPopoverOpen(!popoverOpen);
+  const loadUserPortfolios = useCallback(async () => {
+    if (!address) { setUserPortfolios([]); return; }
+    try {
+      const { data: profiles } = await dataClient.models.UserProfile.list({
+        filter: { walletAddress: { eq: address } },
+      });
+      if (!profiles.length) { setUserPortfolios([]); return; }
+      const { data: portfolios } = await dataClient.models.Portfolio.list({
+        filter: { userProfileId: { eq: profiles[0].id } },
+      });
+      const portfoliosWithTokens = await Promise.all(
+        (portfolios ?? []).map(async (p) => {
+          const { data: tokens } = await dataClient.models.PortfolioToken.list({
+            filter: { portfolioId: { eq: p.id } },
+          });
+          return {
+            id: p.id,
+            name: p.name,
+            tokens: (tokens ?? []).map((t) => {
+              const meta = logoMap.get(t.symbol);
+              return {
+                symbol: t.symbol,
+                name: t.name ?? t.symbol,
+                amount: t.customValue ?? 0,
+                logo: meta ?? null,
+              };
+            }),
+          };
+        })
+      );
+      setUserPortfolios(portfoliosWithTokens);
+    } catch {
+      setUserPortfolios([]);
+    }
+  }, [address]);
+
+  const walletTokens = useMemo(() => {
+    const result: DemoToken[] = [];
+    const tokens = chainId === 1952 ? BASE_TOKENS_TESTNET : BASE_TOKENS;
+    for (const token of tokens) {
+      const balance = parseFloat(walletBalances[token.symbol] ?? '0');
+      if (balance > 0) {
+        result.push({ symbol: token.symbol, name: token.name, amount: balance, logo: token.logo ?? null });
+      }
+    }
+    for (const t of tracked) {
+      const balance = parseFloat(rwaBalances[t.symbol] ?? '0');
+      if (balance > 0) {
+        const logo = t.logo ?? logoMap.get(t.symbol) ?? null;
+        result.push({ symbol: t.symbol, name: t.name, amount: balance, logo });
+      }
+    }
+    return result;
+  }, [chainId, walletBalances, tracked, rwaBalances]);
+
+  const handleToggleWallet = () => {
+    const next = !expandedWallet;
+    setExpandedWallet(next);
+    if (next && isConnected) {
+      void loadUserPortfolios();
+    }
   };
+
+  useEffect(() => {
+    if (popoverOpen && isConnected) {
+      void loadUserPortfolios();
+    }
+  }, [popoverOpen, isConnected, loadUserPortfolios]);
 
   return (
     <div className="flex flex-col w-full max-w-3xl mx-auto">
@@ -110,7 +201,7 @@ export default function HeroPrompt() {
                   </div>
                 ) : (
                   <button
-                    onClick={handleAttachClick}
+                    onClick={() => setPopoverOpen(!popoverOpen)}
                     className="w-9 h-9 rounded-lg bg-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.1] border border-border3/50 flex items-center justify-center transition-colors"
                     title="Attach portfolio"
                   >
@@ -119,35 +210,123 @@ export default function HeroPrompt() {
                 )}
 
                 {popoverOpen && (
-                  <div className="absolute bottom-full left-0 mb-2 w-96 bg-surface border border-border3/60 rounded-xl shadow-2xl overflow-hidden z-50">
-                    <div className="px-3 py-2 border-b border-border3/40 text-[11px] font-semibold tracking-wider text-white/40">
-                      Choose a Demo Portfolio
-                    </div>
-                    {DEMO_PORTFOLIOS.map((p) => (
-                      <button
-                        key={p.name}
-                        onClick={() => {
-                          setAttached(p);
-                          setPopoverOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2.5 hover:bg-white/[0.04] transition-colors border-b border-border3/20 last:border-b-0 ${
-                          attached?.name === p.name ? 'bg-accent/10' : ''
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[13px] font-medium text-white/90">{p.name}</span>
-                          <span className="text-[11px] text-white/40">{p.tokens.length} tokens</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {p.tokens.slice(0, 6).map((t) => (
-                            <span key={t.symbol} className="flex items-center gap-1 text-[11px] text-white/50">
-                              {t.logo && <img src={t.logo} alt="" className="w-3.5 h-3.5 rounded-full" />}
-                              {t.symbol}
-                            </span>
-                          ))}
-                        </div>
-                      </button>
-                    ))}
+                  <div className="absolute bottom-full left-0 mb-2 w-80 bg-surface border border-border3/60 rounded-xl shadow-2xl overflow-hidden z-50">
+                    <button
+                      onClick={() => setExpandedDemo(!expandedDemo)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-[12px] font-medium text-white/70 hover:bg-white/[0.04] transition-colors border-b border-border3/30"
+                    >
+                      <span>Demo Portfolio (No AI Credit Needed)</span>
+                      <ChevronRight className={`w-3.5 h-3.5 text-white/40 transition-transform ${expandedDemo ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedDemo && (
+                      <div className="border-b border-border3/30">
+                        {DEMO_PORTFOLIOS.map((p) => (
+                          <button
+                            key={p.name}
+                            onClick={() => {
+                              setAttached(p);
+                              setPopoverOpen(false);
+                              setExpandedDemo(false);
+                            }}
+                              className={`w-full text-left px-3 py-2 hover:bg-white/[0.04] transition-colors border-b border-border3/20 last:border-b-0 ${
+                              attached?.name === p.name ? 'bg-accent/10' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[12px] font-medium text-white/80">{p.name}</span>
+                              <span className="text-[10px] text-white/35">{p.tokens.length} tokens</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {p.tokens.slice(0, 4).map((t) => (
+                                <span key={t.symbol} className="flex items-center gap-1 text-[10px] text-white/45">
+                                  {t.logo && <img src={t.logo} alt="" className="w-3 h-3 rounded-full" />}
+                                  {t.amount} {t.symbol}
+                                </span>
+                              ))}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={handleToggleWallet}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-[12px] font-medium text-white/70 hover:bg-white/[0.04] transition-colors"
+                    >
+                      <span>Your Portfolio</span>
+                      <ChevronRight className={`w-3.5 h-3.5 text-white/40 transition-transform ${expandedWallet ? 'rotate-90' : ''}`} />
+                    </button>
+                    {expandedWallet && (
+                      <div>
+                         {isConnected ? (
+                           <div className="max-h-40 overflow-y-auto">
+                             <button
+                               onClick={() => {
+                                 setAttached({ name: 'Connected Wallet', tokens: walletTokens });
+                                 setPopoverOpen(false);
+                                 setExpandedWallet(false);
+                               }}
+                               className={`w-full text-left px-3 py-2 hover:bg-white/[0.04] transition-colors border-b border-border3/20 ${
+                                 attached?.name === 'Connected Wallet' ? 'bg-accent/10' : ''
+                               }`}
+                             >
+                               <div className="flex items-center justify-between mb-1">
+                                 <span className="text-[12px] font-medium text-white/80">Connected Wallet</span>
+                                 <span className="text-[10px] text-white/35">{walletTokens.length} tokens</span>
+                               </div>
+                               {walletTokens.length > 0 && (
+                                 <div className="flex items-center gap-1.5 flex-wrap">
+                                   {walletTokens.slice(0, 4).map((t) => (
+                                     <span key={t.symbol} className="flex items-center gap-1 text-[10px] text-white/45">
+                                       {t.logo && <img src={t.logo} alt="" className="w-3 h-3 rounded-full" />}
+                                       {t.amount.toLocaleString(undefined, { maximumFractionDigits: 2 })} {t.symbol}
+                                     </span>
+                                   ))}
+                                   {walletTokens.length > 4 && (
+                                     <span className="text-[10px] text-white/30">+{walletTokens.length - 4} more</span>
+                                   )}
+                                 </div>
+                               )}
+                             </button>
+                             {userPortfolios.map((p) => (
+                               <button
+                                 key={p.id}
+                                 onClick={() => {
+                                   setAttached(p);
+                                   setPopoverOpen(false);
+                                   setExpandedWallet(false);
+                                 }}
+                                 className={`w-full text-left px-3 py-2 hover:bg-white/[0.04] transition-colors border-b border-border3/20 last:border-b-0 ${
+                                   attached?.name === p.name ? 'bg-accent/10' : ''
+                                 }`}
+                               >
+                                 <div className="flex items-center justify-between mb-1">
+                                   <span className="text-[12px] font-medium text-white/80">{p.name}</span>
+                                   <span className="text-[10px] text-white/35">{p.tokens.length} tokens</span>
+                                 </div>
+                                 <div className="flex items-center gap-1.5 flex-wrap">
+                                   {p.tokens.slice(0, 4).map((t) => (
+                                     <span key={t.symbol} className="flex items-center gap-1 text-[10px] text-white/45">
+                                       {t.logo && <img src={t.logo} alt="" className="w-3 h-3 rounded-full" />}
+                                       {t.amount} {t.symbol}
+                                     </span>
+                                   ))}
+                                 </div>
+                               </button>
+                             ))}
+                             {userPortfolios.length === 0 && (
+                               <div className="px-3 py-1.5 text-[10px] text-white/30">
+                                 No simulated portfolios
+                               </div>
+                             )}
+                           </div>
+                         ) : (
+                          <div className="px-2 py-3 text-[11px] text-white/35 text-center">
+                            Connect your wallet to use your portfolio
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
