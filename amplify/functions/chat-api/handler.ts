@@ -81,22 +81,30 @@ async function chatStreamHandler(
     return;
   }
 
+  console.log(`[chat] starting reviewId=${reviewId} msg="${message.slice(0, 80)}"`);
+
   try {
+    console.log(`[chat] fetching SavedReview...`);
     const { data: reviewRaw } = await dataClient.models.SavedReview.get({ id: reviewId });
     if (!reviewRaw) {
+      console.log(`[chat] review not found: ${reviewId}`);
       responseStream.write(`data: ${JSON.stringify({ error: "Review not found" })}\n\n`);
       responseStream.end();
       return;
     }
     const review = reviewRaw as any;
+    console.log(`[chat] review loaded: portfolio=${review.portfolioName}, hasReport=${!!report}, hasChats=${!!review.chats}`);
 
     let chatItems: any[] = [];
     try {
       chatItems = JSON.parse(review.chats as string) ?? [];
-    } catch {
+      console.log(`[chat] loaded ${chatItems.length} chat items`);
+    } catch (e) {
+      console.log(`[chat] chat parse failed:`, e);
       chatItems = [];
     }
 
+    console.log(`[chat] init openai client...`);
     const OpenAI = (await import("openai")).default;
     const openaiClient = new OpenAI({
       apiKey: env.OPENAI_API_KEY,
@@ -106,6 +114,7 @@ async function chatStreamHandler(
     const { setDefaultOpenAIClient, setTracingDisabled } = await import("@openai/agents");
     setDefaultOpenAIClient(openaiClient);
     setTracingDisabled(true);
+    console.log(`[chat] openai client ready`);
 
     const historyMessages = chatItems.map((item: any) => {
       const role = item.role ?? "user";
@@ -121,10 +130,17 @@ async function chatStreamHandler(
       ...historyMessages,
       { type: "message" as const, role: "user" as const, content: [{ type: "input_text" as const, text: message }] },
     ];
+    console.log(`[chat] messages prepared: ${allMessages.length} history + 1 new`);
 
     const reviewSummary = buildReviewSummary(review);
+    console.log(`[chat] reviewSummary: ${reviewSummary.slice(0, 200)}`);
+
     const triageAgent = createTriageAgent(reviewId, reviewSummary);
+    console.log(`[chat] triageAgent created with ${triageAgent.tools?.length ?? 0} tools`);
+
+    console.log(`[chat] starting agent stream...`);
     const stream = await run(triageAgent, allMessages as any, { stream: true, maxTurns: 20 });
+    console.log(`[chat] stream started`);
 
     const STREAM_TIMEOUT_MS = 250000;
     const NO_PROGRESS_TIMEOUT_MS = 45000;
@@ -143,11 +159,16 @@ async function chatStreamHandler(
       setTimeout(() => reject(new Error("Stream timeout")), STREAM_TIMEOUT_MS)
     );
 
+    let eventCount = 0;
+    console.log(`[stream] entering event loop...`);
     try {
       await Promise.race([
         (async () => {
           for await (const event of stream) {
             lastEventTime = Date.now();
+            eventCount++;
+            const eventData = JSON.stringify(event).slice(0, 300);
+            console.log(`[stream] event #${eventCount}: type=${event.type} data=${eventData}`);
             if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
               responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
             }
@@ -155,11 +176,13 @@ async function chatStreamHandler(
               responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
             }
           }
+          console.log(`[stream] loop ended normally after ${eventCount} events`);
         })(),
         timeoutPromise,
       ]);
     } catch (streamErr) {
       clearInterval(noProgressInterval);
+      console.error(`[stream] error after ${eventCount} events:`, streamErr);
       const msg = streamErr instanceof Error && streamErr.message.includes("Max turns")
         ? "Agent took too many steps. Try rephrasing."
         : "Stream interrupted. Try again.";
@@ -168,7 +191,15 @@ async function chatStreamHandler(
       clearInterval(noProgressInterval);
     }
 
-    const streamFinalOutput = stream.finalOutput ?? '';
+    console.log(`[stream] accessing finalOutput...`);
+    let streamFinalOutput = '';
+    try {
+      streamFinalOutput = stream.finalOutput ?? '';
+      console.log(`[stream] finalOutput length: ${streamFinalOutput.length}`, streamFinalOutput.slice(0, 300));
+    } catch (e) {
+      console.error('[stream] finalOutput access failed:', e);
+      streamFinalOutput = '';
+    }
 
     const finalItems = [
       ...chatItems,
@@ -176,14 +207,17 @@ async function chatStreamHandler(
       { type: "message", role: "assistant", content: streamFinalOutput || "I'm processing your request. Please try again." },
     ];
 
+    console.log(`[chat] saving ${finalItems.length} chat items...`);
     await dataClient.models.SavedReview.update({
       id: reviewId,
       chats: JSON.stringify(finalItems),
     });
+    console.log(`[chat] chat saved`);
 
     const inputTokens = estimateTokens(message);
     const outputTokens = estimateTokens(streamFinalOutput);
     const creditsUsed = (inputTokens + outputTokens) * CREDIT_RATE;
+    console.log(`[chat] credits: input=${inputTokens} output=${outputTokens} used=${creditsUsed}`);
     try {
       const profileId = review.userProfileId as string;
       if (profileId) {
@@ -201,11 +235,13 @@ async function chatStreamHandler(
       console.error('[credits] failed to deduct:', creditErr);
     }
 
+    console.log(`[chat] done, sending completion`);
     responseStream.write(`data: ${JSON.stringify({ done: true, reviewId })}\n\n`);
   } catch (error) {
-    console.error("Chat error:", error);
+    console.error("[chat] fatal error:", error);
     responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" })}\n\n`);
   } finally {
+    console.log(`[chat] closing stream`);
     responseStream.end();
   }
 }
