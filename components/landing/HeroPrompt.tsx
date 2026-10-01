@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowRight, Plus, X, ChevronRight } from 'lucide-react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
@@ -14,6 +15,8 @@ import { BASE_TOKENS, BASE_TOKENS_TESTNET } from '@/lib/tokens/base-tokens';
 import rwaList from '@/lib/data/rwa-v1-list.json';
 
 const dataClient = generateClient<Schema>();
+
+const DEMO_USER_PROFILE_ID = 'd543f3b6-247d-4ecc-be25-7c2a5486da1a';
 
 interface DemoToken {
   symbol: string;
@@ -48,7 +51,7 @@ const DEMO_PORTFOLIOS: DemoPortfolio[] = (() => {
     {
       name: 'High-Beta Growth',
       tokens: [
-        { symbol: 'USDT', name: 'Tether', amount: 5000, logo: getLogo('USDT') },
+        { symbol: 'USDT', name: 'Tether', amount: 1000, logo: getLogo('USDT') },
         { symbol: 'TSLAX', name: 'Tesla', amount: 5, logo: getLogo('TSLAX') },
         { symbol: 'NVDAX', name: 'NVIDIA', amount: 12, logo: getLogo('NVDAX') },
         { symbol: 'GOOGLX', name: 'Google', amount: 8, logo: getLogo('GOOGLX') },
@@ -67,15 +70,17 @@ const DEMO_PORTFOLIOS: DemoPortfolio[] = (() => {
 })();
 
 export default function HeroPrompt() {
-  const [inputValue, setInputValue] = useState('');
+  const router = useRouter();
+  const [inputValue, setInputValue] = useState('What are the hidden risks in my portfolio?');
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [attached, setAttached] = useState<DemoPortfolio | null>(null);
   const [expandedDemo, setExpandedDemo] = useState(false);
   const [expandedWallet, setExpandedWallet] = useState(false);
   const [userPortfolios, setUserPortfolios] = useState<{ id: string; name: string; tokens: DemoToken[] }[]>([]);
+  const [submitting, setSubmitting] = useState(false);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const { loading: rwaLoading } = usePrices();
-  const { loading: baseLoading } = useBaseTokenPrices();
+  const { prices, loading: rwaLoading } = usePrices();
+  const { prices: basePrices, loading: baseLoading } = useBaseTokenPrices();
   const loading = rwaLoading || baseLoading;
   const { address, isConnected, chainId } = useWallet();
   const { balances: walletBalances } = useTokenBalances(address ?? undefined, chainId ?? undefined);
@@ -163,6 +168,69 @@ export default function HeroPrompt() {
       void loadUserPortfolios();
     }
   }, [popoverOpen, isConnected, loadUserPortfolios]);
+
+  const handleSubmit = async () => {
+    const prompt = inputValue.trim();
+    if (!prompt || !attached || submitting || loading) return;
+    setSubmitting(true);
+    try {
+      let userProfileId: string | null = null;
+      if (address) {
+        const { data: profiles } = await dataClient.models.UserProfile.list({
+          filter: { walletAddress: { eq: address } },
+        });
+        if (profiles.length > 0) {
+          userProfileId = profiles[0].id;
+        } else {
+          const { data: created } = await dataClient.models.UserProfile.create({
+            walletAddress: address,
+            credits: 1000,
+          });
+          if (created) userProfileId = created.id;
+        }
+      } else {
+        const { data: created } = await dataClient.models.UserProfile.create({
+          credits: 1000,
+        });
+        if (created) userProfileId = created.id;
+      }
+
+      const rwaPriceMap = new Map(prices.map((p) => [p.token_symbol, p.price ?? 0]));
+      const holdings = attached.tokens.map((t) => {
+        const rwaPrice = rwaPriceMap.get(t.symbol);
+        const price = rwaPrice != null ? rwaPrice : basePrices[t.symbol]?.price ?? 0;
+        return { symbol: t.symbol, name: t.name, balance: t.amount, price };
+      });
+      console.log('[HeroPrompt] holdings:', holdings);
+
+      const isDemo = attached.name === 'High-Beta Growth' || attached.name === 'Large Cap Focus';
+      const profileId = isDemo ? DEMO_USER_PROFILE_ID : userProfileId!;
+
+      const { data, errors } = await dataClient.queries.riskReview({
+        userProfileId: profileId,
+        prompt,
+        holdings: JSON.stringify(holdings),
+      });
+      if (errors?.length) console.error('[HeroPrompt] riskReview errors:', errors);
+      const result = typeof data === 'string' ? JSON.parse(data) : data;
+      if (result?.questions?.length) {
+        sessionStorage.setItem('xray-review', JSON.stringify({
+          prompt,
+          userProfileId: profileId,
+          portfolioName: attached.name,
+          holdings,
+          questions: result.questions,
+        }));
+        router.push('/dashboard/review');
+      } else {
+        console.error('[HeroPrompt] no questions returned');
+      }
+    } catch (err) {
+      console.error('[HeroPrompt] riskReview failed:', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full max-w-3xl mx-auto">
@@ -331,12 +399,13 @@ export default function HeroPrompt() {
                 )}
               </div>
               <button
-                disabled={loading}
+                onClick={handleSubmit}
+                disabled={loading || submitting || !attached}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
-                  loading ? 'bg-accent/60 cursor-wait' : 'bg-accent hover:bg-accent/80'
+                  loading || submitting || !attached ? 'bg-accent/60 cursor-wait' : 'bg-accent hover:bg-accent/80'
                 }`}
               >
-                {loading ? (
+                {submitting || loading ? (
                   <svg className="w-4 h-4 text-white animate-spin" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />

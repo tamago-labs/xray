@@ -91,7 +91,7 @@ const ISSUER_RISK_TABLE: Record<string, IssuerRisk> = {
 
 export function getIssuerRisk(issuerName?: string): IssuerRisk | null {
   if (!issuerName) return null;
-  return ISSUER_RISK_TABLE[issuerName] ?? null;
+  return ISSUER_RISK_TABLE[issuerName] ?? BASE_ISSUER_RISK[issuerName] ?? null;
 }
 
 const tokenIndex = new Map<string, TokenMeta>();
@@ -121,6 +121,75 @@ for (const asset of (rwaList as any).assets ?? []) {
       tokenIndex.set(token.symbol.toUpperCase(), meta);
     }
   }
+}
+
+interface BaseTokenMeta {
+  symbol: string;
+  name: string;
+  slug: string;
+  type: "base";
+  issuer_name: string;
+  volume_24h: number;
+  market_cap: number;
+}
+
+const BASE_TOKEN_OVERRIDES: BaseTokenMeta[] = [
+  { symbol: "USDT", name: "Tether", slug: "tether", type: "base", issuer_name: "Tether", volume: 60000000000, market_cap: 165000000000 },
+  { symbol: "USDC", name: "USDC", slug: "usd-coin", type: "base", issuer_name: "Circle", volume: 8000000000, market_cap: 65000000000 },
+  { symbol: "ETH", name: "Ethereum", slug: "ethereum", type: "base", issuer_name: "Ethereum Foundation", volume: 15000000000, market_cap: 400000000000 },
+  { symbol: "SOL", name: "Solana", slug: "solana", type: "base", issuer_name: "Solana Foundation", volume: 3000000000, market_cap: 80000000000 },
+  { symbol: "USDG", name: "Global Dollar", slug: "global-dollar", type: "base", issuer_name: "Global Dollar", volume: 500000000, market_cap: 1000000000 },
+  { symbol: "OKB", name: "OKB", slug: "okb", type: "base", issuer_name: "OKX", volume: 200000000, market_cap: 6000000000 },
+];
+
+const BASE_ISSUER_RISK: Record<string, IssuerRisk> = {
+  "Tether": {
+    level: "Moderate",
+    custody: "Fiat-backed (commercial paper + reserves)",
+    description: "Tether Limited issues USDT backed by reserves including cash, cash equivalents, and other assets. Reserves composition and transparency have historically been subject to scrutiny. Large market presence and deep liquidity offset some counterparty concerns.",
+  },
+  "Circle": {
+    level: "Low",
+    custody: "Fiat-backed (regulated, fully reserved)",
+    description: "Circle issues USDC as a fully reserved stablecoin regulated under US money transmitter laws. Reserves held in cash and short-duration US Treasuries at regulated institutions with monthly attestations by major accounting firms.",
+  },
+  "Ethereum Foundation": {
+    level: "Low",
+    custody: "Decentralized (protocol-native)",
+    description: "ETH is the native asset of Ethereum, a decentralized smart contract platform. No single issuer counterparty risk. Value derives from network utility, staking economics, and market demand.",
+  },
+  "Solana Foundation": {
+    level: "Low-Moderate",
+    custody: "Decentralized (protocol-native)",
+    description: "SOL is the native asset of Solana, a high-performance blockchain. Network has experienced occasional outages, introducing additional protocol risk compared to Ethereum.",
+  },
+  "Global Dollar": {
+    level: "Moderate",
+    custody: "Fiat-backed (emerging, less transparent)",
+    description: "USDG is a newer stablecoin with emerging market presence. Reserve composition and regulatory standing are less established than major stablecoins.",
+  },
+  "OKX": {
+    level: "Moderate",
+    custody: "Exchange-issued utility token",
+    description: "OKB is the utility token of OKX exchange. Value is tied to exchange platform health, buyback/burn mechanics, and regulatory standing of the parent company.",
+  },
+};
+
+for (const bt of BASE_TOKEN_OVERRIDES) {
+  const meta: TokenMeta = {
+    symbol: bt.symbol,
+    name: bt.name,
+    slug: bt.slug,
+    type: "base",
+    issuer_name: bt.issuer_name,
+    volume_24h: bt.volume_24h,
+    market_cap: bt.market_cap,
+  };
+  tokenIndex.set(bt.symbol.toUpperCase(), meta);
+}
+
+export function getBaseTokenMeta(symbol: string): TokenMeta | undefined {
+  return tokenIndex.get(symbol.toUpperCase());
 }
 
 export function getTokenMeta(symbol: string): TokenMeta | undefined {
