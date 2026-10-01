@@ -133,12 +133,12 @@ interface BaseTokenMeta {
 }
 
 const BASE_TOKEN_OVERRIDES: BaseTokenMeta[] = [
-  { symbol: "USDT", name: "Tether", slug: "tether", type: "base", issuer_name: "Tether", volume: 60000000000, market_cap: 165000000000 },
-  { symbol: "USDC", name: "USDC", slug: "usd-coin", type: "base", issuer_name: "Circle", volume: 8000000000, market_cap: 65000000000 },
-  { symbol: "ETH", name: "Ethereum", slug: "ethereum", type: "base", issuer_name: "Ethereum Foundation", volume: 15000000000, market_cap: 400000000000 },
-  { symbol: "SOL", name: "Solana", slug: "solana", type: "base", issuer_name: "Solana Foundation", volume: 3000000000, market_cap: 80000000000 },
-  { symbol: "USDG", name: "Global Dollar", slug: "global-dollar", type: "base", issuer_name: "Global Dollar", volume: 500000000, market_cap: 1000000000 },
-  { symbol: "OKB", name: "OKB", slug: "okb", type: "base", issuer_name: "OKX", volume: 200000000, market_cap: 6000000000 },
+  { symbol: "USDT", name: "Tether", slug: "tether", issuer_name: "Tether", volume_24h: 60000000000, market_cap: 165000000000 },
+  { symbol: "USDC", name: "USDC", slug: "usd-coin", issuer_name: "Circle", volume_24h: 8000000000, market_cap: 65000000000 },
+  { symbol: "ETH", name: "Ethereum", slug: "ethereum", issuer_name: "Ethereum Foundation", volume_24h: 15000000000, market_cap: 400000000000 },
+  { symbol: "SOL", name: "Solana", slug: "solana", issuer_name: "Solana Foundation", volume_24h: 3000000000, market_cap: 80000000000 },
+  { symbol: "USDG", name: "Global Dollar", slug: "global-dollar", issuer_name: "Global Dollar", volume_24h: 500000000, market_cap: 1000000000 },
+  { symbol: "OKB", name: "OKB", slug: "okb", issuer_name: "OKX", volume_24h: 200000000, market_cap: 6000000000 },
 ];
 
 const BASE_ISSUER_RISK: Record<string, IssuerRisk> = {
