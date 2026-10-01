@@ -10,15 +10,33 @@ import { PROVIDER_BASE_URL, PROVIDER_MODEL } from "./provider";
 import { createTriageAgent } from "./agents/triage";
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env as any);
-
 Amplify.configure(resourceConfig, libraryOptions);
-
 const dataClient = generateClient<Schema>();
 
 const CREDIT_RATE = 0.01;
 
 function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
+}
+
+function buildReviewSummary(review: Record<string, any>): string {
+  try {
+    const report = JSON.parse(review.report as string);
+    const holdings = JSON.parse(review.holdings as string);
+    const topHoldings = holdings
+      .filter((h: any) => h.balance > 0 && h.price > 0)
+      .sort((a: any, b: any) => (b.balance * b.price) - (a.balance * a.price))
+      .slice(0, 5)
+      .map((h: any) => `${h.symbol} (${h.balance.toLocaleString()})`)
+      .join(', ');
+    const concentration = report.deterministicFactors?.concentration ?? 'N/A';
+    const marketExposure = report.deterministicFactors?.marketExposure ?? 'N/A';
+    const liquidity = report.deterministicFactors?.liquidity ?? 'N/A';
+    const issuer = report.deterministicFactors?.issuer ?? 'N/A';
+    return `Portfolio: ${review.portfolioName} | Score: ${report.overallScore} (${report.overallLabel}) | Top: ${topHoldings} | Factors: concentration=${concentration}, marketExposure=${marketExposure}, liquidity=${liquidity}, issuer=${issuer} | Summary: ${report.overallSummary ?? ''}`;
+  } catch {
+    return `Portfolio: ${review.portfolioName}`;
+  }
 }
 
 async function chatStreamHandler(
@@ -49,36 +67,14 @@ async function chatStreamHandler(
     return;
   }
 
-  const { message, sessionName, sessionId, walletAddress } = body;
+  const { message, reviewId } = body;
 
-  if (!walletAddress) {
-    responseStream.write(`data: ${JSON.stringify({ error: "walletAddress is required" })}\n\n`);
+  if (!reviewId) {
+    responseStream.write(`data: ${JSON.stringify({ error: "reviewId is required" })}\n\n`);
     responseStream.end();
     return;
   }
 
-  // Mode 1: Create empty session — returns session ID immediately
-  if (!sessionId) {
-    try {
-      const { data: newSession, errors } = await dataClient.models.AgentSession.create({
-        sessionName: sessionName || "New Chat",
-        items: JSON.stringify([]),
-        walletAddress,
-      });
-      if (errors) {
-        console.error('[create session] errors:', JSON.stringify(errors));
-      }
-      console.log('[create session] newSession:', JSON.stringify(newSession));
-      responseStream.write(`data: ${JSON.stringify({ sessionId: newSession?.id ?? null })}\n\n`);
-    } catch (error) {
-      console.error('[create session] exception:', error);
-      responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Failed to create session" })}\n\n`);
-    }
-    responseStream.end();
-    return;
-  }
-
-  // Mode 2: Stream chat
   if (!message || typeof message !== "string") {
     responseStream.write(`data: ${JSON.stringify({ error: "Message is required" })}\n\n`);
     responseStream.end();
@@ -86,36 +82,32 @@ async function chatStreamHandler(
   }
 
   try {
-    let sessionItems: any[] = [];
-    let currentSessionId = sessionId;
-
-    if (currentSessionId) {
-      const { data: sessions } = await dataClient.models.AgentSession.get({ id: currentSessionId });
-      if (sessions) {
-        sessionItems = JSON.parse(sessions.items as string) ?? [];
-      }
+    const { data: reviewRaw } = await dataClient.models.SavedReview.get({ id: reviewId });
+    if (!reviewRaw) {
+      responseStream.write(`data: ${JSON.stringify({ error: "Review not found" })}\n\n`);
+      responseStream.end();
+      return;
     }
+    const review = reviewRaw as any;
 
-    if (!currentSessionId) {
-      const { data: newSession } = await dataClient.models.AgentSession.create({
-        sessionName: sessionName || "New Chat",
-        items: JSON.stringify([]),
-        walletAddress,
-      });
-      currentSessionId = newSession?.id ?? undefined;
+    let chatItems: any[] = [];
+    try {
+      chatItems = JSON.parse(review.chats as string) ?? [];
+    } catch {
+      chatItems = [];
     }
 
     const OpenAI = (await import("openai")).default;
-    const client = new OpenAI({
+    const openaiClient = new OpenAI({
       apiKey: env.OPENAI_API_KEY,
       baseURL: PROVIDER_BASE_URL,
     });
 
     const { setDefaultOpenAIClient, setTracingDisabled } = await import("@openai/agents");
-    setDefaultOpenAIClient(client);
+    setDefaultOpenAIClient(openaiClient);
     setTracingDisabled(true);
 
-    const historyMessages = sessionItems.map((item: any) => {
+    const historyMessages = chatItems.map((item: any) => {
       const role = item.role ?? "user";
       let content = item.content ?? "";
       if (typeof content === "string") {
@@ -130,125 +122,88 @@ async function chatStreamHandler(
       { type: "message" as const, role: "user" as const, content: [{ type: "input_text" as const, text: message }] },
     ];
 
-    const triageAgent = createTriageAgent(walletAddress);
+    const reviewSummary = buildReviewSummary(review);
+    const triageAgent = createTriageAgent(reviewId, reviewSummary);
     const stream = await run(triageAgent, allMessages as any, { stream: true, maxTurns: 20 });
 
     const STREAM_TIMEOUT_MS = 250000;
+    const NO_PROGRESS_TIMEOUT_MS = 45000;
+    let lastEventTime = Date.now();
+
+    const noProgressInterval = setInterval(() => {
+      if (Date.now() - lastEventTime > NO_PROGRESS_TIMEOUT_MS) {
+        console.error("[stream] no progress — aborting");
+        responseStream.write(`data: ${JSON.stringify({ error: "Agent taking too long. Try a shorter message." })}\n\n`);
+        responseStream.end();
+        process.exit(1);
+      }
+    }, 5000);
 
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Stream timeout")), STREAM_TIMEOUT_MS)
     );
 
-    const newTrades: any[] = [];
-
     try {
       await Promise.race([
         (async () => {
           for await (const event of stream) {
-            try {
-              if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
-                responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
-              }
-              if (event.type === "agent_updated_stream_event") {
-                responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
-              }
-              if (event.type === "run_item_stream_event") {
-                const item = event.item as any;
-                const itemType = item.type ?? "";
-                const rawType = item.rawItem?.type ?? "";
-                const toolName = item.rawItem?.name ?? item.name ?? "";
-                if (toolName.includes("prepare_trade")) {
-                  if (rawType === "function_call_result" || itemType === "tool_call_output_item") {
-                    try {
-                      const raw = item.output ?? item.rawItem?.output;
-                      if (raw != null) {
-                        const output = typeof raw === "string" ? raw : JSON.stringify(raw);
-                        let parsed = JSON.parse(output);
-                        if (parsed.type === "text" && parsed.text) {
-                          parsed = JSON.parse(parsed.text);
-                        }
-                        if (parsed.error) {
-                          console.log("[stream] trade error:", parsed.error);
-                        } else {
-                          const trade = { ...parsed, status: "pending", createdAt: new Date().toISOString() };
-                          newTrades.push(trade);
-                          responseStream.write(`data: ${JSON.stringify({ trade })}\n\n`);
-                        }
-                      }
-                    } catch (e) {
-                      console.log("[stream] trade parse error:", e);
-                    }
-                  }
-                }
-              }
-            } catch (eventErr) {
-              console.error("[stream] event error:", eventErr);
+            lastEventTime = Date.now();
+            if (event.type === "raw_model_stream_event" && event.data.type === "output_text_delta") {
+              responseStream.write(`data: ${JSON.stringify({ chunk: event.data.delta })}\n\n`);
+            }
+            if (event.type === "agent_updated_stream_event") {
+              responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
             }
           }
         })(),
         timeoutPromise,
       ]);
     } catch (streamErr) {
-      console.error("[stream] error or timeout:", streamErr);
+      clearInterval(noProgressInterval);
       const msg = streamErr instanceof Error && streamErr.message.includes("Max turns")
-        ? "This request was too complex. Try breaking it into smaller questions."
-        : "Stream interrupted";
+        ? "Agent took too many steps. Try rephrasing."
+        : "Stream interrupted. Try again.";
       responseStream.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
+    } finally {
+      clearInterval(noProgressInterval);
     }
 
-    const finalItems = allMessages.concat(
-      [{ type: "message", role: "assistant", content: [{ type: "output_text", text: stream.finalOutput ?? "" }] }]
-    );
+    const finalItems = [
+      ...chatItems,
+      { type: "message", role: "user", content: message },
+      { type: "message", role: "assistant", content: stream.finalOutput ?? "" },
+    ];
 
-    if (currentSessionId) {
-      await dataClient.models.AgentSession.update({
-        id: currentSessionId,
-        items: JSON.stringify(finalItems),
-      });
-    }
-
-    if (currentSessionId && newTrades.length > 0) {
-      try {
-        const { data: session } = await dataClient.models.AgentSession.get({ id: currentSessionId });
-        const existingTransactions = session?.transactions ? JSON.parse(session.transactions as string) : [];
-        const updatedTransactions = [...existingTransactions, ...newTrades];
-        await dataClient.models.AgentSession.update({
-          id: currentSessionId,
-          transactions: JSON.stringify(updatedTransactions),
-        });
-      } catch (tradeErr) {
-        console.error("[trades] failed to save:", tradeErr);
-      }
-    }
+    await dataClient.models.SavedReview.update({
+      id: reviewId,
+      chats: JSON.stringify(finalItems),
+    });
 
     const inputTokens = estimateTokens(message);
     const outputTokens = estimateTokens(stream.finalOutput ?? '');
     const creditsUsed = (inputTokens + outputTokens) * CREDIT_RATE;
-    console.log(`[credits] inputTokens=${inputTokens} outputTokens=${outputTokens} creditsUsed=${creditsUsed}`);
-
     try {
-      const { data: profiles } = await dataClient.models.UserProfile.list({
-        filter: { walletAddress: { eq: walletAddress } },
-      });
-      const profile = profiles?.[0];
-      if (profile) {
-        const newCredits = Math.max(0, (profile.credits ?? 0) - creditsUsed);
-        await dataClient.models.UserProfile.update({
-          id: profile.id,
-          credits: newCredits,
-        });
-        console.log(`[credits] deducted ${creditsUsed} from ${profile.id}, new balance: ${newCredits}`);
+      const profileId = review.userProfileId as string;
+      if (profileId) {
+        const { data: profile } = await dataClient.models.UserProfile.get({ id: profileId });
+        if (profile) {
+          const p = profile as any;
+          const newCredits = Math.max(0, (p.credits ?? 0) - creditsUsed);
+          await dataClient.models.UserProfile.update({
+            id: p.id,
+            credits: newCredits,
+          });
+        }
       }
     } catch (creditErr) {
       console.error('[credits] failed to deduct:', creditErr);
     }
 
-    responseStream.write(`data: ${JSON.stringify({ done: true, sessionId: currentSessionId })}\n\n`);
+    responseStream.write(`data: ${JSON.stringify({ done: true, reviewId })}\n\n`);
   } catch (error) {
     console.error("Chat error:", error);
     responseStream.write(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" })}\n\n`);
   } finally {
-    console.log("[stream] closing response stream");
     responseStream.end();
   }
 }
