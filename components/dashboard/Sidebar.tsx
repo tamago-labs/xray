@@ -15,7 +15,7 @@ const navItems = [
   { href: '/dashboard/explore', label: 'Explore', icon: Compass },
   { href: '/dashboard/pre-ipo', label: 'Pre-IPO', icon: Rocket },
   // { href: '/dashboard/alerts', label: 'Alerts', icon: Bell },
-  { href: '/dashboard/top-news', label: 'Top News', icon: Newspaper },
+  { href: '/dashboard/top-news', label: 'Market News', icon: Newspaper },
 ];
 
 const dataClient = generateClient<Schema>();

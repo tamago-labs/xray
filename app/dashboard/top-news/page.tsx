@@ -54,19 +54,16 @@ export default function TopNews() {
           <h2 className="text-[14px] font-semibold text-white/85">Market Intelligence</h2>
         </div>
 
-        <MarketOverview />
         <FearGreedGauge />
+        <MarketOverview />
         <AltcoinSeasonChart />
       </div>
 
       {/* Right column — News */}
       <div className="lg:col-span-7 space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-accent2" />
-            <h2 className="text-[14px] font-semibold text-white/85">Top News</h2>
-          </div>
-          <span className="text-[11px] text-white/30">Personalized to your themes</span>
+        <div className="flex items-center gap-2 mb-1">
+          <TrendingUp className="w-4 h-4 text-accent2" />
+          <h2 className="text-[14px] font-semibold text-white/85">Top News</h2>
         </div>
 
         <div className="space-y-3">

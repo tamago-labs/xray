@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, BarChart2, DollarSign } from 'lucide-react';
+import { TrendingUp, BarChart2, DollarSign } from 'lucide-react';
 
 interface GlobalMetrics {
   total_market_cap: number;
@@ -47,8 +47,8 @@ export default function MarketOverview() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[...Array(4)].map((_, i) => (
+    <div className="grid grid-cols-3 gap-3">
+        {[...Array(3)].map((_, i) => (
           <div key={i} className="bg-surface border border-border3/50 rounded-xl p-4 h-[80px] animate-pulse" />
         ))}
       </div>
@@ -61,17 +61,13 @@ export default function MarketOverview() {
     { label: 'Total Market Cap', value: formatLarge(metrics.total_market_cap), icon: DollarSign, color: 'text-accent' },
     { label: '24h Volume', value: formatLarge(metrics.total_volume_24h), icon: BarChart2, color: 'text-zenblue' },
     { label: 'BTC Dominance', value: `${metrics.btc_dominance.toFixed(1)}%`, icon: TrendingUp, color: 'text-warn2' },
-    { label: 'Active Cryptos', value: metrics.active_cryptocurrencies.toLocaleString(), icon: TrendingDown, color: 'text-accent2' },
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       {stats.map((s) => (
         <div key={s.label} className="bg-surface border border-border3/50 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <s.icon className={`w-3.5 h-3.5 ${s.color}`} />
-            <span className="text-[10px] text-white/40 uppercase tracking-wider">{s.label}</span>
-          </div>
+          <span className="text-[10px] text-white/40 uppercase tracking-wider block mb-2">{s.label}</span>
           <p className="text-[16px] font-semibold text-white/90">{s.value}</p>
         </div>
       ))}

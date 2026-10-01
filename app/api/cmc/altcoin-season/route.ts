@@ -5,10 +5,10 @@ const { serverRuntimeConfig } = getConfig();
 
 export async function GET(request: NextRequest) {
   const apiKey = serverRuntimeConfig.CMC_API_KEY || process.env.CMC_API_KEY || '';
-  const limit = request.nextUrl.searchParams.get('limit') || '90';
+  const timeframe = request.nextUrl.searchParams.get('timeframe') || '90d';
 
   try {
-    const url = `https://pro-api.coinmarketcap.com/v1/global-metrics/altcoin-season-index/historical?limit=${limit}&convert=USD`;
+    const url = `https://pro-api.coinmarketcap.com/v1/altcoin-season-index/historical?timeframe=${timeframe}`;
 
     const res = await fetch(url, {
       headers: {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {
-    console.error('[cmc altcoin-season] error:', err);
+    console.error('[altcoin-season] error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

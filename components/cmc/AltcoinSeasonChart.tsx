@@ -14,23 +14,25 @@ export default function AltcoinSeasonChart() {
   const [seasonLabel, setSeasonLabel] = useState('');
 
   useEffect(() => {
-    fetch('/api/cmc/altcoin-season?limit=180')
+    fetch('/api/cmc/altcoin-season?timeframe=90d')
       .then((r) => r.json())
       .then((res) => {
-        if (res.data) {
-          const items = res.data.map((d: any) => {
-            const val = Number(d.value);
+        if (res.data?.points) {
+          const items = res.data.points.map((d: any) => {
+            const val = Number(d.altcoin_index);
+            const ts = typeof d.timestamp === 'number' ? d.timestamp * 1000 : Date.parse(d.timestamp);
             return {
               value: val,
-              date: new Date(d.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              date: new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             };
           });
           setData(items);
 
           const latest = items[items.length - 1];
           if (latest) {
-            if (latest.value >= 75) setSeasonLabel('Altcoin Season');
-            else if (latest.value >= 50) setSeasonLabel('Transition');
+            const v = latest.value;
+            if (v >= 75) setSeasonLabel('Altcoin Season');
+            else if (v >= 50) setSeasonLabel('Mixed / Balanced');
             else setSeasonLabel('Bitcoin Season');
           }
         }
@@ -79,7 +81,7 @@ export default function AltcoinSeasonChart() {
             <Tooltip
               contentStyle={{ background: '#141419', border: '1px solid #2A2A35', borderRadius: 8, fontSize: 11 }}
               labelStyle={{ color: 'rgba(255,255,255,0.4)' }}
-              formatter={(v: any) => [v >= 75 ? `${v} 🔥 Alt Season` : v >= 50 ? `${v} Transition` : `${v} BTC Season`, 'Index']}
+              formatter={(v: any) => [v >= 75 ? `${v} 🔥 Alt Season` : v >= 50 ? `${v} Mixed` : `${v} BTC Season`, 'Index']}
             />
             <Area type="monotone" dataKey="value" stroke="#00D2A0" fill="url(#seasonGrad)" strokeWidth={2} dot={false} />
           </AreaChart>

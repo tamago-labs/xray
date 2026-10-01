@@ -11,8 +11,8 @@ interface FearGreedData {
 }
 
 interface HistoricalItem {
-  value: string;
-  timestamp: string;
+  value: number;
+  date: string;
 }
 
 const getColor = (value: number): string => {
@@ -79,15 +79,24 @@ export default function FearGreedGauge() {
   useEffect(() => {
     Promise.all([
       fetch('/api/cmc/fear-greed').then((r) => r.json()),
-      fetch('/api/cmc/fear-greed?history=true').then((r) => r.json()),
+      fetch('/api/cmc/fear-greed?history=true&limit=90').then((r) => r.json()),
     ]).then(([latest, hist]) => {
-      if (latest.data) setData(latest.data);
+      if (latest.data) {
+        setData({
+          value: String(latest.data.value),
+          value_classification: latest.data.value_classification,
+          timestamp: latest.data.update_time || String(Date.now() / 1000),
+        });
+      }
       if (hist.data) {
         setHistory(
-          hist.data.map((d: any) => ({
-            value: Number(d.value),
-            date: new Date(d.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          }))
+          hist.data.map((d: any) => {
+            const ts = typeof d.timestamp === 'number' ? d.timestamp * 1000 : Date.parse(d.timestamp);
+            return {
+              value: Number(d.value),
+              date: new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            };
+          })
         );
       }
     }).catch(() => {}).finally(() => setLoading(false));
@@ -108,16 +117,16 @@ export default function FearGreedGauge() {
     <div className="bg-surface border border-border3/50 rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[14px] font-semibold text-white/85">Fear & Greed Index</h3>
-        <span className="text-[10px] text-white/30 uppercase tracking-wider">CMC</span>
+        <span className="text-[10px] text-white/30">From CoinMarketCap</span>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
         <div className="flex-1 max-w-[180px]">
           <GaugeArc value={value} />
         </div>
-        <div className="flex-1 text-center">
-          <span className="text-[12px] text-white/40">{label}</span>
-        </div>
+          <div className="flex-1 text-center">
+            <span className="text-[12px]"><span className="text-white/40">Market sentiment: </span><span style={{ color: getColor(value) }}>{label}</span></span>
+          </div>
       </div>
 
       <div className="h-[80px] mt-2">
