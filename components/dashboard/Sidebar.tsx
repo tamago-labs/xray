@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown, Plus } from 'lucide-react';
+import { MessageSquare, PieChart, Compass, Rocket, Bell, Newspaper, List, ChevronDown, Plus, BookCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
@@ -20,39 +20,57 @@ const navItems = [
 
 const dataClient = generateClient<Schema>();
 
+function relativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { isConnected, address } = useWallet();
   const [chatsOpen, setChatsOpen] = useState(false);
-  const [sessions, setSessions] = useState<{ id: string; sessionName: string }[]>([]);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<Array<{ id: string; portfolioName: string; overallScore: number; overallLabel: string; createdAt: string }>>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchSessions = () => {
-    if (!isConnected || !address) {
-      setSessions([]);
-      return;
-    }
+  useEffect(() => {
+    if (!address) { setProfileId(null); setReviews([]); return; }
+    void (async () => {
+      try {
+        const { data: profiles } = await dataClient.models.UserProfile.list({
+          filter: { walletAddress: { eq: address } },
+        });
+        setProfileId(profiles?.[0]?.id ?? null);
+      } catch { setProfileId(null); }
+    })();
+  }, [address]);
+
+  useEffect(() => {
+    if (!profileId) { setReviews([]); return; }
     setLoading(true);
-    dataClient.models.AgentSession.list({
-      filter: { walletAddress: { eq: address } },
+    dataClient.models.SavedReview.list({
+      filter: { userProfileId: { eq: profileId } },
     }).then((res) => {
-      setSessions((res.data ?? []).map((s) => ({ id: s.id, sessionName: s.sessionName })));
+      setReviews((res.data ?? [])
+        .map((r) => ({ id: r.id, portfolioName: r.portfolioName, overallScore: r.overallScore, overallLabel: r.overallLabel, createdAt: r.createdAt }))
+        .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1))
+        .slice(0, 20));
     }).catch(() => {
-      setSessions([]);
+      setReviews([]);
     }).finally(() => {
       setLoading(false);
     });
-  };
-
-  useEffect(() => {
-    fetchSessions();
-  }, [isConnected, address, pathname]);
+  }, [profileId, pathname, chatsOpen]);
 
   const toggleChats = () => {
-    setChatsOpen((v) => {
-      if (!v) fetchSessions();
-      return !v;
-    });
+    setChatsOpen(!chatsOpen);
   };
 
   return (
@@ -86,14 +104,14 @@ export default function Sidebar() {
           );
         })}
 
-        {/* Chats accordion */}
+        {/* Saved Reviews accordion */}
         <div>
           <button
             onClick={toggleChats}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-display font-medium text-white/50 hover:text-white hover:bg-white/[0.03] transition-colors"
           >
-            <MessageSquare className="w-4 h-4" />
-            <span className="flex-1 text-left">Chats</span>
+            <BookCheck className="w-4 h-4" />
+            <span className="flex-1 text-left">Saved Reviews</span>
             <motion.div
               animate={{ rotate: chatsOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
@@ -113,25 +131,27 @@ export default function Sidebar() {
               >
                 <div className="pl-10 pr-3 py-1 space-y-0.5">
                   {!isConnected ? (
-                    <p className="px-3 py-1.5 text-[11px] text-white/30">Connect wallet to see chats</p>
+                    <p className="px-3 py-1.5 text-[11px] text-white/30">Connect wallet to see reviews</p>
                   ) : loading ? (
                     <p className="px-3 py-1.5 text-[11px] text-white/30">Loading...</p>
-                  ) : sessions.length === 0 ? (
-                    <p className="px-3 py-1.5 text-[11px] text-white/30">No chats yet</p>
+                  ) : reviews.length === 0 ? (
+                    <p className="px-3 py-1.5 text-[11px] text-white/30">No reviews yet</p>
                   ) : (
-                    sessions.map((session) => {
-                      const isActive = pathname === `/dashboard/chats/${session.id}`;
+                    reviews.map((review) => {
+                      const isActive = pathname === `/dashboard/chats/${review.id}`;
                       return (
                         <Link
-                          key={session.id}
-                          href={`/dashboard/chats/${session.id}`}
-                          className={`block px-3 py-1.5 rounded-md text-[12px] font-display truncate transition-colors ${
+                          key={review.id}
+                          href={`/dashboard/chats/${review.id}`}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-[12px] transition-colors ${
                             isActive
                               ? 'bg-accent/10 text-accent'
                               : 'text-white/40 hover:text-white/70 hover:bg-white/[0.02]'
                           }`}
                         >
-                          {session.sessionName}
+                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${review.overallScore <= 30 ? 'bg-emerald-400' : review.overallScore <= 60 ? 'bg-yellow-400' : review.overallScore <= 80 ? 'bg-orange-400' : 'bg-red-400'}`} />
+                          <span className="truncate flex-1">{review.portfolioName}</span>
+                          <span className="text-white/25 shrink-0 text-[10px]">{relativeTime(review.createdAt)}</span>
                         </Link>
                       );
                     })
