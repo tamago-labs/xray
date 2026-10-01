@@ -184,9 +184,14 @@ async function chatStreamHandler(
     } catch (streamErr) {
       clearInterval(noProgressInterval);
       console.error(`[stream] error after ${eventCount} events:`, streamErr);
-      const msg = streamErr instanceof Error && streamErr.message.includes("Max turns")
-        ? "Agent took too many steps. Try rephrasing."
-        : "Stream interrupted. Try again.";
+      let msg = "Stream interrupted. Try again.";
+      if (streamErr instanceof Error) {
+        if (streamErr.message.includes("Max turns")) {
+          msg = "Agent took too many steps. Try rephrasing.";
+        } else if (streamErr.message.includes("server_error") || streamErr.message.includes("Scheduler unavailable")) {
+          msg = "AI provider temporarily unavailable. Please retry in a moment.";
+        }
+      }
       responseStream.write(`data: ${JSON.stringify({ error: msg })}\n\n`);
     } finally {
       clearInterval(noProgressInterval);
