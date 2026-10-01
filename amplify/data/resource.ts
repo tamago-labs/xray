@@ -42,17 +42,6 @@ const schema = a.schema({
     .secondaryIndexes((index) => [
       index("symbol").queryField("bySymbol"),
     ]),
-  AgentSession: a
-    .model({
-      walletAddress: a.string().required(),
-      sessionName: a.string().required(),
-      items: a.json().required(),
-      transactions: a.json(),
-    })
-    .authorization((allow) => [allow.publicApiKey().to(["read", "create", "update", "delete"])])
-    .secondaryIndexes((index) => [
-      index("walletAddress").queryField("bySessionWallet"),
-    ]),
   UserProfile: a
     .model({
       walletAddress: a.string().required(),

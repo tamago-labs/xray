@@ -143,6 +143,7 @@ async function chatStreamHandler(
       setTimeout(() => reject(new Error("Stream timeout")), STREAM_TIMEOUT_MS)
     );
 
+    let finalOutput = '';
     try {
       await Promise.race([
         (async () => {
@@ -153,6 +154,20 @@ async function chatStreamHandler(
             }
             if (event.type === "agent_updated_stream_event") {
               responseStream.write(`data: ${JSON.stringify({ agent: event.agent.name })}\n\n`);
+            }
+            if (event.type === "run_item_stream_event") {
+              const item = event.item as any;
+              const itemType = item.type ?? "";
+              if (itemType === "tool_call_output_item" || itemType === "handoff_output_item") {
+                const output = item.output ?? item.rawItem?.output;
+                if (output != null) {
+                  const text = typeof output === "string" ? output : JSON.stringify(output);
+                  responseStream.write(`data: ${JSON.stringify({ toolResult: text })}\n\n`);
+                }
+              }
+            }
+            if (event.type === "run_completed_stream_event") {
+              finalOutput = (event as any).result?.finalOutput ?? '';
             }
           }
         })(),
@@ -168,10 +183,20 @@ async function chatStreamHandler(
       clearInterval(noProgressInterval);
     }
 
+    if (!finalOutput) {
+      try {
+        finalOutput = stream.finalOutput ?? '';
+      } catch {
+        finalOutput = '';
+      }
+    }
+
+    const streamFinalOutput = finalOutput;
+
     const finalItems = [
       ...chatItems,
       { type: "message", role: "user", content: message },
-      { type: "message", role: "assistant", content: stream.finalOutput ?? "" },
+      { type: "message", role: "assistant", content: streamFinalOutput || "I'm processing your request. Please try again." },
     ];
 
     await dataClient.models.SavedReview.update({
@@ -180,7 +205,7 @@ async function chatStreamHandler(
     });
 
     const inputTokens = estimateTokens(message);
-    const outputTokens = estimateTokens(stream.finalOutput ?? '');
+    const outputTokens = estimateTokens(streamFinalOutput);
     const creditsUsed = (inputTokens + outputTokens) * CREDIT_RATE;
     try {
       const profileId = review.userProfileId as string;
