@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '@/amplify/data/resource';
+import { TrendingUp, Clock, Newspaper } from 'lucide-react';
+import MarketOverview from '@/components/cmc/MarketOverview';
+import FearGreedGauge from '@/components/cmc/FearGreedGauge';
+import AltcoinSeasonChart from '@/components/cmc/AltcoinSeasonChart';
 
 const dataClient = generateClient<Schema>();
 
@@ -42,31 +46,56 @@ export default function TopNews() {
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-[16px] font-semibold">Top News</h2>
-        <span className="text-[12px] text-white/30">Personalized to your themes</span>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      {/* Left column — Metrics */}
+      <div className="lg:col-span-5 space-y-5">
+        <div className="flex items-center gap-2 mb-1">
+          <Newspaper className="w-4 h-4 text-accent" />
+          <h2 className="text-[14px] font-semibold text-white/85">Market Intelligence</h2>
+        </div>
+
+        <MarketOverview />
+        <FearGreedGauge />
+        <AltcoinSeasonChart />
       </div>
 
-      <div className="space-y-3">
-        {articles.map((item) => (
-          <article key={item.id} className="bg-surface border border-border3/50 rounded-xl p-5 hover:border-border3 transition-colors">
-            <div className="flex items-center gap-3 mb-2">
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${themeColors[item.theme] || 'text-white/40 bg-white/5'}`}>
-                {item.theme}
-              </span>
-              <span className="text-[11px] text-white/25">{item.source} · {timeAgo(item.publishedAt)}</span>
+      {/* Right column — News */}
+      <div className="lg:col-span-7 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-accent2" />
+            <h2 className="text-[14px] font-semibold text-white/85">Top News</h2>
+          </div>
+          <span className="text-[11px] text-white/30">Personalized to your themes</span>
+        </div>
+
+        <div className="space-y-3">
+          {articles.length === 0 && (
+            <div className="bg-surface border border-border3/50 rounded-xl p-8 text-center">
+              <Clock className="w-5 h-5 text-white/20 mx-auto mb-2" />
+              <span className="text-sm text-white/30">Loading articles...</span>
             </div>
-            {item.url ? (
-              <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-semibold text-white/85 mb-1 hover:text-accent transition-colors">
-                {item.title}
-              </a>
-            ) : (
-              <h3 className="text-[14px] font-semibold text-white/85 mb-1">{item.title}</h3>
-            )}
-            <p className="text-[13px] text-white/45 leading-relaxed">{item.summary}</p>
-          </article>
-        ))}
+          )}
+          {articles.map((item) => (
+            <article key={item.id} className="bg-surface border border-border3/50 rounded-xl p-5 hover:border-border3 transition-colors group">
+              <div className="flex items-center gap-3 mb-2">
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${themeColors[item.theme] || 'text-white/40 bg-white/5'}`}>
+                  {item.theme}
+                </span>
+                <span className="text-[11px] text-white/25">{item.source}</span>
+                <span className="text-[10px] text-white/15 ml-auto">{timeAgo(item.publishedAt)}</span>
+              </div>
+              {item.url ? (
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[13px] font-semibold text-white/85 mb-1 block group-hover:text-accent transition-colors">
+                  {item.title}
+                </a>
+              ) : (
+                <h3 className="text-[13px] font-semibold text-white/85 mb-1">{item.title}</h3>
+              )}
+              <p className="text-[12px] text-white/40 leading-relaxed">{item.summary}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   );
