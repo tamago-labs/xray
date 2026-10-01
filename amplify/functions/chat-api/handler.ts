@@ -93,7 +93,7 @@ async function chatStreamHandler(
       return;
     }
     const review = reviewRaw as any;
-    console.log(`[chat] review loaded: portfolio=${review.portfolioName}, hasReport=${!!report}, hasChats=${!!review.chats}`);
+    console.log(`[chat] review loaded: portfolio=${review.portfolioName}, hasReport=${!!review.report}, hasChats=${!!review.chats}`);
 
     let chatItems: any[] = [];
     try {
