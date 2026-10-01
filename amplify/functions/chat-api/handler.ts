@@ -117,13 +117,14 @@ async function chatStreamHandler(
     console.log(`[chat] openai client ready`);
 
     const historyMessages = chatItems.map((item: any) => {
-      const role = item.role ?? "user";
+      const rawRole = item.role ?? "user";
+      const role = rawRole === "ai" ? "assistant" : rawRole;
       let content = item.content ?? "";
       if (typeof content === "string") {
         const contentType = role === "assistant" ? "output_text" : "input_text";
         content = [{ type: contentType, text: content }];
       }
-      return { type: item.type ?? "message", role, content };
+      return { type: "message", role, content };
     });
 
     const allMessages = [
