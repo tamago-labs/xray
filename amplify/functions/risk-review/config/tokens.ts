@@ -1,24 +1,24 @@
 import rwaList from "./rwa-v1-list.json";
 
-export interface TokenMeta {
-  symbol: string;
-  name: string;
-  stockSymbol?: string;
-  stockName?: string;
-  slug: string;
-  crypto_id?: number;
-  type: "tokenized";
-  sector?: string;
-  industry?: string;
-  description?: string;
-  website?: string;
-  exchange?: string;
-  tags?: string[];
-  issuer_name?: string;
-  issuer_id?: string;
-  volume_24h?: number;
-  market_cap?: number;
-}
+  export interface TokenMeta {
+    symbol: string;
+    name: string;
+    stockSymbol?: string;
+    stockName?: string;
+    slug: string;
+    crypto_id?: number;
+    type: "tokenized" | "base";
+    sector?: string;
+    industry?: string;
+    description?: string;
+    website?: string;
+    exchange?: string;
+    tags?: string[];
+    issuer_name?: string;
+    issuer_id?: string;
+    volume_24h?: number;
+    market_cap?: number;
+  }
 
 interface IssuerRisk {
   level: "Low" | "Low-Moderate" | "Moderate" | "Moderate-High" | "High";
@@ -127,7 +127,6 @@ interface BaseTokenMeta {
   symbol: string;
   name: string;
   slug: string;
-  type: "base";
   issuer_name: string;
   volume_24h: number;
   market_cap: number;
@@ -180,7 +179,7 @@ for (const bt of BASE_TOKEN_OVERRIDES) {
     symbol: bt.symbol,
     name: bt.name,
     slug: bt.slug,
-    type: "base",
+    type: "base" as const,
     issuer_name: bt.issuer_name,
     volume_24h: bt.volume_24h,
     market_cap: bt.market_cap,

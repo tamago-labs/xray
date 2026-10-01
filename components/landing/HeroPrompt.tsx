@@ -18,6 +18,20 @@ const dataClient = generateClient<Schema>();
 
 const DEMO_USER_PROFILE_ID = 'd543f3b6-247d-4ecc-be25-7c2a5486da1a';
 
+async function resolveProfileId(address: string | null): Promise<string> {
+  if (!address) throw new Error('Wallet not connected');
+  const { data: profiles } = await dataClient.models.UserProfile.list({
+    filter: { walletAddress: { eq: address } },
+  });
+  if (profiles.length > 0) return profiles[0].id;
+  const { data: created } = await dataClient.models.UserProfile.create({
+    walletAddress: address,
+    credits: 1000,
+  });
+  if (!created) throw new Error('Failed to create profile');
+  return created.id;
+}
+
 interface DemoToken {
   symbol: string;
   name: string;
@@ -174,26 +188,8 @@ export default function HeroPrompt() {
     if (!prompt || !attached || submitting || loading) return;
     setSubmitting(true);
     try {
-      let userProfileId: string | null = null;
-      if (address) {
-        const { data: profiles } = await dataClient.models.UserProfile.list({
-          filter: { walletAddress: { eq: address } },
-        });
-        if (profiles.length > 0) {
-          userProfileId = profiles[0].id;
-        } else {
-          const { data: created } = await dataClient.models.UserProfile.create({
-            walletAddress: address,
-            credits: 1000,
-          });
-          if (created) userProfileId = created.id;
-        }
-      } else {
-        const { data: created } = await dataClient.models.UserProfile.create({
-          credits: 1000,
-        });
-        if (created) userProfileId = created.id;
-      }
+      const isDemo = attached.name === 'High-Beta Growth' || attached.name === 'Large Cap Focus';
+      const profileId = isDemo ? DEMO_USER_PROFILE_ID : await resolveProfileId(address);
 
       const rwaPriceMap = new Map(prices.map((p) => [p.token_symbol, p.price ?? 0]));
       const holdings = attached.tokens.map((t) => {
@@ -202,9 +198,6 @@ export default function HeroPrompt() {
         return { symbol: t.symbol, name: t.name, balance: t.amount, price };
       });
       console.log('[HeroPrompt] holdings:', holdings);
-
-      const isDemo = attached.name === 'High-Beta Growth' || attached.name === 'Large Cap Focus';
-      const profileId = isDemo ? DEMO_USER_PROFILE_ID : userProfileId!;
 
       const { data, errors } = await dataClient.queries.riskReview({
         userProfileId: profileId,

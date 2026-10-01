@@ -32,7 +32,6 @@ interface EnrichedHolding {
   price: number;
   value: number;
   valuePct: number;
-  type: string;
   industry: string;
   issuer: string;
   issuerRiskLevel: string;
@@ -131,8 +130,7 @@ function enrichHoldings(holdings: Holding[]): { enriched: EnrichedHolding[]; tot
         price: h.price,
         value,
         valuePct: 0,
-        type: meta?.type === "base" ? "base" : "tokenized",
-        industry: meta?.industry ?? (meta?.type === "base" ? "Crypto" : "Unknown"),
+        industry: meta?.industry ?? "Unknown",
         issuer: meta?.issuer_name ?? "Unknown",
         issuerRiskLevel: issuerRisk?.level ?? "Unknown",
         liquidityTier,
