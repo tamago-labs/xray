@@ -38,14 +38,16 @@
           ],
           "date_added": "2025-07-01T12:51:56.000Z",
           "slug": "circle-tokenized-stock-xstock",
-          "contractAddress": {
-            "solana": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
-            "ethereum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
-            "arbitrum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
-            "bnb": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
-            "xlayer": "0xfEbDEd1B0986a8ee107f5AB1a1c5a813491DeCEB"
-          }
-        },
+           "contractAddress": {
+             "solana": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
+             "ethereum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
+             "arbitrum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
+             "bnb": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
+             "xlayer": "0xfEbDEd1B0986a8ee107f5AB1a1c5a813491DeCEB"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "CRCLon",
           "name": "Circle Internet Group Tokenized Stock (Ondo)",
@@ -353,9 +355,11 @@
             "ethereum": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
             "arbitrum": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
             "bnb": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
-            "xlayer": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28"
-          }
-        },
+             "xlayer": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "SPCXon",
           "name": "SpaceX Tokenized Stock (Ondo)",
@@ -597,9 +601,11 @@
             "ethereum": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
             "arbitrum": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
             "bnb": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
-            "xlayer": "0xAE2f842EF90C0d5213259Ab82639D5BBF649b08E"
-          }
-        },
+             "xlayer": "0xAE2f842EF90C0d5213259Ab82639D5BBF649b08E"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "MSTRon",
           "name": "MicroStrategy Tokenized Stock (Ondo)",
@@ -812,9 +818,11 @@
             "ethereum": "0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
             "arbitrum": null,
             "bnb": "0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
-            "xlayer": "0xc845b2894dBddd03858fd2D643B4eF725fE0849d"
-          }
-        },
+             "xlayer": "0xc845b2894dBddd03858fd2D643B4eF725fE0849d"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "NVDAon",
           "name": "NVIDIA Tokenized Stock (Ondo)",
@@ -1064,9 +1072,11 @@
             "ethereum": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
             "arbitrum": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
             "bnb": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
-            "xlayer": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4"
-          }
-        },
+             "xlayer": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "MUB",
           "name": "Micron Technology Tokenized bStocks",
@@ -1273,9 +1283,11 @@
             "ethereum": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
             "arbitrum": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
             "bnb": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
-            "xlayer": "0x8aD3c73F833d3F9A523aB01476625F269aEB7Cf0"
-          }
-        },
+             "xlayer": "0x8aD3c73F833d3F9A523aB01476625F269aEB7Cf0"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "TSLAon",
           "name": "Tesla Tokenized Stock (Ondo)",
@@ -1519,9 +1531,11 @@
             "ethereum": "0xe92f673ca36c5e2efd2de7628f815f84807e803f",
             "arbitrum": "0xe92f673Ca36C5E2Efd2DE7628f815f84807e803F",
             "bnb": "0xe92f673ca36c5e2efd2de7628f815f84807e803f",
-            "xlayer": "0xe92f673Ca36C5E2Efd2DE7628f815f84807e803F"
-          }
-        },
+             "xlayer": "0xe92f673Ca36C5E2Efd2DE7628f815f84807e803F"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "GOOGLon",
           "name": "Alphabet Class A Tokenized Stock (Ondo)",
@@ -1827,9 +1841,11 @@
             "ethereum": "0xb63efbc28860c8097e341de1fcf59456161e9d98",
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xb63efbc28860c8097e341de1fcf59456161e9d98"
-          }
-        },
+             "xlayer": "0xb63efbc28860c8097e341de1fcf59456161e9d98"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "SNDKB",
           "name": "SanDisk Tokenized bStocks",
@@ -2072,9 +2088,11 @@
             "ethereum": "0xf8a80d1cb9cfd70d03d655d9df42339846f3b3c8",
             "arbitrum": "0xf8a80d1cb9cfd70d03d655d9df42339846f3b3c8",
             "bnb": "0xf8a80d1cb9cfd70d03d655d9df42339846f3b3c8",
-            "xlayer": "0xf8A80D1cb9cFD70D03D655D9dF42339846F3B3C8"
-          }
-        },
+             "xlayer": "0xf8A80D1cb9cFD70D03D655D9dF42339846F3B3C8"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "INTCB",
           "name": "Intel Tokenized bStocks",
@@ -2251,9 +2269,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x364f210f430ec2448fc68a49203040f6124096f0"
-          }
-        },
+             "xlayer": "0x364f210f430ec2448fc68a49203040f6124096f0"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "COINon",
           "name": "Coinbase Tokenized Stock (Ondo)",
@@ -2501,9 +2521,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xeaad46f4146ded5a47b55aa7f6c48c191deaec88"
-          }
-        },
+             "xlayer": "0xeaad46f4146ded5a47b55aa7f6c48c191deaec88"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rMRVL",
           "name": "Marvell Tokenized Stock (Reality)",
@@ -2680,9 +2702,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a"
-          }
-        },
+             "xlayer": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "AAPLon",
           "name": "Apple Tokenized Stock (Ondo)",
@@ -2925,9 +2949,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x58100046a4afcd4ee4fadbd4244f3f895a341c56"
-          }
-        },
+             "xlayer": "0x58100046a4afcd4ee4fadbd4244f3f895a341c56"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "SKHYB",
           "name": "SK Hynix Tokenized bStocks",
@@ -3106,9 +3132,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x96702be57cd9777f835117a809c7124fe4ec989a"
-          }
-        },
+             "xlayer": "0x96702be57cd9777f835117a809c7124fe4ec989a"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "METAon",
           "name": "Meta Platforms Tokenized Stock (Ondo)",
@@ -3352,9 +3380,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xe1385fdd5ffb10081cd52c56584f25efa9084015"
-          }
-        },
+             "xlayer": "0xe1385fdd5ffb10081cd52c56584f25efa9084015"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "HOODon",
           "name": "Robinhood Markets Tokenized Stock (Ondo)",
@@ -3568,9 +3598,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x5621737f42dae558b81269fcb9e9e70c19aa6b35"
-          }
-        },
+             "xlayer": "0x5621737f42dae558b81269fcb9e9e70c19aa6b35"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "MSFTon",
           "name": "Microsoft Tokenized Stock (Ondo)",
@@ -3814,9 +3846,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x38bac69cbbd28156796e4163b2b6dcb81e336565"
-          }
-        },
+             "xlayer": "0x38bac69cbbd28156796e4163b2b6dcb81e336565"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "AVGOon",
           "name": "Broadcom Tokenized Stock (Ondo)",
@@ -4028,9 +4062,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x3557ba345b01efa20a1bddc61f573bfd87195081"
-          }
-        },
+             "xlayer": "0x3557ba345b01efa20a1bddc61f573bfd87195081"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "AMZNon",
           "name": "Amazon Tokenized Stock (Ondo)",
@@ -4274,9 +4310,11 @@
             "ethereum": "0x3522513e5f146a2006e2901b05f16b2821485e19",
             "arbitrum": null,
             "bnb": "0x3522513E5F146a2006e2901b05f16B2821485E19",
-            "xlayer": "0x3522513E5F146a2006e2901b05f16B2821485E19"
-          }
-        },
+             "xlayer": "0x3522513E5F146a2006e2901b05f16B2821485E19"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "AMDon",
           "name": "AMD Tokenized Stock (Ondo)",
@@ -4646,11 +4684,13 @@
             "ethereum": "0x9e3bf4ecfc44eedd624f26656b6736a3f093b073",
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x9e3bf4Ecfc44EeDD624F26656B6736a3F093b073"
-          },
-          "decimals": 18,
-          "verified": true
-        }
+             "xlayer": "0x9e3bf4Ecfc44EeDD624F26656B6736a3F093b073"
+           },
+           "trade_247": true,
+           "earn_xpoints": true,
+           "decimals": 18,
+           "verified": true
+         }
       ],
       "website": "https://www.tsmc.com",
       "industry": null,
@@ -4736,9 +4776,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x548308e91ec9f285c7bff05295badbd56a6e4971"
-          }
-        },
+             "xlayer": "0x548308e91ec9f285c7bff05295badbd56a6e4971"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rORCL",
           "name": "Oracle Tokenized Stock (Reality)",
@@ -4915,7 +4957,9 @@
             "arbitrum": null,
             "bnb": null,
             "xlayer": "0xe5f6d3b2405abdfe6f660e63202b25d23763160d"
-          }
+          },
+           "trade_247": true,
+           "earn_xpoints": true
         },
         {
           "symbol": "GMEon",
@@ -4945,13 +4989,13 @@
           "date_added": "2025-09-03T10:54:57.000Z",
           "slug": "gamestop-tokenized-stock-ondo",
           "contractAddress": {
-            "solana": "aznKt8v32CwYMEcTcB4bGTv8DXWStCpHrcCtyy7ondo",
-            "ethereum": null,
-            "arbitrum": null,
-            "bnb": null,
-            "xlayer": null
-          }
-        },
+             "solana": "aznKt8v32CwYMEcTcB4bGTv8DXWStCpHrcCtyy7ondo",
+             "ethereum": null,
+             "arbitrum": null,
+             "bnb": null,
+             "xlayer": null
+           }
+         },
         {
           "symbol": "GME",
           "name": "GameStop Tokenized Stock (Robinhood)",
@@ -5248,9 +5292,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x6d482cec5f9dd1f05ccee9fd3ff79b246170f8e2"
-          }
-        },
+             "xlayer": "0x6d482cec5f9dd1f05ccee9fd3ff79b246170f8e2"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "PLTRB",
           "name": "Palantir Tokenized bStocks",
@@ -5463,9 +5509,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xc0b417e7f83db438631eb5e096684dd742e5294f"
-          }
-        },
+             "xlayer": "0xc0b417e7f83db438631eb5e096684dd742e5294f"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rASML",
           "name": "ASML Tokenized Stock (Reality)",
@@ -5817,9 +5865,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xfbfc1fd14eec970276c8a3bf5e6131cd751cc0b9"
-          }
-        },
+             "xlayer": "0xfbfc1fd14eec970276c8a3bf5e6131cd751cc0b9"
+           },
+           "trade_247": false,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rIREN",
           "name": "IREN Tokenized Stock (Reality)",
@@ -6030,9 +6080,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xdcc1a2699441079da889b1f49e12b69cc791129b"
-          }
-        },
+             "xlayer": "0xdcc1a2699441079da889b1f49e12b69cc791129b"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "WKOX",
           "name": "Wrapped Coca-Cola Tokenized stock (xStock)",
@@ -6328,9 +6380,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x80a77a372c1e12accda84299492f404902e2da67"
-          }
-        },
+             "xlayer": "0x80a77a372c1e12accda84299492f404902e2da67"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "MCDon",
           "name": "McDonald's Tokenized Stock (Ondo)",
@@ -6618,9 +6672,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x39c31fc6038490ea4bf8a21ca18cd18f33b8d3fb"
-          }
-        },
+             "xlayer": "0x39c31fc6038490ea4bf8a21ca18cd18f33b8d3fb"
+           },
+           "trade_247": false,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rSMCI",
           "name": "Super Micro Tokenized Stock (Reality)",
@@ -6796,9 +6852,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x2782df1cc877f720c81b4f6568db64563f1d3aa3"
-          }
-        },
+             "xlayer": "0x2782df1cc877f720c81b4f6568db64563f1d3aa3"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "rDELL",
           "name": "Dell Tokenized Stock (Reality)",
@@ -6974,9 +7032,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x7aefc9965699fbea943e03264d96e50cd4a97b21"
-          }
-        },
+             "xlayer": "0x7aefc9965699fbea943e03264d96e50cd4a97b21"
+           },
+           "trade_247": false,
+           "earn_xpoints": true
+         },
         {
           "symbol": "WMTon",
           "name": "Walmart Tokenized Stock (Ondo)",
@@ -7234,9 +7294,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x12992613fdd35abe95dec5a4964331b1ee23b50d"
-          }
-        },
+             "xlayer": "0x12992613fdd35abe95dec5a4964331b1ee23b50d"
+           },
+           "trade_247": true,
+           "earn_xpoints": true
+         },
         {
           "symbol": "WBRK.BX",
           "name": "Wrapped Berkshire Hathaway Tokenized stock (xStock)",
@@ -7686,9 +7748,11 @@
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x17d8186ed8f68059124190d147174d0f6697dc40"
-          }
-        },
+             "xlayer": "0x17d8186ed8f68059124190d147174d0f6697dc40"
+           },
+           "trade_247": false,
+           "earn_xpoints": true
+         },
         {
           "symbol": "MRKon",
           "name": "Merck Tokenized Stock (Ondo)",

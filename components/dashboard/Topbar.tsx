@@ -123,7 +123,7 @@ export default function Topbar() {
             </span>
           )}
           {tokenMeta?.name?.toLowerCase().includes("wrapped") && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-zenblue/20 text-zenblue cursor-default" title="This is xStocks wrapped token use it for temporary holding or for DeFI">
+            <span className="text-[10px] font-semibold px-2.5 py-1 rounded-xl bg-zenblue text-white cursor-default" title="This is xStocks wrapped token use it for temporary holding or for DeFI">
               Wrapped
             </span>
           )}

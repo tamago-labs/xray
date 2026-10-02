@@ -15,6 +15,8 @@ export interface Token {
   verified?: boolean | null;
   circulating_supply?: number | null;
   total_supply?: number | null;
+  trade_247?: boolean;
+  earn_xpoints?: boolean;
 }
 
 export interface Asset {
