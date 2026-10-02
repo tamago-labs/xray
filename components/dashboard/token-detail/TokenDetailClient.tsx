@@ -30,7 +30,7 @@ export default function TokenDetailClient({
          <TokenDetailHeader token={token} asset={asset} />
         <div className="grid grid-cols-5 gap-6">
            <div className="col-span-2 space-y-6">
-            <TokenDetailStats token={token} price={price} />
+             <TokenDetailStats token={token} price={price} asset={asset} />
             <SwapPanel token={token} asset={asset} />
             <TokenDetailInfo token={token} asset={asset} price={price} />
           </div>
