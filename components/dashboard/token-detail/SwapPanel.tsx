@@ -7,6 +7,7 @@ import { ArrowRight, ChevronDown, X, Loader2, RefreshCw, ExternalLink } from "lu
 import { BASE_TOKENS, type BaseToken } from "@/lib/tokens/base-tokens";
 import { formatTokenAmount } from "@/lib/utils/format";
 import RouteVisualization from "./RouteVisualization";
+import WrapPanel from "./WrapPanel";
 import { useWallet } from "@/components/app/WalletContext";
 import { formatUnits } from "ethers";
 
@@ -35,6 +36,22 @@ interface Quote {
 }
 
 export default function SwapPanel({ token, asset }: { token: Token; asset: Asset }) {
+  const hasXLayer = !!(token.contractAddress as any)?.xlayer;
+  const isWrapped = token.name?.toLowerCase().includes("wrapped");
+
+  if (!hasXLayer && !isWrapped) {
+    return (
+      <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 text-center">
+        <p className="text-[13px] text-white/40">This token is not available on X Layer</p>
+        <p className="text-[11px] text-white/20 mt-1">Trading is only supported for tokens deployed on X Layer.</p>
+      </div>
+    );
+  }
+
+  if (isWrapped) {
+    return <WrapPanel token={token} asset={asset} />;
+  }
+
   const { address, provider } = useWallet();
   const [tab, setTab] = useState<Tab>("Buy");
   const [fromAmount, setFromAmount] = useState("");
