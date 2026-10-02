@@ -76,7 +76,7 @@ export default function Topbar() {
   const tokenCryptoId = tokenMatch?.[2];
   const assetData = (listData as any).assets.find((a: any) => a.slug === tokenSlug);
   const tokenData = assetData?.tokens?.find((t: any) => String(t.crypto_id) === tokenCryptoId);
-  const otherTokens = assetData?.tokens?.filter((t: any) => String(t.crypto_id) !== tokenCryptoId) ?? [];
+  const otherTokens = assetData?.tokens?.filter((t: any) => String(t.crypto_id) !== tokenCryptoId && t.contractAddress?.xlayer) ?? [];
   const tokenPrice = tokenData ? prices.find((p) => p.token_symbol === tokenData.symbol) : undefined;
 
   const tokenMeta = tokenData ? {
@@ -109,6 +109,14 @@ export default function Topbar() {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="flex items-center gap-3 px-2 ml-5 overflow-hidden"
         >
+          {tokenMeta.logo ? (
+            <img src={tokenMeta.logo} alt="" className="w-7 h-7 rounded-full" />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white/40">
+              {tokenMeta.symbol?.slice(0, 2)}
+            </div>
+          )}
+          <span className="text-sm font-semibold text-white/90 cursor-default" title={tokenMeta.name}>{tokenMeta.symbol}</span>
           {tokenMeta.rwaRank != null && (
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/[0.06] text-white/40 cursor-default" title={`Ranked #${tokenMeta.rwaRank} by CoinMarketCap`}>
               #{tokenMeta.rwaRank}
@@ -159,7 +167,7 @@ export default function Topbar() {
           )}
           {otherTokens.length > 0 && (
             <div className="flex items-center gap-2 ml-3 pl-3 border-l border-white/[0.06]">
-              <span className="text-[10px] text-white/25 shrink-0">Other {tokenMeta.assetSymbol}</span>
+              <span className="text-[10px] text-white/25 shrink-0 cursor-default" title={`Other ${tokenMeta.assetSymbol} tokens on X Layer`}>Other {tokenMeta.assetSymbol}</span>
               {otherTokens.map((ot: any) => {
                 const otPrice = prices.find((p) => p.token_symbol === ot.symbol);
                 return (

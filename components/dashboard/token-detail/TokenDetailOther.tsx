@@ -54,7 +54,7 @@ export default function TokenDetailOther({
     <div className="space-y-6">
       {xLayerTokens.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-3">Other {asset.symbol} on X Layer</h3>
+          <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-3">Corresponding Tokens</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {xLayerTokens.map((ot) => (
               <TokenCard key={ot.crypto_id} token={ot} />
@@ -65,7 +65,7 @@ export default function TokenDetailOther({
 
       {otherChainTokens.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-3">on All Chains</h3>
+          <h3 className="text-[11px] font-medium text-white/30 uppercase tracking-wider mb-3">Other {asset.symbol} Tokens</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {otherChainTokens.map((ot) => (
               <TokenCard key={ot.crypto_id} token={ot} />

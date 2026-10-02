@@ -2,10 +2,12 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ChevronUp, ChevronDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Info } from "lucide-react";
 import { usePrices } from "@/app/contexts/PriceContext";
 import { formatLargeNumber } from "@/lib/utils/format";
 import listData from "@/lib/data/rwa-v1-list.json";
+
+const XSTOCK_ISSUER_ID = "6878977dcbbf471de3366e85";
 
 interface TokenRow {
   token_symbol: string;
@@ -21,10 +23,12 @@ interface TokenRow {
   percent_7d: number | null;
   percent_30d: number | null;
   market_cap: number | null;
+  mcap_all: number | null;
   volume_24h: number | null;
+  volume_all: number | null;
 }
 
-type SortKey = "token_symbol" | "stock_symbol" | "issuer" | "price" | "percent_24h" | "percent_7d" | "percent_30d" | "market_cap" | "volume_24h";
+type SortKey = "token_symbol" | "stock_symbol" | "issuer" | "price" | "percent_24h" | "percent_7d" | "percent_30d" | "mcap_all" | "volume_all";
 type SortDir = "asc" | "desc";
 
 function usePageSize(rowHeight = 48, offset = 220) {
@@ -68,7 +72,10 @@ export default function Explore() {
     for (const asset of (listData as any).assets) {
       for (const token of asset.tokens ?? []) {
         if (chainFilter === "xlayer" && !token.contractAddress?.xlayer) continue;
+        if (token.name?.toLowerCase().includes("wrapped")) continue;
+        if (chainFilter === "xlayer" && token.issuer_id !== XSTOCK_ISSUER_ID) continue;
         const price = priceMap.get(token.symbol);
+        const wrappedPrice = priceMap.get(`W${token.symbol}`);
         result.push({
           token_symbol: token.symbol,
           stock_symbol: asset.symbol,
@@ -82,8 +89,10 @@ export default function Explore() {
           percent_24h: price?.percent_24h ?? null,
           percent_7d: price?.percent_7d ?? null,
           percent_30d: price?.percent_30d ?? null,
-          market_cap: price?.market_cap ?? null,
-          volume_24h: price?.volume_24h ?? null,
+          market_cap: wrappedPrice?.market_cap ?? null,
+          mcap_all: price?.market_cap ?? null,
+          volume_24h: wrappedPrice?.volume_24h ?? null,
+          volume_all: price?.volume_24h ?? null,
         });
       }
     }
@@ -152,7 +161,7 @@ export default function Explore() {
         </div>
         <select
           value={chainFilter}
-          onChange={(e) => { setChainFilter(e.target.value as "xlayer" | "all"); setPage(1); }}
+          onChange={(e) => { setChainFilter(e.target.value as "xlayer" | "all"); setPage(1); setSortKey("volume_all"); setSortDir("desc"); }}
           className="bg-surface border border-border3 rounded-lg px-3 py-2.5 text-[13px] text-white/60 outline-none focus:border-accent/50 transition-colors cursor-pointer"
         >
           <option value="xlayer">Only X Layer</option>
@@ -201,13 +210,27 @@ export default function Explore() {
                   </button>
                 </th>
                 <th className="text-right px-4 py-3 font-medium">
-                  <button onClick={() => handleSort("market_cap")} className="flex items-center gap-1 justify-end w-full hover:text-white/50 transition-colors">
-                    MCap <SortIcon column="market_cap" />
+                  <button onClick={() => handleSort("mcap_all")} className="flex items-center gap-1 justify-end w-full group hover:text-white/50 transition-colors">
+                    Market Cap
+                    <SortIcon column="market_cap" />
+                    <span className="relative ml-0.5">
+                      <Info className="w-3 h-3 text-white/20 cursor-help" />
+                      <span className="absolute top-full right-0 mt-1 px-2 py-1 text-[10px] bg-surface border border-border3/50 rounded-md text-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                        X Layer / All
+                      </span>
+                    </span>
                   </button>
                 </th>
                 <th className="text-right px-4 py-3 font-medium">
-                  <button onClick={() => handleSort("volume_24h")} className="flex items-center gap-1 justify-end w-full hover:text-white/50 transition-colors">
-                    Volume <SortIcon column="volume_24h" />
+                  <button onClick={() => handleSort("volume_all")} className="flex items-center gap-1 justify-end w-full group hover:text-white/50 transition-colors">
+                    Volume (24h)
+                    <SortIcon column="volume_24h" />
+                    <span className="relative ml-0.5">
+                      <Info className="w-3 h-3 text-white/20 cursor-help" />
+                      <span className="absolute top-full right-0 mt-1 px-2 py-1 text-[10px] bg-surface border border-border3/50 rounded-md text-white/50 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                        X Layer / All
+                      </span>
+                    </span>
                   </button>
                 </th>
               </tr>
@@ -258,12 +281,24 @@ export default function Explore() {
                   }`}>
                     {row.percent_30d != null ? `${row.percent_30d >= 0 ? "+" : ""}${row.percent_30d.toFixed(2)}%` : "—"}
                   </td>
-                   <td className="px-4 py-3 text-right text-white/40">
-                     {formatLargeNumber(row.market_cap, "$")}
-                   </td>
-                   <td className="px-4 py-3 text-right text-white/40">
-                     {formatLargeNumber(row.volume_24h, "$")}
-                   </td>
+                    <td className="px-4 py-3 text-right text-white/40 text-[12px]">
+                      {row.market_cap != null && row.mcap_all != null
+                        ? <span><span className="text-white/60">{formatLargeNumber(row.market_cap, "$")}</span> <span className="text-white/20">/</span> <span className="text-white/40">{formatLargeNumber(row.mcap_all, "$")}</span></span>
+                        : row.market_cap != null
+                        ? formatLargeNumber(row.market_cap, "$")
+                        : row.mcap_all != null
+                        ? formatLargeNumber(row.mcap_all, "$")
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-right text-white/40 text-[12px]">
+                      {row.volume_24h != null && row.volume_all != null
+                        ? <span><span className="text-white/60">{formatLargeNumber(row.volume_24h, "$")}</span> <span className="text-white/20">/</span> <span className="text-white/40">{formatLargeNumber(row.volume_all, "$")}</span></span>
+                        : row.volume_24h != null
+                        ? formatLargeNumber(row.volume_24h, "$")
+                        : row.volume_all != null
+                        ? formatLargeNumber(row.volume_all, "$")
+                        : "—"}
+                    </td>
                 </tr>
               ))}
             </tbody>
