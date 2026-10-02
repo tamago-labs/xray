@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, useCallback, type ReactNode } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
 
@@ -19,17 +19,27 @@ export interface PriceData {
   total_supply?: number | null;
 }
 
+export interface StockPricePoint {
+  time: number;
+  price: number;
+}
+
 interface PriceContextValue {
   prices: PriceData[];
   loading: boolean;
+  stockPriceHistory: Record<string, StockPricePoint[]>;
+  fetchStockPriceHistory: (symbol: string) => Promise<StockPricePoint[]>;
+  getStockPrice: (symbol: string) => number | null;
 }
 
-const PriceContext = createContext<PriceContextValue>({ prices: [], loading: true });
+const PriceContext = createContext<PriceContextValue>({ prices: [], loading: true, stockPriceHistory: {}, fetchStockPriceHistory: async () => [], getStockPrice: () => null });
 
 export function PriceProvider({ children }: { children: ReactNode }) {
   const [prices, setPrices] = useState<PriceData[]>([]);
   const [loading, setLoading] = useState(true);
   const fetchedRef = useRef(false);
+  const [stockPriceHistory, setStockPriceHistory] = useState<Record<string, StockPricePoint[]>>({});
+  const stockFetchedRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
     if (fetchedRef.current) return;
@@ -80,8 +90,34 @@ export function PriceProvider({ children }: { children: ReactNode }) {
     fetchPrices();
   }, []);
 
+  const fetchStockPriceHistory = useCallback(async (symbol: string): Promise<StockPricePoint[]> => {
+    if (stockFetchedRef.current[symbol]) {
+      return stockPriceHistory[symbol] ?? [];
+    }
+    stockFetchedRef.current[symbol] = true;
+
+    try {
+      const now = new Date();
+      const from = new Date(now.getTime() - 90 * 86400000).toISOString().split("T")[0];
+      const to = now.toISOString().split("T")[0];
+      const res = await fetch(`/api/stock-price-history?symbol=${symbol}&timespan=day&from=${from}&to=${to}`);
+      const json = await res.json();
+      const data: StockPricePoint[] = json.data ?? [];
+      setStockPriceHistory((prev) => ({ ...prev, [symbol]: data }));
+      return data;
+    } catch {
+      return [];
+    }
+  }, [stockPriceHistory]);
+
+  const getStockPrice = useCallback((symbol: string): number | null => {
+    const history = stockPriceHistory[symbol];
+    if (!history || history.length === 0) return null;
+    return history[history.length - 1].price;
+  }, [stockPriceHistory]);
+
   return (
-    <PriceContext.Provider value={{ prices, loading }}>
+    <PriceContext.Provider value={{ prices, loading, stockPriceHistory, fetchStockPriceHistory, getStockPrice }}>
       {children}
     </PriceContext.Provider>
   );

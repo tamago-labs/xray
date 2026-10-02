@@ -23,7 +23,7 @@ export default function TokenDetailInfo({ token, asset, price }: { token: Token;
           <DetailRow label="Issuer" value={token.issuer_name} />
         </div>
         <div className="space-y-3">
-          <DetailRow label="Blockchain" value={token.contractAddress ? Object.entries(token.contractAddress).filter(([, addr]) => addr).map(([chain]) => chain.charAt(0).toUpperCase() + chain.slice(1)).join(", ") : "—"} />
+          <DetailRow label="Blockchain" value={token.contractAddress ? Object.entries(token.contractAddress).filter(([, addr]) => addr).map(([chain]) => chain.length <= 4 ? chain.toUpperCase() : chain.charAt(0).toUpperCase() + chain.slice(1)).join(", ") : "—"} />
           <DetailRow label="Circulating Supply" value={price?.circulating_supply != null ? price.circulating_supply.toLocaleString() : "—"} />
           <DetailRow label="Total Supply" value={price?.total_supply != null ? price.total_supply.toLocaleString() : "—"} />
           <DetailRow label="Market Cap" value={price?.market_cap != null ? formatNumber(price.market_cap, "$") : "—"} />

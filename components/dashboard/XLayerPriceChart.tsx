@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import type { Token, Asset } from "@/lib/types/token";
+import { usePrices } from "@/app/contexts/PriceContext";
 
 interface PricePoint {
   time: number;
@@ -41,6 +42,7 @@ function interpolateValue(data: PricePoint[], target: number): number {
 }
 
 export default function XLayerPriceChart({ token, asset }: { token: Token; asset: Asset }) {
+  const { fetchStockPriceHistory } = usePrices();
   const [timeframe, setTimeframe] = useState<Timeframe>("30D");
   const [priceData, setPriceData] = useState<TokenPriceData[]>([]);
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
@@ -95,30 +97,14 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
     if (asset.symbol) {
       fetchPromises.push(
         (async () => {
-          try {
-            const now = new Date();
-            const from = new Date(now.getTime() - 90 * 86400000).toISOString().split("T")[0];
-            const to = now.toISOString().split("T")[0];
-            const res = await fetch(
-              `/api/stock-price-history?symbol=${asset.symbol}&timespan=day&from=${from}&to=${to}`
-            );
-            const json = await res.json();
-            return {
-              symbol: asset.symbol,
-              logo: token.logo ?? null,
-              color: "#FFFFFF",
-              dashed: true,
-              data: json.data ?? [],
-            } as TokenPriceData;
-          } catch {
-            return {
-              symbol: asset.symbol,
-              logo: token.logo ?? null,
-              color: "#FFFFFF",
-              dashed: true,
-              data: [],
-            } as TokenPriceData;
-          }
+          const data = await fetchStockPriceHistory(asset.symbol);
+          return {
+            symbol: asset.symbol,
+            logo: token.logo ?? null,
+            color: "#FFFFFF",
+            dashed: true,
+            data,
+          } as TokenPriceData;
         })()
       );
     }
@@ -133,7 +119,7 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
       setEnabled(initialEnabled);
       setLoading(false);
     });
-  }, [timeframe, tokensToFetch, asset.symbol]);
+  }, [timeframe, tokensToFetch, asset.symbol, fetchStockPriceHistory]);
 
   const chartData = useMemo(() => {
     const enabledData = priceData.filter((d) => enabled[d.symbol]);
