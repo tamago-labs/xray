@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { AreaChart, Area, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import type { Token, Asset } from "@/lib/types/token";
 
 interface PricePoint {
@@ -33,8 +33,8 @@ function interpolateValue(data: PricePoint[], target: number): number {
   if (target >= data[data.length - 1].time) return data[data.length - 1].price;
   for (let i = 0; i < data.length - 1; i++) {
     if (target >= data[i].time && target <= data[i + 1].time) {
-      const t = (target - data[i].time) / (data[i + 1].time - data[i].time);
-      return data[i].price + t * (data[i + 1].price - data[i].price);
+      const ratio = (target - data[i].time) / (data[i + 1].time - data[i].time);
+      return data[i].price + ratio * (data[i + 1].price - data[i].price);
     }
   }
   return data[data.length - 1].price;
@@ -75,13 +75,9 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
     return list;
   }, [token, asset.tokens]);
 
-
   useEffect(() => {
- 
-
     const tf = timeframes.find((t) => t.key === timeframe)!;
     setLoading(true);
-
 
     const fetchPromises = tokensToFetch.map(async (t, i) => {
       const res = await fetch(
@@ -96,7 +92,6 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
       } as TokenPriceData;
     });
 
-    // Fetch stock reference price
     if (asset.symbol) {
       fetchPromises.push(
         (async () => {
@@ -133,7 +128,7 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
       setPriceData(allSeries);
       const initialEnabled: Record<string, boolean> = {};
       allSeries.forEach((r) => {
-        initialEnabled[r.symbol] = true;
+        initialEnabled[r.symbol] = r.symbol === token.symbol;
       });
       setEnabled(initialEnabled);
       setLoading(false);
@@ -159,8 +154,8 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
       let latest = -Infinity;
       tokenSeries.forEach((series) => {
         series.data.forEach((p) => {
-          earliest = Math.min(earliest, p.time);
-          latest = Math.max(latest, p.time);
+          if (p.time < earliest) earliest = p.time;
+          if (p.time > latest) latest = p.time;
         });
       });
 
@@ -190,9 +185,29 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
     return Array.from(timeMap.values()).sort((a, b) => a.time - b.time);
   }, [priceData, enabled]);
 
+  const premiumData = useMemo(() => {
+    const wrapped = priceData.find((d) => !d.dashed && d.symbol.toUpperCase().startsWith("W"));
+    const stock = priceData.find((d) => d.dashed);
+    if (!wrapped || !stock || wrapped.data.length === 0 || stock.data.length === 0) return [];
+
+    const sortedStock = [...stock.data].sort((a, b) => a.time - b.time);
+    const wrappedMap = new Map<number, number>();
+    wrapped.data.forEach((p) => wrappedMap.set(p.time, p.price));
+
+    const result: { time: number; premium: number }[] = [];
+    wrappedMap.forEach((wrappedPrice, time) => {
+      const stockPrice = interpolateValue(sortedStock, time);
+      if (stockPrice > 0) {
+        const premium = ((wrappedPrice - stockPrice) / stockPrice) * 100;
+        result.push({ time, premium: parseFloat(premium.toFixed(2)) });
+      }
+    });
+
+    return result.sort((a, b) => a.time - b.time);
+  }, [priceData]);
+
   const formatTime = (timestamp: number) => {
     const d = new Date(timestamp * 1000);
-    if (timeframe === "7D") return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
@@ -241,42 +256,43 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
           <span className="text-xs text-white/30">Loading chart...</span>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-            <defs>
-              {priceData.map((series) => (
-                <linearGradient key={series.symbol} id={`grad-${series.symbol}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={series.color} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={series.color} stopOpacity={0} />
-                </linearGradient>
-              ))}
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-            <XAxis
-              dataKey="time"
-              tickFormatter={formatTime}
-              tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }}
-              axisLine={{ stroke: "rgba(255,255,255,0.06)" }}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }}
-              axisLine={{ stroke: "rgba(255,255,255,0.06)" }}
-              tickLine={false}
-              tickFormatter={(v: number) => `$${v.toLocaleString()}`}
-              domain={["auto", "auto"]}
-            />
-            <Tooltip
-              contentStyle={{
-                background: "#141419",
-                border: "1px solid #2A2A35",
-                borderRadius: 8,
-                fontSize: 11,
-              }}
-              labelStyle={{ color: "rgba(255,255,255,0.4)", marginBottom: 4 }}
-              formatter={(value: number, name: string) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
-              labelFormatter={(label: number) => new Date(label * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-            />
+        <>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
+              <defs>
+                {priceData.map((series) => (
+                  <linearGradient key={series.symbol} id={`grad-${series.symbol}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={series.color} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={series.color} stopOpacity={0} />
+                  </linearGradient>
+                ))}
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis
+                dataKey="time"
+                tickFormatter={formatTime}
+                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }}
+                axisLine={{ stroke: "rgba(255,255,255,0.06)" }}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }}
+                axisLine={{ stroke: "rgba(255,255,255,0.06)" }}
+                tickLine={false}
+                tickFormatter={(v: number) => `$${v.toLocaleString()}`}
+                domain={["auto", "auto"]}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "#141419",
+                  border: "1px solid #2A2A35",
+                  borderRadius: 8,
+                  fontSize: 11,
+                }}
+                labelStyle={{ color: "rgba(255,255,255,0.4)", marginBottom: 4 }}
+                formatter={(value: number, name: string) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
+                labelFormatter={(label: number) => new Date(label * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              />
               {priceData
                 .filter((d) => enabled[d.symbol])
                 .map((series) => (
@@ -292,8 +308,33 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
                     connectNulls
                   />
                 ))}
-          </AreaChart>
-        </ResponsiveContainer>
+            </AreaChart>
+          </ResponsiveContainer>
+          {premiumData.length > 0 && (
+            <div className="mt-2 border-t border-white/[0.04] pt-2">
+              <ResponsiveContainer width="100%" height={60}>
+                <BarChart data={premiumData} margin={{ top: 0, right: 5, bottom: 0, left: 5 }}>
+                  <XAxis dataKey="time" hide />
+                  <YAxis hide={false} tick={{ fontSize: 9, fill: "rgba(255,255,255,0.25)" }} axisLine={false} tickLine={false} tickFormatter={(v: number) => `${v > 0 ? "+" : ""}${v.toFixed(1)}%`} />
+                  <ReferenceLine y={0} stroke="rgba(255,255,255,0.1)" />
+                  <Tooltip
+                    contentStyle={{ background: "#141419", border: "1px solid #2A2A35", borderRadius: 6, fontSize: 10 }}
+                    labelStyle={{ color: "rgba(255,255,255,0.5)" }}
+                    itemStyle={{ color: "rgba(255,255,255,0.7)" }}
+                    formatter={(value: number) => [`${value > 0 ? "+" : ""}${value.toFixed(2)}%`, "Premium"]}
+                    labelFormatter={(label: number) => new Date(label * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  />
+                  <Bar dataKey="premium" radius={[2, 2, 0, 0]}>
+                    {premiumData.map((entry, index) => (
+                      <Cell key={index} fill={entry.premium >= 0 ? "rgba(255,107,107,0.7)" : "rgba(0,210,160,0.7)"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="text-[10px] text-white/20 text-center mt-1">Premium / Discount</div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
