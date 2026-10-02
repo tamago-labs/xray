@@ -35,7 +35,7 @@ export default function TokenDetailClient({
             <TokenDetailInfo token={token} asset={asset} price={price} />
           </div>
           <div className="col-span-3 space-y-6">
-            <TokenDetailPrice token={token} />
+             <TokenDetailPrice token={token} asset={asset} />
             <TokenDetailAbout asset={asset} description={description} />
             <TokenDetailLinks token={token} />
           </div>

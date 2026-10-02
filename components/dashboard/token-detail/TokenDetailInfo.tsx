@@ -37,7 +37,7 @@ export default function TokenDetailInfo({ token, asset, price }: { token: Token;
                   .filter(([, addr]) => addr)
                   .map(([chain, addr]) => (
                     <div key={chain} className="flex items-center justify-between">
-                      <span className="text-[11px] text-white/40 capitalize">{chain}</span>
+                      <span className="text-[11px] text-white/40">{chain.length <= 4 ? chain.toUpperCase() : chain.charAt(0).toUpperCase() + chain.slice(1)}</span>
                       <div className="flex items-center gap-1.5">
                         <span className="font-mono text-white/70 text-xs">
                           {(addr as string).slice(0, 8)}...{(addr as string).slice(-6)}
