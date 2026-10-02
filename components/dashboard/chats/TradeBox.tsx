@@ -20,12 +20,12 @@ function getTokenBySymbol(symbol: string): { contractAddress: string; decimals: 
   for (const asset of (listData as any).assets) {
     for (const token of asset.tokens ?? []) {
       if (token.symbol.toUpperCase() === sym) {
-        return { contractAddress: token.contractAddress ?? '', decimals: token.decimals ?? 18 };
+        return { contractAddress: (token.contractAddress as any)?.xlayer ?? '', decimals: token.decimals ?? 18 };
       }
     }
     if (asset.symbol.toUpperCase() === sym) {
       const firstToken = asset.tokens?.[0];
-      return { contractAddress: firstToken?.contractAddress ?? '', decimals: firstToken?.decimals ?? 18 };
+      return { contractAddress: (firstToken?.contractAddress as any)?.xlayer ?? '', decimals: firstToken?.decimals ?? 18 };
     }
   }
   return null;

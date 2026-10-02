@@ -38,7 +38,7 @@
           ],
           "date_added": "2025-07-01T12:51:56.000Z",
           "slug": "circle-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsueG8BtpquVJX9LVLLEGuViXUungE6WmK5YZ3p3bd1",
             "ethereum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
             "arbitrum": "0xfebded1b0986a8ee107f5ab1a1c5a813491deceb",
@@ -74,7 +74,7 @@
           ],
           "date_added": "2025-09-03T10:55:40.000Z",
           "slug": "circle-internet-group-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "6xHEyem9hmkGtVq6XGCiQUGpPsHBaoYuYdFNZa5ondo",
             "ethereum": "0x3632DEa96A953C11dac2f00b4A05a32CD1063fAE",
             "arbitrum": null,
@@ -107,7 +107,7 @@
           ],
           "date_added": "2026-06-11T03:03:59.000Z",
           "slug": "circle-internet-group-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -139,7 +139,7 @@
           ],
           "date_added": "2026-07-02T07:39:16.000Z",
           "slug": "circle-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0x861a85a78c371bc0a02675bbe00a4cbc0826b421",
@@ -168,7 +168,7 @@
           ],
           "date_added": "2026-08-04T07:31:34.000Z",
           "slug": "circle-internet-group-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -247,7 +247,7 @@
           ],
           "date_added": "2025-08-08T06:30:53.000Z",
           "slug": "spacex-tokenized-stock-prestocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -277,7 +277,7 @@
           ],
           "date_added": "2026-05-19T04:37:39.000Z",
           "slug": "t-spacex-tokenized-stock-tessera",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -310,7 +310,7 @@
           ],
           "date_added": "2026-06-11T03:04:29.000Z",
           "slug": "spacex-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -348,12 +348,12 @@
           ],
           "date_added": "2026-06-08T15:32:52.000Z",
           "slug": "spacex-tokenized-stock-xtock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xs3oZwbHvqis4NYcf4YKWmEia2eC84wSiVrcYcTqpH8",
             "ethereum": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
             "arbitrum": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
             "bnb": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28",
-            "xlayer": "0x8e2eed8b8b5e13ea7bf38e50d7821d2c57309072"
+            "xlayer": "0x68fa48b1c2fe52b3d776e1953e0e782b5044ce28"
           }
         },
         {
@@ -381,7 +381,7 @@
           ],
           "date_added": "2026-06-12T09:35:08.000Z",
           "slug": "spacex-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "wzAyQTorWyoVXuJKj2x8EqKEGJpS13z6EWE9z5Aondo",
             "ethereum": "0xc9eef266834730340A55B6CC24621B31BAF55581",
             "arbitrum": null,
@@ -411,7 +411,7 @@
           ],
           "date_added": "2026-06-13T13:02:26.000Z",
           "slug": "spacex-tokenized-stock-backpack",
-          "addresses": {
+          "contractAddress": {
             "solana": "SPCXxcqXj6e5dJDVNovHN8744zkbhM2bYudU45BimGb",
             "ethereum": null,
             "arbitrum": null,
@@ -443,7 +443,7 @@
           ],
           "date_added": "2026-07-02T07:39:19.000Z",
           "slug": "spacex-pre-ipo-stock-republic",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -475,7 +475,7 @@
           ],
           "date_added": "2026-07-02T07:39:29.000Z",
           "slug": "spacex-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -507,7 +507,7 @@
           ],
           "date_added": "2026-08-31T09:40:11.000Z",
           "slug": "spacex-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -592,7 +592,7 @@
           ],
           "date_added": "2025-07-01T12:32:41.000Z",
           "slug": "microstrategy-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ",
             "ethereum": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
             "arbitrum": "0xae2f842ef90c0d5213259ab82639d5bbf649b08e",
@@ -628,7 +628,7 @@
           ],
           "date_added": "2025-09-03T10:55:37.000Z",
           "slug": "microstrategy-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "FSz4ouiqXpHuGPcpacZfTzbMjScoj5FfzHkiyu2ondo",
             "ethereum": "0xCabD955322dfbf94C084929ac5E9Eca3fEB5556F",
             "arbitrum": null,
@@ -661,7 +661,7 @@
           ],
           "date_added": "2026-06-21T05:20:40.000Z",
           "slug": "strategy-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -693,7 +693,7 @@
           ],
           "date_added": "2026-07-02T07:39:15.000Z",
           "slug": "microstrategy-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0x10fe806857055d3b5ae00d2eabafd3e61f0e89aa",
@@ -722,7 +722,7 @@
           ],
           "date_added": "2026-08-04T07:31:49.000Z",
           "slug": "strategy-inc-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -807,7 +807,7 @@
           ],
           "date_added": "2025-07-01T07:20:20.000Z",
           "slug": "nvidia-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xsc9qvGR1efVDFGLrVsmkzv3qi45LTBjeUKSPmx9qEh",
             "ethereum": "0xc845b2894dbddd03858fd2d643b4ef725fe0849d",
             "arbitrum": null,
@@ -843,7 +843,7 @@
           ],
           "date_added": "2025-09-03T10:55:27.000Z",
           "slug": "nvidia-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "gEGtLTPNQ7jcg25zTetkbmF7teoDLcrfTnQfmn2ondo",
             "ethereum": "0x2D1F7226Bd1F780AF6B9A49DCC0aE00E8Df4bDEE",
             "arbitrum": null,
@@ -876,7 +876,7 @@
           ],
           "date_added": "2026-06-11T03:04:13.000Z",
           "slug": "nvidia-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -908,7 +908,7 @@
           ],
           "date_added": "2026-07-02T07:39:03.000Z",
           "slug": "nvidia-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0x0a85b6ebe3c150a1979a65656e304033d62b1e12",
@@ -937,7 +937,7 @@
           ],
           "date_added": "2026-08-04T07:31:24.000Z",
           "slug": "nvidia-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1021,7 +1021,7 @@
           ],
           "date_added": "2025-09-03T10:55:38.000Z",
           "slug": "micron-technology-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "Fz9edBpaURPPzpKVRR1A8PENYDEgHqwx5D5th28ondo",
             "ethereum": "0x050362Ab1072Cb2Ce74d74770E22A3203Ad04ee5",
             "arbitrum": null,
@@ -1059,12 +1059,12 @@
           ],
           "date_added": "2026-06-10T06:33:41.000Z",
           "slug": "micron-technology-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsQLZycSZ7QnBBdBXQaTbQdiUcbRqjNJgyBGAMzhHav",
             "ethereum": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
             "arbitrum": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
             "bnb": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4",
-            "xlayer": "0xe2047ee3bddb5c99ae428ab83df63f8730698e30"
+            "xlayer": "0xf6a873bae4ba1b304e45df52a4b7d176e1c6a8c4"
           }
         },
         {
@@ -1092,7 +1092,7 @@
           ],
           "date_added": "2026-06-11T03:03:49.000Z",
           "slug": "micron-technology-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1124,7 +1124,7 @@
           ],
           "date_added": "2026-07-02T07:39:08.000Z",
           "slug": "micron-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0x548cc634a64301a346f174071a90efa93dae4eb3",
@@ -1153,7 +1153,7 @@
           ],
           "date_added": "2026-08-04T07:31:29.000Z",
           "slug": "micron-technology-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1183,7 +1183,7 @@
           ],
           "date_added": "2026-06-13T13:02:26.000Z",
           "slug": "micron-technology-inc-tokenized-stock-backpack",
-          "addresses": {
+          "contractAddress": {
             "solana": "MUxEsUKSMACyw5fZf68wxf5FLnZVhtU9CwH8uNNGay1",
             "ethereum": null,
             "arbitrum": null,
@@ -1268,7 +1268,7 @@
           ],
           "date_added": "2025-07-01T12:44:26.000Z",
           "slug": "tesla-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB",
             "ethereum": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
             "arbitrum": "0x8ad3c73f833d3f9a523ab01476625f269aeb7cf0",
@@ -1304,7 +1304,7 @@
           ],
           "date_added": "2025-09-03T10:55:15.000Z",
           "slug": "tesla-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "KeGv7bsfR4MheC1CkmnAVceoApjrkvBhHYjWb67ondo",
             "ethereum": "0xf6b1117ec07684D3958caD8BEb1b302bfD21103f",
             "arbitrum": null,
@@ -1335,7 +1335,7 @@
           ],
           "date_added": "2026-02-25T10:53:01.000Z",
           "slug": "tesla-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1368,7 +1368,7 @@
           ],
           "date_added": "2026-06-11T03:04:06.000Z",
           "slug": "tesla-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1400,7 +1400,7 @@
           ],
           "date_added": "2026-07-02T07:39:12.000Z",
           "slug": "tesla-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0xf912911c9c8d5131929c758e66e6dc54e65cf3ba",
@@ -1429,7 +1429,7 @@
           ],
           "date_added": "2026-08-04T07:31:27.000Z",
           "slug": "tesla-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1514,7 +1514,7 @@
           ],
           "date_added": "2025-07-01T14:12:11.000Z",
           "slug": "alphabet-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsCPL9dNWBMvFtTmwcCA5v3xWPSMEBCszbQdiLLq6aN",
             "ethereum": "0xe92f673ca36c5e2efd2de7628f815f84807e803f",
             "arbitrum": "0xe92f673Ca36C5E2Efd2DE7628f815f84807e803F",
@@ -1550,7 +1550,7 @@
           ],
           "date_added": "2025-09-03T10:55:17.000Z",
           "slug": "alphabet-class-a-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "bbahNA5vT9WJeYft8tALrH1LXWffjwqVoUbqYa1ondo",
             "ethereum": "0xbA47214eDd2bb43099611b208f75E4b42FDcfEDc",
             "arbitrum": null,
@@ -1581,7 +1581,7 @@
           ],
           "date_added": "2026-02-25T10:53:00.000Z",
           "slug": "alphabet-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1613,7 +1613,7 @@
           ],
           "date_added": "2026-07-02T07:39:07.000Z",
           "slug": "google-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0xca1942edeb697a85af98ef8c74c4910fe9587afb",
@@ -1642,7 +1642,7 @@
           ],
           "date_added": "2026-08-04T07:31:54.000Z",
           "slug": "alphabet-class-a-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1675,7 +1675,7 @@
           ],
           "date_added": "2026-07-06T06:10:06.000Z",
           "slug": "alphabet-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1741,7 +1741,7 @@
           ],
           "date_added": "2026-09-11T02:10:27.000Z",
           "slug": "alphabet-class-c-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "jcA9zXHWuTuDFDDDDYJTNhersed1B5etkuB6X9Eondo",
             "ethereum": "0x36B90aDcDC99Be31BF39A3c031288bAa0B457E10",
             "arbitrum": null,
@@ -1790,7 +1790,7 @@
           ],
           "date_added": "2026-03-24T02:56:16.000Z",
           "slug": "sandisk-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "EJmUVvDqAdfH5zEohkdS4234bi3c6iunqEMobjmondo",
             "ethereum": "0x71E2400CF1Cb83204f33794eD326636A71a9AAfC",
             "arbitrum": null,
@@ -1822,12 +1822,12 @@
           ],
           "date_added": "2026-07-17T05:27:55.000Z",
           "slug": "sandisk-corporation-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xswbpc8UqU6e1j9QZEWCjBMjyvz4twqD7PCy6j2e7jj",
             "ethereum": "0xb63efbc28860c8097e341de1fcf59456161e9d98",
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xb63efbc28860c8097e341de1fcf59456161e9d98"
           }
         },
         {
@@ -1855,7 +1855,7 @@
           ],
           "date_added": "2026-06-11T03:04:22.000Z",
           "slug": "sandisk-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1887,7 +1887,7 @@
           ],
           "date_added": "2026-07-02T07:39:21.000Z",
           "slug": "sandisk-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0xc78c5a7be0e8d72cdda205e53d1147aaacf5a075",
@@ -1916,7 +1916,7 @@
           ],
           "date_added": "2026-08-04T07:31:31.000Z",
           "slug": "sandisk-corporation-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -1946,7 +1946,7 @@
           ],
           "date_added": "2026-06-13T13:02:26.000Z",
           "slug": "sandisk-corp-tokenized-stock-backpack",
-          "addresses": {
+          "contractAddress": {
             "solana": "SNDKbwMUQvZhnLnxLduradgLHG5KrPuKwpnrkkGRhfH",
             "ethereum": null,
             "arbitrum": null,
@@ -2030,7 +2030,7 @@
           ],
           "date_added": "2025-09-03T10:55:20.000Z",
           "slug": "intel-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "cJpUMp5R7rZ6fGeLHbHhrRuJzK9mkyKDjZqNpT3ondo",
             "ethereum": "0xFdA09936DbD717368De0835bA441d9E62069d36f",
             "arbitrum": null,
@@ -2067,7 +2067,7 @@
           ],
           "date_added": "2025-07-01T15:48:56.000Z",
           "slug": "intel-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XshPgPdXFRWB8tP1j82rebb2Q9rPgGX37RuqzohmArM",
             "ethereum": "0xf8a80d1cb9cfd70d03d655d9df42339846f3b3c8",
             "arbitrum": "0xf8a80d1cb9cfd70d03d655d9df42339846f3b3c8",
@@ -2100,7 +2100,7 @@
           ],
           "date_added": "2026-06-21T05:25:59.000Z",
           "slug": "intel-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2132,7 +2132,7 @@
           ],
           "date_added": "2026-07-02T07:39:09.000Z",
           "slug": "intel-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": "0xafa43b4badfd062f5f1891a398a0579c904da776",
@@ -2161,7 +2161,7 @@
           ],
           "date_added": "2026-08-04T07:31:29.000Z",
           "slug": "intel-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2246,12 +2246,12 @@
           ],
           "date_added": "2025-07-01T06:36:40.000Z",
           "slug": "coinbase-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x364f210f430ec2448fc68a49203040f6124096f0"
           }
         },
         {
@@ -2282,7 +2282,7 @@
           ],
           "date_added": "2025-09-03T10:55:18.000Z",
           "slug": "coinbase-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "5u6KDiNJXxX4rGMfYT4BApZQC5CuDNrG6MHkwp1ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -2314,7 +2314,7 @@
           ],
           "date_added": "2026-07-02T07:39:22.000Z",
           "slug": "coinbase-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2343,7 +2343,7 @@
           ],
           "date_added": "2026-08-04T07:31:40.000Z",
           "slug": "coinbase-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2376,7 +2376,7 @@
           ],
           "date_added": "2026-07-06T06:10:00.000Z",
           "slug": "coinbase-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2459,7 +2459,7 @@
           ],
           "date_added": "2025-09-03T10:55:28.000Z",
           "slug": "marvell-technology-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "FovBwhoV5KQjZCdhoM6jgXYwXLX3F8vgAfvmLH7ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -2496,12 +2496,12 @@
           ],
           "date_added": "2025-07-01T18:39:58.000Z",
           "slug": "marvell-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsuxRGDzbLjnJ72v74b7p9VY6N66uYgTCyfwwRjVCJA",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xeaad46f4146ded5a47b55aa7f6c48c191deaec88"
           }
         },
         {
@@ -2528,7 +2528,7 @@
           ],
           "date_added": "2026-07-02T07:39:07.000Z",
           "slug": "marvell-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2557,7 +2557,7 @@
           ],
           "date_added": "2026-08-04T07:31:40.000Z",
           "slug": "marvell-technology-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2590,7 +2590,7 @@
           ],
           "date_added": "2026-07-13T11:01:03.000Z",
           "slug": "marvell-technology-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2675,12 +2675,12 @@
           ],
           "date_added": "2025-07-01T07:38:36.000Z",
           "slug": "apple-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsbEhLAtcf6HdfpFZ5xEMdqW8nfAvcsP5bdudRLJzJp",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x9d275685dc284c8eb1c79f6aba7a63dc75ec890a"
           }
         },
         {
@@ -2711,7 +2711,7 @@
           ],
           "date_added": "2025-09-03T10:55:37.000Z",
           "slug": "apple-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "123mYEnRLM2LLYsJW3K6oyYh8uP1fngj732iG638ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -2742,7 +2742,7 @@
           ],
           "date_added": "2026-02-25T10:52:59.000Z",
           "slug": "apple-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2771,7 +2771,7 @@
           ],
           "date_added": "2026-07-02T03:36:49.000Z",
           "slug": "apple-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2800,7 +2800,7 @@
           ],
           "date_added": "2026-08-04T07:31:32.000Z",
           "slug": "apple-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2833,7 +2833,7 @@
           ],
           "date_added": "2026-07-28T07:08:33.000Z",
           "slug": "apple-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2920,12 +2920,12 @@
           ],
           "date_added": "2026-07-04T03:32:51.000Z",
           "slug": "sk-hynix-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsnhgGRQwhExfS2bmWzR6EYddKGPRGDEjeJsatkmKqU",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x6215a58ed045d71f2561aaabe54f4c885c522998"
+            "xlayer": "0x58100046a4afcd4ee4fadbd4244f3f895a341c56"
           }
         },
         {
@@ -2953,7 +2953,7 @@
           ],
           "date_added": "2026-07-09T01:45:56.000Z",
           "slug": "sk-hynix-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -2986,7 +2986,7 @@
           ],
           "date_added": "2026-06-12T09:35:08.000Z",
           "slug": "sk-hynix-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "Huyb2fyDDjSuDKCRWsN9ci2rmcgPo6NFiLbx9ZDondo",
             "ethereum": null,
             "arbitrum": null,
@@ -3016,7 +3016,7 @@
           ],
           "date_added": "2026-06-13T13:02:26.000Z",
           "slug": "sk-hynix-tokenized-stock-backpack",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3101,12 +3101,12 @@
           ],
           "date_added": "2025-07-01T18:40:19.000Z",
           "slug": "meta-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xsa62P5mvPszXL1krVUnU5ar38bBSVcWAB6fmPCo5Zu",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x96702be57cd9777f835117a809c7124fe4ec989a"
           }
         },
         {
@@ -3137,7 +3137,7 @@
           ],
           "date_added": "2025-09-03T10:55:33.000Z",
           "slug": "meta-platforms-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "fDxs5y12E7x7jBwCKBXGqt71uJmCWsAQ3Srkte6ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -3168,7 +3168,7 @@
           ],
           "date_added": "2026-02-25T10:52:58.000Z",
           "slug": "meta-platforms-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3201,7 +3201,7 @@
           ],
           "date_added": "2026-07-02T07:38:49.000Z",
           "slug": "meta-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3233,7 +3233,7 @@
           ],
           "date_added": "2026-07-02T07:39:02.000Z",
           "slug": "meta-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3262,7 +3262,7 @@
           ],
           "date_added": "2026-08-04T07:32:04.000Z",
           "slug": "meta-platforms-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3347,12 +3347,12 @@
           ],
           "date_added": "2025-07-01T18:39:24.000Z",
           "slug": "robinhood-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsvNBAYkrDRNhA7wPHQfX3ZUXZyZLdnCQDfHZ56bzpg",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xe1385fdd5ffb10081cd52c56584f25efa9084015"
           }
         },
         {
@@ -3383,7 +3383,7 @@
           ],
           "date_added": "2025-09-03T10:55:32.000Z",
           "slug": "robinhood-markets-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "BVdXGvmgi6A9oAiwWvBvP76fyTqcCNRJMM7zMN6ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -3413,7 +3413,7 @@
           ],
           "date_added": "2026-02-25T10:53:01.000Z",
           "slug": "robinhood-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3445,7 +3445,7 @@
           ],
           "date_added": "2026-07-02T07:39:10.000Z",
           "slug": "robinhood-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3478,7 +3478,7 @@
           ],
           "date_added": "2026-07-13T11:04:01.000Z",
           "slug": "robinhood-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3563,12 +3563,12 @@
           ],
           "date_added": "2025-07-01T18:40:23.000Z",
           "slug": "microsoft-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XspzcW1PRtgf6Wj92HCiZdjzKCyFekVD8P5Ueh3dRMX",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x5621737f42dae558b81269fcb9e9e70c19aa6b35"
           }
         },
         {
@@ -3599,7 +3599,7 @@
           ],
           "date_added": "2025-09-03T10:55:38.000Z",
           "slug": "microsoft-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "FRmH6iRkMr33DLG6zVLR7EM4LojBFAuq6NtFzG6ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -3630,7 +3630,7 @@
           ],
           "date_added": "2026-02-25T10:52:59.000Z",
           "slug": "microsoft-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3663,7 +3663,7 @@
           ],
           "date_added": "2026-07-02T07:38:50.000Z",
           "slug": "microsoft-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3695,7 +3695,7 @@
           ],
           "date_added": "2026-07-02T07:39:05.000Z",
           "slug": "microsoft-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3724,7 +3724,7 @@
           ],
           "date_added": "2026-08-04T07:31:28.000Z",
           "slug": "microsoft-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3809,12 +3809,12 @@
           ],
           "date_added": "2025-07-01T15:49:32.000Z",
           "slug": "broadcom-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsgSaSvNSqLTtFuyWPBhK9196Xb9Bbdyjj4fH3cPJGo",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x38bac69cbbd28156796e4163b2b6dcb81e336565"
           }
         },
         {
@@ -3844,7 +3844,7 @@
           ],
           "date_added": "2025-09-03T10:55:21.000Z",
           "slug": "broadcom-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "1FWZtdWN7y38BSXGzbs8D6Shk88oL9atDNgbVz9ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -3876,7 +3876,7 @@
           ],
           "date_added": "2026-07-02T07:39:03.000Z",
           "slug": "broadcom-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3905,7 +3905,7 @@
           ],
           "date_added": "2026-08-04T07:31:32.000Z",
           "slug": "broadcom-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -3938,7 +3938,7 @@
           ],
           "date_added": "2026-07-13T10:47:09.000Z",
           "slug": "broadcom-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4023,12 +4023,12 @@
           ],
           "date_added": "2025-07-01T14:12:20.000Z",
           "slug": "amazon-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xs3eBt7uRfJX8QUs4suhyU8p2M6DoUDrJyWBa8LLZsg",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x3557ba345b01efa20a1bddc61f573bfd87195081"
           }
         },
         {
@@ -4059,7 +4059,7 @@
           ],
           "date_added": "2025-09-03T10:55:12.000Z",
           "slug": "amazon-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "14Tqdo8V1FhzKsE3W2pFsZCzYPQxxupXRcqw9jv6ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -4090,7 +4090,7 @@
           ],
           "date_added": "2026-02-25T10:53:00.000Z",
           "slug": "amazon-tokenized-stock-hyperliquid",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4122,7 +4122,7 @@
           ],
           "date_added": "2026-07-02T07:39:03.000Z",
           "slug": "amazon-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4151,7 +4151,7 @@
           ],
           "date_added": "2026-08-04T07:31:38.000Z",
           "slug": "amazon-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4184,7 +4184,7 @@
           ],
           "date_added": "2026-07-28T07:16:57.000Z",
           "slug": "amazon-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4241,6 +4241,43 @@
       "rwa_rank": 19,
       "tokens": [
         {
+          "symbol": "AMDx",
+          "name": "AMD Tokenised Stock (xStock)",
+          "price": 628.0658000970672,
+          "crypto_id": 39699,
+          "issuer_id": "6878977dcbbf471de3366e85",
+          "issuer_name": "Backed Assets",
+          "market_cap": 8379633.24,
+          "volume_24h": 2826609.40378789,
+          "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/39699.png",
+          "description": "AMD xStock (AMDx) is a tracker certificate issued as a freely transferable token on selected blockchains. AMDx tracks the price of Advanced Micro Devices, Inc. AMDx is designed to give eligible investors regulatory-compliant access to the stock price of Advanced Micro Devices, Inc., whilst maintaining the benefits of blockchain technology.",
+          "website": "https://xstocks.fi",
+          "twitter": "https://twitter.com/xstocksfi",
+          "discord": "https://defi.xstocks.fi/wrap",
+          "tags": [
+            "defi",
+            "ethereum-ecosystem",
+            "tokenized-stock",
+            "solana-ecosystem",
+            "arbitrum-ecosystem",
+            "bnb-chain-ecosystem",
+            "toncoin-ecosystem",
+            "x-layer-ecosystem",
+            "internet-capital-markets",
+            "tokenized-assets",
+            "xstocks-ecosystem"
+          ],
+          "date_added": "2025-07-01T14:12:20.000Z",
+          "slug": "amazon-tokenized-stock-xstock",
+          "contractAddress": {
+            "solana": "XsXcJ6GZ9kVnjqGsjBnktRcuwMBmvKWh8S93RefZ1rF",
+            "ethereum": "0x3522513e5f146a2006e2901b05f16b2821485e19",
+            "arbitrum": null,
+            "bnb": "0x3522513E5F146a2006e2901b05f16B2821485E19",
+            "xlayer": "0x3522513E5F146a2006e2901b05f16B2821485E19"
+          }
+        },
+        {
           "symbol": "AMDon",
           "name": "AMD Tokenized Stock (Ondo)",
           "price": 628.0658000970672,
@@ -4268,7 +4305,7 @@
           ],
           "date_added": "2025-09-03T10:55:20.000Z",
           "slug": "amd-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "14diAn5z8kjrKwSC8WLqvBqqe5YmihJhjxRxd8Z6ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -4301,7 +4338,7 @@
           ],
           "date_added": "2026-06-21T05:23:03.000Z",
           "slug": "advanced-micro-devices-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4333,7 +4370,7 @@
           ],
           "date_added": "2026-07-02T07:39:02.000Z",
           "slug": "amd-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4362,7 +4399,7 @@
           ],
           "date_added": "2026-08-04T07:31:25.000Z",
           "slug": "amd-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4446,7 +4483,7 @@
           ],
           "date_added": "2025-09-03T10:55:33.000Z",
           "slug": "taiwan-semiconductor-manufacturing-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "keybg184d4vyXeQdFqs4o99YsMg7xBthxTJ6Ky3ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -4478,7 +4515,7 @@
           ],
           "date_added": "2026-07-02T07:39:04.000Z",
           "slug": "tsmc-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4507,7 +4544,7 @@
           ],
           "date_added": "2026-08-04T07:31:59.000Z",
           "slug": "tsmc-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4540,7 +4577,7 @@
           ],
           "date_added": "2026-07-13T10:34:40.000Z",
           "slug": "tsmc-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4577,6 +4614,39 @@
             "arbitrum": null,
             "bnb": null,
             "xlayer": "0x27d62249488fc66ecbb92c8da3f56f700b8e8501"
+          },
+          "decimals": 18,
+          "verified": true
+        },
+        {
+          "symbol": "TSMX",
+          "name": "TSMC tokenized stock(xStock)",
+          "price": 418.0065465235427,
+          "crypto_id": 40083,
+          "issuer_id": "6878977dcbbf471de3366e85",
+          "issuer_name": "Backed Assets",
+          "market_cap": 0,
+          "volume_24h": 28883.83010473,
+          "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/40083.png",
+          "description": "For too long, investing has come with barriers. Borders. Brokers. Limitations. It’s been complicated, costly, and — for millions — out of reach. xStocks were created to change that. xStocks are tokenized stocks. They’re backed 1:1 by the underlying assets, composable with DeFi protocols, compliant with EU regulations, accessible to non-US users, and provide a legal claim to the value of the stock. xStocks enable easy access to 57 US Stocks and ETFs to regular users through top centralized and decentralized exchanges, and can be integrated with other DeFi protocols like any other token.",
+          "website": "https://xstocks.fi",
+          "twitter": "https://twitter.com/xstocksfi",
+          "discord": "https://defi.xstocks.fi/wrap",
+          "tags": [
+            "defi",
+            "tokenized-stock",
+            "x-layer-ecosystem",
+            "tokenized-assets",
+            "xstocks-ecosystem"
+          ],
+          "date_added": "2026-08-11T16:26:33.000Z",
+          "slug": "tsmc-tokenized-stock-xstock",
+          "contractAddress": {
+            "solana": null,
+            "ethereum": "0x9e3bf4ecfc44eedd624f26656b6736a3f093b073",
+            "arbitrum": null,
+            "bnb": null,
+            "xlayer": "0x9e3bf4Ecfc44EeDD624F26656B6736a3F093b073"
           },
           "decimals": 18,
           "verified": true
@@ -4624,7 +4694,7 @@
           ],
           "date_added": "2025-09-03T10:55:12.000Z",
           "slug": "oracle-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "GmDADFpfwjfzZq9MfCafMDTS69MgVjtzD7Fd9a4ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -4661,12 +4731,12 @@
           ],
           "date_added": "2025-07-01T18:35:09.000Z",
           "slug": "oracle-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsjFwUPiLofddX5cWFHW35GCbXcSu1BCUGfxoQAQjeL",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x548308e91ec9f285c7bff05295badbd56a6e4971"
           }
         },
         {
@@ -4693,7 +4763,7 @@
           ],
           "date_added": "2026-07-02T07:39:24.000Z",
           "slug": "oracle-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4722,7 +4792,7 @@
           ],
           "date_added": "2026-08-04T07:32:01.000Z",
           "slug": "oracle-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4755,7 +4825,7 @@
           ],
           "date_added": "2026-07-20T08:19:17.000Z",
           "slug": "oracle-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4839,12 +4909,12 @@
           ],
           "date_added": "2025-07-01T15:49:25.000Z",
           "slug": "gamestop-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xsf9mBktVB9BSU5kf4nHxPq5hCBJ2j2ui3ecFGxPRGc",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xe5f6d3b2405abdfe6f660e63202b25d23763160d"
           }
         },
         {
@@ -4874,7 +4944,7 @@
           ],
           "date_added": "2025-09-03T10:54:57.000Z",
           "slug": "gamestop-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "aznKt8v32CwYMEcTcB4bGTv8DXWStCpHrcCtyy7ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -4903,7 +4973,7 @@
           ],
           "date_added": "2026-08-04T07:31:32.000Z",
           "slug": "gamestop-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -4936,7 +5006,7 @@
           ],
           "date_added": "2026-08-11T03:55:00.000Z",
           "slug": "gamestop-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5019,7 +5089,7 @@
           ],
           "date_added": "2026-01-08T15:44:10.000Z",
           "slug": "bitmine-immersion-technologies-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "MYXqkDYbzr7vjXAz2BapR4AiYRXzoikGirrLoRzondo",
             "ethereum": null,
             "arbitrum": null,
@@ -5052,7 +5122,7 @@
           ],
           "date_added": "2026-08-04T17:07:09.000Z",
           "slug": "bitmine-immersion-technologies-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5136,7 +5206,7 @@
           ],
           "date_added": "2025-09-03T10:55:39.000Z",
           "slug": "palantir-technologies-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "HfsnTS5qtdStwec9DfBrunRqnAMYMMz1kjv9Hu9ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -5173,12 +5243,12 @@
           ],
           "date_added": "2025-07-01T18:35:10.000Z",
           "slug": "palantir-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsoBhf2ufR8fTyNSjqfU71DYGaE6Z3SUGAidpzriAA4",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x6d482cec5f9dd1f05ccee9fd3ff79b246170f8e2"
           }
         },
         {
@@ -5206,7 +5276,7 @@
           ],
           "date_added": "2026-07-02T07:38:49.000Z",
           "slug": "palantir-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5238,7 +5308,7 @@
           ],
           "date_added": "2026-07-02T07:39:24.000Z",
           "slug": "palantir-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5267,7 +5337,7 @@
           ],
           "date_added": "2026-08-04T07:31:26.000Z",
           "slug": "palantir-technologies-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5350,7 +5420,7 @@
           ],
           "date_added": "2025-09-03T10:55:33.000Z",
           "slug": "asml-holding-nv-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "1eLZPRsn8bAKmoxsqDMH9Q2m2k7GMNp6RLSQGm8ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -5388,12 +5458,12 @@
           ],
           "date_added": "2026-06-10T06:33:38.000Z",
           "slug": "asml-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XshuHQ6o6SVpUNawvnnTMxsZ4tacZsNgVCLorv7TkFq",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x9147b03c16b18fc4f686f610f189f91ddf4347b4"
+            "xlayer": "0xc0b417e7f83db438631eb5e096684dd742e5294f"
           }
         },
         {
@@ -5420,7 +5490,7 @@
           ],
           "date_added": "2026-07-02T07:39:23.000Z",
           "slug": "asml-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5449,7 +5519,7 @@
           ],
           "date_added": "2026-08-04T07:31:41.000Z",
           "slug": "asml-holding-nv-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5482,7 +5552,7 @@
           ],
           "date_added": "2026-08-04T03:48:05.000Z",
           "slug": "asml-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5562,7 +5632,7 @@
           ],
           "date_added": "2026-07-02T07:39:22.000Z",
           "slug": "nebius-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5591,7 +5661,7 @@
           ],
           "date_added": "2026-08-04T07:32:00.000Z",
           "slug": "nebius-group-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5624,7 +5694,7 @@
           ],
           "date_added": "2026-07-06T06:10:10.000Z",
           "slug": "nebius-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5705,7 +5775,7 @@
           ],
           "date_added": "2026-01-08T15:44:25.000Z",
           "slug": "iren-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "13QHuepdhtJ3urNsV9i1hdL8nQoca2G7ZaLzb5FYondo",
             "ethereum": null,
             "arbitrum": null,
@@ -5742,12 +5812,12 @@
           ],
           "date_added": "2026-06-10T06:33:47.000Z",
           "slug": "iren-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xshh1dRsnxatP45yBfrzU9MrvrFCvxHQGTrWjgdA81E",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xb3a16db475a9cb321fc8956aa2cb01385a022e75"
+            "xlayer": "0xfbfc1fd14eec970276c8a3bf5e6131cd751cc0b9"
           }
         },
         {
@@ -5774,7 +5844,7 @@
           ],
           "date_added": "2026-07-02T07:39:11.000Z",
           "slug": "iren-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5803,7 +5873,7 @@
           ],
           "date_added": "2026-08-04T07:31:43.000Z",
           "slug": "iren-limited-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5836,7 +5906,7 @@
           ],
           "date_added": "2026-08-04T03:53:41.000Z",
           "slug": "iren-limited-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -5919,7 +5989,7 @@
           ],
           "date_added": "2025-09-03T10:55:22.000Z",
           "slug": "coca-cola-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "e6G4pfFcrdKxJuZ4YXixRFfMbpMvgXG2Mjcus71ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -5955,12 +6025,12 @@
           ],
           "date_added": "2025-07-01T15:48:32.000Z",
           "slug": "coca-cola-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsaBXg8dU5cPM6ehmVctMkVqoiRG2ZjMo1cyBJ3AykQ",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xdcc1a2699441079da889b1f49e12b69cc791129b"
           }
         },
         {
@@ -6036,7 +6106,7 @@
           ],
           "date_added": "2025-09-03T10:55:13.000Z",
           "slug": "ibm-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "C8bZkgSxXkyT1RgxByp2teJ24hgimPLoyEYoNa9ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -6073,12 +6143,12 @@
           ],
           "date_added": "2025-07-01T15:48:56.000Z",
           "slug": "international-business-machines-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XspwhyYPdWVM8XBHZnpS9hgyag9MKjLRyE3tVfmCbSr",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0xd9913208647671fe0f48f7f260076b2c6f310aac"
           }
         },
         {
@@ -6105,7 +6175,7 @@
           ],
           "date_added": "2026-07-02T07:39:06.000Z",
           "slug": "ibm-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6138,7 +6208,7 @@
           ],
           "date_added": "2026-07-13T10:40:21.000Z",
           "slug": "ibm-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6180,37 +6250,6 @@
           "verified": true
         },
         {
-          "symbol": "wIBMx",
-          "name": "Wrapped International Business Tokenized Stock (xStock)",
-          "price": 230.2525623952644,
-          "crypto_id": 41431,
-          "issuer_id": "6878977dcbbf471de3366e85",
-          "issuer_name": "Backed Assets",
-          "market_cap": 0,
-          "volume_24h": 0,
-          "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/41431.png",
-          "description": "Wrapped International Business Tokenized Stock (xStock) (wIBMx) is a cryptocurrency and operates on the X Layer platform. Wrapped International Business Tokenized Stock (xStock) has a current supply of 0. The last known price of Wrapped International Business Tokenized Stock (xStock) is 230.2525624 USD and is down -0.11 over the last 24 hours. It is currently trading on 1 active market(s) with $0.00 traded over the last 24 hours. More information can be found at https://xstocks.fi.",
-          "website": "https://xstocks.fi",
-          "twitter": "https://twitter.com/xstocksfi",
-          "discord": "https://defi.xstocks.fi/wrap",
-          "tags": [
-            "defi",
-            "tokenized-stock",
-            "x-layer-ecosystem",
-            "tokenized-assets",
-            "xstocks-ecosystem"
-          ],
-          "date_added": "2026-08-11T16:23:42.000Z",
-          "slug": "wrapped-international-business-tokenized-stock-xstock",
-          "addresses": {
-            "solana": null,
-            "ethereum": null,
-            "arbitrum": null,
-            "bnb": null,
-            "xlayer": "0xbf69d85055642a9c6450bdfde3c49baac50f8286"
-          }
-        },
-        {
           "symbol": "IBM",
           "name": "IBM Tokenized Stock (Robinhood)",
           "price": 225.23053424882104,
@@ -6233,7 +6272,7 @@
           ],
           "date_added": "2026-09-23T06:34:45.000Z",
           "slug": "ibm-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6284,12 +6323,12 @@
           ],
           "date_added": "2025-07-01T18:39:58.000Z",
           "slug": "mcdonald-s-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsqE9cRRpzxcGKDXj1BJ7Xmg4GRhZoyY1KpmGSxAWT2",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x80a77a372c1e12accda84299492f404902e2da67"
           }
         },
         {
@@ -6314,7 +6353,7 @@
           ],
           "date_added": "2025-09-03T10:55:09.000Z",
           "slug": "mcdonalds-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "EUbJjmDt8JA222M91bVLZs211siZ2jzbFArH9N3ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -6394,7 +6433,7 @@
           ],
           "date_added": "2026-07-02T07:39:29.000Z",
           "slug": "rocket-lab-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6423,7 +6462,7 @@
           ],
           "date_added": "2026-08-04T07:31:27.000Z",
           "slug": "rocket-lab-corporation-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6456,7 +6495,7 @@
           ],
           "date_added": "2026-07-13T10:44:19.000Z",
           "slug": "rocket-lab-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6539,7 +6578,7 @@
           ],
           "date_added": "2025-09-03T10:55:22.000Z",
           "slug": "super-micro-computer-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "jLca79XzcewRuBZyaJxVxuKpUHcEix1X4CP1RP9ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -6574,12 +6613,12 @@
           ],
           "date_added": "2026-06-10T06:33:29.000Z",
           "slug": "super-micro-computer-inc-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsMxAoJP47FQGLsVUvSS2QfBaHdNsd7DRU6nWRL8RSa",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0xd89556e08fdc04e5a2d9344eb06568a043001166"
+            "xlayer": "0x39c31fc6038490ea4bf8a21ca18cd18f33b8d3fb"
           }
         },
         {
@@ -6606,7 +6645,7 @@
           ],
           "date_added": "2026-07-02T07:39:01.000Z",
           "slug": "super-micro-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6635,7 +6674,7 @@
           ],
           "date_added": "2026-08-04T07:32:01.000Z",
           "slug": "super-micro-computer-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6668,7 +6707,7 @@
           ],
           "date_added": "2026-08-04T04:02:06.000Z",
           "slug": "super-micro-computer-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6752,12 +6791,12 @@
           ],
           "date_added": "2026-06-10T06:33:30.000Z",
           "slug": "dell-technologies-inc-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xsu7Tc5J2fVUE4H5vYAiSr34cvLJeCsYPMjAYnayQn6",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": "0x04db4384013664baa627c1a3fa4ff0c50f37cfd3"
+            "xlayer": "0x2782df1cc877f720c81b4f6568db64563f1d3aa3"
           }
         },
         {
@@ -6784,7 +6823,7 @@
           ],
           "date_added": "2026-07-02T07:39:08.000Z",
           "slug": "dell-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6813,7 +6852,7 @@
           ],
           "date_added": "2026-08-04T07:31:48.000Z",
           "slug": "dell-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6846,7 +6885,7 @@
           ],
           "date_added": "2026-07-28T07:37:00.000Z",
           "slug": "dell-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -6930,12 +6969,12 @@
           ],
           "date_added": "2025-07-01T18:39:48.000Z",
           "slug": "walmart-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xs151QeqTCiuKtinzfRATnUESM2xTU6V9Wy8Vy538ci",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x7aefc9965699fbea943e03264d96e50cd4a97b21"
           }
         },
         {
@@ -6963,7 +7002,7 @@
           ],
           "date_added": "2025-09-03T10:55:22.000Z",
           "slug": "walmart-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "LZddqAqKqJW9oMZSjTxCUmbmzBRQtv9gMkD9hZ3ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -7044,7 +7083,7 @@
           ],
           "date_added": "2025-09-03T10:55:41.000Z",
           "slug": "reddit-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "HXFrTf9v9NdjGUTnx4sojR3Cf92hoBsQFUxKTN7ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -7073,7 +7112,7 @@
           ],
           "date_added": "2026-08-04T07:32:03.000Z",
           "slug": "reddit-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7106,7 +7145,7 @@
           ],
           "date_added": "2026-09-15T08:55:00.000Z",
           "slug": "reddit-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7190,12 +7229,12 @@
           ],
           "date_added": "2025-07-01T15:49:32.000Z",
           "slug": "berkshire-hathaway-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "Xs6B6zawENwAbWVi7w92rjazLuAr5Az59qgWKcNb45x",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x12992613fdd35abe95dec5a4964331b1ee23b50d"
           }
         },
         {
@@ -7270,7 +7309,7 @@
           ],
           "date_added": "2026-07-02T07:39:17.000Z",
           "slug": "coreweave-tokenized-stock-reality",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7299,7 +7338,7 @@
           ],
           "date_added": "2026-08-04T07:31:27.000Z",
           "slug": "coreweave-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7332,7 +7371,7 @@
           ],
           "date_added": "2026-07-20T08:44:50.000Z",
           "slug": "coreweave-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7413,7 +7452,7 @@
           ],
           "date_added": "2026-01-08T15:44:19.000Z",
           "slug": "moderna-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "14VP7DvCAdBCc5XGNZkPt6zhtPzJrWWS64Koxtxyondo",
             "ethereum": null,
             "arbitrum": null,
@@ -7421,7 +7460,7 @@
             "xlayer": null
           }
         },
-         {
+        {
           "symbol": "MRNAB",
           "name": "Moderna Tokenized bStocks",
           "price": 201.1075731805183,
@@ -7446,7 +7485,7 @@
           ],
           "date_added": "2026-09-01T08:28:55.000Z",
           "slug": "moderna-tokenized-bstocks",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7477,7 +7516,7 @@
           ],
           "date_added": "2026-08-04T07:31:24.000Z",
           "slug": "moderna-tokenized-stock-robinhood",
-          "addresses": {
+          "contractAddress": {
             "solana": null,
             "ethereum": null,
             "arbitrum": null,
@@ -7558,7 +7597,7 @@
           ],
           "date_added": "2025-09-03T10:55:16.000Z",
           "slug": "nike-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "g646pcdG2Rt5DH9WZzL7VVnVDWCCMTTrnktwE74ondo",
             "ethereum": null,
             "arbitrum": null,
@@ -7642,12 +7681,12 @@
           ],
           "date_added": "2025-07-01T18:40:09.000Z",
           "slug": "merck-tokenized-stock-xstock",
-          "addresses": {
+          "contractAddress": {
             "solana": "XsnQnU7AdbRZYe2akqqpibDdXjkieGFfSkbkjX1Sd1X",
             "ethereum": null,
             "arbitrum": null,
             "bnb": null,
-            "xlayer": null
+            "xlayer": "0x17d8186ed8f68059124190d147174d0f6697dc40"
           }
         },
         {
@@ -7673,7 +7712,7 @@
           ],
           "date_added": "2026-01-08T15:44:28.000Z",
           "slug": "merck-tokenized-stock-ondo",
-          "addresses": {
+          "contractAddress": {
             "solana": "bn1fb8dwzafGePqNPrM8m8cbAKQiFqeEPuZkPySondo",
             "ethereum": null,
             "arbitrum": null,

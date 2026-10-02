@@ -52,7 +52,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
 
   useEffect(() => {
     if (!address || !provider) { setBalance(null); return; }
-    const tokenAddr = tab === "Buy" ? baseToken.address : token.contractAddress;
+    const tokenAddr = tab === "Buy" ? baseToken.address : (token.contractAddress as any)?.xlayer;
     const decimals = tab === "Buy" ? baseToken.decimals : token.decimals ?? 18;
     if (!tokenAddr) { setBalance(null); return; }
 
@@ -83,8 +83,9 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
     const decimals = tab === "Buy" ? baseToken.decimals : token.decimals ?? 18;
     const rawAmount = (Number(amount) * Math.pow(10, decimals)).toString();
 
-    const fromAddr = tab === "Buy" ? baseToken.address : (token.contractAddress ?? "");
-    const toAddr = tab === "Buy" ? (token.contractAddress ?? "") : baseToken.address;
+    const tokenXlayerAddr = (token.contractAddress as any)?.xlayer ?? "";
+    const fromAddr = tab === "Buy" ? baseToken.address : tokenXlayerAddr;
+    const toAddr = tab === "Buy" ? tokenXlayerAddr : baseToken.address;
 
     try {
       const params = new URLSearchParams({
@@ -134,8 +135,9 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
 
     const decimals = tab === "Buy" ? baseToken.decimals : token.decimals ?? 18;
     const rawAmount = (Number(quoteAmount) * Math.pow(10, decimals)).toString();
-    const fromAddr = tab === "Buy" ? baseToken.address : (token.contractAddress ?? "");
-    const toAddr = tab === "Buy" ? (token.contractAddress ?? "") : baseToken.address;
+    const tokenXlayerAddr = (token.contractAddress as any)?.xlayer ?? "";
+    const fromAddr = tab === "Buy" ? baseToken.address : tokenXlayerAddr;
+    const toAddr = tab === "Buy" ? tokenXlayerAddr : baseToken.address;
 
     setSwapStatus("swapping");
     setTxHash("");
@@ -236,16 +238,16 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
               <ChevronDown className="w-3 h-3 text-white/40" />
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 shrink-0 bg-white/[0.06] px-2 py-1 rounded-lg">
-              {token.logo ? (
-                <img src={token.logo} alt="" className="w-4 h-4 rounded-full" />
-              ) : (
-                <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[7px] font-bold text-white/40">
-                  {token.symbol.slice(0, 2)}
-                </div>
-              )}
-              <span className="text-[12px] font-medium text-white/70">{token.symbol}</span>
-            </div>
+              <div className="flex items-center gap-1.5 shrink-0 bg-white/[0.06] px-2 py-1 rounded-lg">
+               {token.logo ? (
+                 <img src={token.logo} alt="" className="w-4 h-4 rounded-full" />
+               ) : (
+                 <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center text-[7px] font-bold text-white/40">
+                   {token.symbol.slice(0, 2)}
+                 </div>
+               )}
+               <span className="text-[12px] font-medium text-white/70">{token.symbol}</span>
+             </div>
           )}
         </div>
       </div>
@@ -253,7 +255,7 @@ export default function SwapPanel({ token, asset }: { token: Token; asset: Asset
       <div className="mt-3 pt-3 border-t border-white/[0.06]">
         <div className="text-[11px] text-white/40 mb-3">
           {balance !== null ? (
-            <span>Balance: <span className="text-white/60">{Number(balance).toFixed(4)} {tab === "Buy" ? baseToken.symbol : token.symbol}</span></span>
+             <span>Balance: <span className="text-white/60">{Number(balance).toFixed(4)} {tab === "Buy" ? baseToken.symbol : token.symbol}</span></span>
           ) : (
             <span className="text-white/20">—</span>
           )}
