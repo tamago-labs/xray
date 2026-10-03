@@ -22,12 +22,8 @@ const faqs = [
     answer: 'Pre-IPO perpetuals let you trade tokenized pre-IPO equity (like OpenAI, Anthropic, Stripe) with a counter-party AMM mechanism on X Layer. You can open long/short positions, manage collateral, and track mark prices in real-time.',
   },
   {
-    question: 'How does portfolio risk analysis work?',
-    answer: 'Xray evaluates your portfolio using two AI agents. The first analyzes concentration, market risk, and token liquidity. The second provides actionable rebalance suggestions — telling you exactly which tokens to reduce or add, with target allocations. Risk scores range from 0-100 based on your actual holdings and real-time market data from CoinMarketCap.',
-  },
-  {
     question: 'What are rebalance suggestions?',
-    answer: 'After a risk evaluation, Xray generates specific recommendations to improve your portfolio\'s risk profile. Each suggestion includes an action (reduce, add, diversify, or hedge), the token involved, a reason based on your concentration and sector exposure, and a suggested target allocation percentage.',
+    answer: 'After seeing your risk score, you can ask Xray to rebalance. It analyzes your concentration and sector exposure, then recommends specific tokens to reduce or add — with target allocations and live liquidity data so you can actually trade the picks.',
   },
   {
     question: 'Can I swap tokens directly on Xray?',
