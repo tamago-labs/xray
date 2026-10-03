@@ -276,8 +276,8 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
                   fontSize: 11,
                 }}
                 labelStyle={{ color: "rgba(255,255,255,0.4)", marginBottom: 4 }}
-                formatter={(value: number, name: string) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
-                labelFormatter={(label: number) => new Date(label * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                formatter={(value, name) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, name]}
+                labelFormatter={(label) => new Date(Number(label) * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
               />
               {priceData
                 .filter((d) => enabled[d.symbol])
@@ -307,8 +307,8 @@ export default function XLayerPriceChart({ token, asset }: { token: Token; asset
                     contentStyle={{ background: "#141419", border: "1px solid #2A2A35", borderRadius: 6, fontSize: 10 }}
                     labelStyle={{ color: "rgba(255,255,255,0.5)" }}
                     itemStyle={{ color: "rgba(255,255,255,0.7)" }}
-                    formatter={(value: number) => [`${value > 0 ? "+" : ""}${value.toFixed(2)}%`, "Premium"]}
-                    labelFormatter={(label: number) => new Date(label * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    formatter={(value) => [`${Number(value) > 0 ? "+" : ""}${Number(value).toFixed(2)}%`, "Premium"]}
+                    labelFormatter={(label) => new Date(Number(label) * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                   />
                   <Bar dataKey="premium" radius={[2, 2, 0, 0]}>
                     {premiumData.map((entry, index) => (

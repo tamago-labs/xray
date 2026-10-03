@@ -28,7 +28,7 @@ interface TokenRow {
   volume_all: number | null;
 }
 
-type SortKey = "token_symbol" | "stock_symbol" | "issuer" | "price" | "percent_24h" | "percent_7d" | "percent_30d" | "mcap_all" | "volume_all";
+type SortKey = "token_symbol" | "stock_symbol" | "issuer" | "price" | "percent_24h" | "percent_7d" | "percent_30d" | "market_cap" | "mcap_all" | "volume_24h" | "volume_all";
 type SortDir = "asc" | "desc";
 
 function usePageSize(rowHeight = 48, offset = 220) {
