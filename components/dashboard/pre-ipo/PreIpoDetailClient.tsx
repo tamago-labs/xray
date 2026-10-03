@@ -10,7 +10,7 @@ import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import { usePreIpoContract } from '@/hooks/usePreIpoContract';
 import { useWallet } from '@/components/app/WalletContext';
-import FundPanel from '@/components/pre-ipo/FundPanel';
+import FundModal from '@/components/pre-ipo/FundModal';
 import TradePanel from '@/components/pre-ipo/TradePanel';
 import PositionsTable from '@/components/pre-ipo/PositionCard';
 import PriceChart from '@/components/pre-ipo/PriceChart';
@@ -31,6 +31,7 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
   const { address, provider, signer, isConnected } = useWallet();
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [txPending, setTxPending] = useState(false);
+  const [fundModalOpen, setFundModalOpen] = useState(false);
 
   const {
     fetchState,
@@ -97,11 +98,20 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
     setTxPending(true);
     try {
       await closePosition(signer);
+      await new Promise((r) => setTimeout(r, 1000));
+      const s = await fetchState(provider || READONLY_PROVIDER);
+      setState(s);
     } catch (err) {
       console.error('[PreIpoDetail] close error:', err);
     } finally {
       setTxPending(false);
     }
+  };
+
+  const handleRefreshState = async () => {
+    await new Promise((r) => setTimeout(r, 1000));
+    const s = await fetchState(provider || READONLY_PROVIDER);
+    setState(s);
   };
 
   if (!asset) {
@@ -203,27 +213,19 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
 
       <div className="grid grid-cols-5 gap-6">
         <div className="col-span-2 space-y-4">
-          <FundPanel
-            collateralDecimals={state?.collateralDecimals ?? 6}
-            collateralSymbol={state?.collateralSymbol ?? 'USDC'}
-            hasPosition={!!hasPosition}
-            onDeposit={deposit}
-            onWithdraw={withdraw}
-            onSuccess={() => fetchState(provider || READONLY_PROVIDER).then(setState)}
-            loading={contractLoading}
-            status={state?.status ?? 0}
-            deposits={state?.deposits ?? BigInt(0)}
-          />
-
           <TradePanel
             markPrice={dbMarkPrice}
             collateralSymbol={state?.collateralSymbol ?? 'USDC'}
             initialMarginRate={state?.initialMarginRate ?? BigInt(0)}
             onOpenPosition={openPosition}
+            onPositionSuccess={handleRefreshState}
             getExecutionPrice={(side, size) => fetchExecutionPrice(provider || READONLY_PROVIDER, side, size)}
             hasPosition={!!hasPosition}
             loading={contractLoading}
             status={state?.status ?? 0}
+            onOpenFund={() => setFundModalOpen(true)}
+            deposits={state?.deposits ?? BigInt(0)}
+            collateralDecimals={state?.collateralDecimals ?? 6}
           />
 
           <MarketStats
@@ -310,6 +312,21 @@ export default function PreIpoDetailClient({ slug }: { slug: string }) {
             })}
         </div>
       </div>
+
+      <FundModal
+        open={fundModalOpen}
+        onClose={() => setFundModalOpen(false)}
+        collateralDecimals={state?.collateralDecimals ?? 6}
+        collateralSymbol={state?.collateralSymbol ?? 'USDC'}
+        hasPosition={!!hasPosition}
+        deposits={state?.deposits ?? BigInt(0)}
+        onDeposit={deposit}
+        onWithdraw={withdraw}
+        onSuccess={() => {
+          fetchState(provider || READONLY_PROVIDER).then(setState);
+          setFundModalOpen(false);
+        }}
+      />
     </div>
   );
 }

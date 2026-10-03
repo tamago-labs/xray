@@ -11,10 +11,14 @@ interface TradePanelProps {
   collateralSymbol: string;
   initialMarginRate: bigint;
   onOpenPosition: (signer: ethers.Signer, side: 'long' | 'short', size: bigint) => Promise<string>;
+  onPositionSuccess?: () => void;
   getExecutionPrice: (side: 'long' | 'short', size: bigint) => Promise<number>;
   hasPosition: boolean;
   loading: boolean;
   status: number;
+  onOpenFund?: () => void;
+  deposits?: bigint;
+  collateralDecimals?: number;
 }
 
 const LEVERAGE_OPTIONS = [1, 2, 3, 5];
@@ -24,10 +28,14 @@ export default function TradePanel({
   collateralSymbol,
   initialMarginRate,
   onOpenPosition,
+  onPositionSuccess,
   getExecutionPrice,
   hasPosition,
   loading,
   status,
+  onOpenFund,
+  deposits,
+  collateralDecimals,
 }: TradePanelProps) {
   const [executionPrice, setExecutionPrice] = useState<number | null>(null);
   const [slippage, setSlippage] = useState<number | null>(null);
@@ -77,6 +85,7 @@ export default function TradePanel({
       const size = ethers.parseUnits(sizeInput, 18);
       await onOpenPosition(signer, side, size);
       setSizeInput('');
+      onPositionSuccess?.();
     } catch (err: unknown) {
       setTxError(err instanceof Error ? err.message : 'Open position failed');
     } finally {
@@ -150,6 +159,14 @@ export default function TradePanel({
             className="flex-1 bg-transparent text-sm text-white/90 outline-none min-w-0"
           />
         </div>
+        {onOpenFund && deposits !== undefined && collateralDecimals !== undefined && (
+          <button
+            onClick={onOpenFund}
+            className="text-[11px] text-white/30 hover:text-white/60 transition-colors mt-1.5 text-left"
+          >
+            Deposited: {(Number(deposits) / Math.pow(10, collateralDecimals)).toFixed(2)} {collateralSymbol}
+          </button>
+        )}
       </div>
 
       <div>
@@ -172,8 +189,8 @@ export default function TradePanel({
       </div>
 
       {hasPosition && (
-        <div className="bg-warn2/10 border border-warn2/20 rounded-xl p-3">
-          <p className="text-[12px] text-warn2/80">
+        <div className="bg-yellow-400/10 border border-yellow-400/20 rounded-xl p-3">
+          <p className="text-[12px] text-yellow-400/80">
             You have an open position. Close it before opening a new one.
           </p>
         </div>
