@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect, Suspense, useCallback, useMemo } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { Send, Plus, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Send, Plus, X, Lightbulb } from 'lucide-react';
 
 import { useWallet } from '@/components/app/WalletContext';
 import { generateClient } from 'aws-amplify/data';
@@ -17,6 +17,12 @@ import rwaList from '@/lib/data/rwa-v1-list.json';
 
 const dataClient = generateClient<Schema>();
 const MIN_CREDITS = 1;
+
+const presetPrompts = [
+  "What are the hidden risks in my portfolio?",
+  "Which of my holdings are most at risk?",
+  "What would a balanced version of my portfolio look like?",
+];
 
 
 
@@ -52,13 +58,13 @@ const getLogo = (symbol: string) => logoMap.get(symbol) ?? null;
 function NewChatInner() {
   const router = useRouter();
   const { isConnected, address, chainId } = useWallet();
-  const searchParams = useSearchParams();
-  const initialPrompt = searchParams.get('prompt');
-  const [input, setInput] = useState(initialPrompt ?? 'What are the hidden risks in my portfolio?');
+  const [input, setInput] = useState('What are the hidden risks in my portfolio?');
 
   const [sending, setSending] = useState(false);
   const [credits, setCredits] = useState<number | null>(null);
   const [error, setError] = useState('');
+  const [ideasOpen, setIdeasOpen] = useState(false);
+  const ideasRef = useRef<HTMLDivElement>(null);
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [attached, setAttached] = useState<DemoPortfolio | null>(null);
   const [expandedWallet, setExpandedWallet] = useState(false);
@@ -97,6 +103,9 @@ function NewChatInner() {
     const onClick = (e: MouseEvent) => {
       if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
         setPopoverOpen(false);
+      }
+      if (ideasRef.current && !ideasRef.current.contains(e.target as Node)) {
+        setIdeasOpen(false);
       }
     };
     document.addEventListener('mousedown', onClick);
@@ -326,6 +335,40 @@ function NewChatInner() {
                         Connect your wallet to use your portfolio
                       </div>
                     )}
+                  </div>
+                )}
+              </div>
+
+              {/* Ideas button */}
+              <div ref={ideasRef} className="relative shrink-0">
+                <button
+                  onClick={() => setIdeasOpen(!ideasOpen)}
+                  className="w-8 h-8 rounded-lg bg-white/[0.06] text-white/40 hover:text-white/70 hover:bg-white/[0.1] border border-border3/50 flex items-center justify-center transition-colors"
+                  title="Need ideas?"
+                >
+                  <Lightbulb className="w-3.5 h-3.5" />
+                </button>
+
+                {ideasOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-72 bg-surface border border-border3/60 rounded-xl shadow-2xl overflow-hidden z-50">
+                    <div className="px-3 py-2 border-b border-border3/40 text-[11px] font-medium text-white/40">
+                      Try a prompt
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {presetPrompts.map((prompt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setInput(prompt);
+                            setIdeasOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-[12px] text-white/60 hover:bg-white/[0.04] hover:text-white/80 transition-colors border-b border-border3/20 last:border-b-0"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+
                   </div>
                 )}
               </div>

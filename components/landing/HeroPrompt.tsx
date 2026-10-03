@@ -237,13 +237,12 @@ export default function HeroPrompt() {
           <span className="text-[12px] text-white/60 font-medium">Xray AI</span>
         </div>
 
-        <div className="p-5">
-          <div className="bg-white/[0.03] border border-border3 rounded-xl p-4">
+            <div className="p-5">
+          <div className="bg-white/[0.03] border border-border3 rounded-xl p-4" title="Use your custom prompt inside the app">
             <textarea
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask Xray anything about the market…"
-              className="w-full bg-transparent text-[14px] text-white placeholder:text-white/25 outline-none resize-none min-h-[32px]"
+              readOnly
+              className="w-full bg-transparent text-[14px] text-white outline-none resize-none min-h-[32px] cursor-default"
             />
             <div className="flex items-center justify-between mt-2">
               <div ref={popoverRef} className="relative">
