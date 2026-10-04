@@ -1,32 +1,35 @@
 # Xray
 
-**Xray** brings AI, real-time market intelligence, and onchain execution together for **tokenized stocks and pre-IPO markets on X Layer**. The product helps users discover tokenized equities, understand market and portfolio risk, and move from analysis to execution without switching between multiple platforms.
+**187% monthly growth in tokenized stocks on X Layer. One-stop platform to navigate it all.**
 
-Its intended users are **Web3 investors and traders** who want exposure to tokenized stocks or emerging pre-IPO markets. The platform combines:
+**Xray** combines AI portfolio risk analysis, multi-agent market intelligence, and onchain execution for tokenized equities and pre-IPO markets on X Layer. Discover assets, understand your risk, and trade — without switching tools.
+
+At its core:
 
 * **AI Portfolio Risk Engine** — evaluates concentration, market, token, and liquidity risk and generates rebalance suggestions.
 * **Multi-Agent AI** — routes questions to specialized agents for market research, news, trading, pre-IPO markets, and portfolio analysis.
-* **Tokenized Stock Explorer** — tracks 41 tokenized stocks with live market data.
-* **Pre-IPO Perpetual DEX** — enables leveraged synthetic exposure through a counter-party AMM.
+* **Tokenized Stock Explorer** — covers 200+ tokenized stocks across multiple chains via CoinMarketCap RWA API, with deeper real-time data, risk scoring, and trading integration for X Layer assets.
+* **Perpetual DEX** — leveraged synthetic exposure for pre-IPO markets with prices tracked from reputable secondary markets (PreStocks).
 
-The core integration combines **X Layer, CoinMarketCap Pro, and OKX DEX Router**. CoinMarketCap supplies market intelligence, OKX provides swap routing and execution, while Xray's AI layer interprets the data and turns it into portfolio insights and trading workflows.
+The core integration combines **X Layer, CoinMarketCap Pro, Massive API, and OKX DEX Router**. CoinMarketCap and Massive API supply market intelligence, OKX provides swap routing and execution, while Xray's AI layer interprets the data and turns it into portfolio insights and trading workflows.
 
 <img width="1870" height="814" alt="Screenshot 2026-09-25 164352" src="https://github.com/user-attachments/assets/7d70b622-2372-47b6-a6ab-ec9a0cda3481" />
 
 ## Quick Links
 
-* **YouTube Demo (3 min)** — https://youtu.be/xBjvcAR2jVE
+* **Video Demo (1 min)** — https://x.com/XrayOnchain/status/2106368771627876783?s=20
+* **Presentation** — https://canva.link/7jabqwf9symp1ng
 * **Live Demo** — https://xray.tamagolabs.com/
 
 ## Highlighted Features
 
 - **AI Chat with Multi-Agent System** — triage routing to 5 specialized agents: Market Research, News Intelligence, Trade Specialist, Pre-IPO Trading, and Triage. Each agent has dedicated tools for real market data, news, swap routing, and portfolio analysis.
-- **Portfolio Risk Engine** — AI-powered risk evaluation across concentration, market risk, and token/liquidity dimensions. Produces a 0-100 risk score with actionable rebalance suggestions (reduce, add, diversify, hedge).
-- **Rebalance Suggestions** — based on risk analysis context, AI recommends specific tokens to reduce or add with target allocation percentages, referencing concentration and sector exposure.
-- **Portfolio Tracking** — connect your EVM wallet and track holdings across base tokens (USDT, USDC, ETH, SOL, OKB) and tokenized stocks (xStocks). Support for both real balances and custom amounts for analysis.
+- **Portfolio Risk Engine** — AI-powered risk evaluation across concentration, market risk, and token/liquidity dimensions. Produces a 0-100 risk score with actionable rebalance suggestions (reduce, add, diversify, hedge). Users can attach a wallet portfolio directly in the chat, run a guided risk review questionnaire, and view a full analysis report.
+- **Portfolio Tracking** — connect your EVM wallet and track holdings across base tokens (USDT, USDC, ETH, SOL, OKB) and tokenized stocks (xStocks). Support for both real balances and simulated portfolios for analysis.
 - **Pre-IPO Perpetual DEX** — trade synthetic exposure to pre-IPO companies (OpenAI, Anthropic, Anduril, Neuralink, Kalshi) with up to 10x leverage via a counter-party AMM with dynamic pricing and funding rates.
 - **AI-Powered Swap Execution** — finds the best route on X Layer via OKX DEX Router. Review quotes (price, price impact, route) and execute swaps directly from the chat interface.
-- **CoinMarketCap Pro Market Data** — real-time prices, market cap, volume, and RWA metadata for every tokenized stock on X Layer.
+- **CoinMarketCap Pro Market Data** — real-time prices, market cap, volume, and RWA metadata for every tokenized stock on X Layer and beyond.
+- **News & Market Insights** — aggregated news from Google News and Yahoo Finance RSS with theme classification, plus CoinMarketCap market metrics (Fear & Greed Index, Altcoin Season, Global Market Overview).
 
 ## System Overview
 
@@ -44,11 +47,11 @@ The dashboard provides a comprehensive interface for tokenized equity and pre-IP
 
 - **Explore** — Browse all 41 tokenized stocks on X Layer with real-time price, market cap, volume, and percentage changes from CoinMarketCap data. Filter by sector, issuer, or metric.
 
-- **Pre-IPO** — Discover pre-IPO perpetual markets with mark price, implied valuation, and 24h change. Each market includes a built-in trade widget for opening long/short positions with leverage.
+- **Perpetual DEX** — Discover pre-IPO perpetual markets with mark price, implied valuation, and 24h change. Prices tracked from reputable secondary markets (PreStocks). Each market includes a built-in trade widget for opening long/short positions with leverage.
 
-- **Token Detail** — Deep dive into any tokenized stock with price chart, market stats, sector exposure, issuer info, and AI-generated insights.
+- **Token Detail** — Deep dive into any tokenized stock with price chart, **premium/discount visualization for wrapped tokens vs underlying stock price**, **built-in wrap/unwrap for wrapped xStock tokens via ERC4626**, market stats, sector exposure, issuer info, and AI-generated insights.
 
-- **Chat** — Multi-agent AI chat where you can ask about tokenized stocks, get personalized recommendations, find best trade routes, execute swaps, and analyze portfolio risk — all through conversational commands.
+- **Chat** — Multi-agent AI chat where you can ask about tokenized stocks, get personalized recommendations, find best trade routes, execute swaps, and analyze portfolio risk — all through conversational commands. Results are rendered as a structured review report at `/dashboard/review` with risk scores, concentration analysis, and rebalancing actions.
 
 ## Backend
 
@@ -75,7 +78,7 @@ Xray's backend uses **AWS Amplify Gen 2** with serverless functions, DynamoDB ta
 
 ## Smart Contracts
 
-Xray includes a dedicated **Pre-IPO Perpetual DEX** deployed on X Layer Testnet. The system uses a counter-party AMM model where the pool takes the opposite side of every trade, with dynamic pricing based on pool utilization and a funding rate mechanism to tether mark price to oracle spot price.
+Xray includes a dedicated **Perpetual DEX** deployed on X Layer Testnet for pre-IPO markets, with prices tracked from reputable secondary markets (PreStocks). The system uses a counter-party AMM model where the pool takes the opposite side of every trade, with dynamic pricing based on pool utilization and a funding rate mechanism to tether mark price to oracle spot price.
 
 **Contracts:**
 - **Perpetual** — Main entry point for deposits, trading, liquidation, and settlement
@@ -100,7 +103,7 @@ The core AI-powered platform, tokenized-stock market data, portfolio analysis, a
 
 ### X Layer Testnet
 
-The Pre-IPO Perpetual DEX is deployed on **X Layer Testnet (chain ID 1952)**:
+The Perpetual DEX is deployed on **X Layer Testnet (chain ID 1952)**:
 
 | Contract | Address |
 |----------|---------|

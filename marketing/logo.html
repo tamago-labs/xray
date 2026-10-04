@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xray — Marketing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: '#0B0B0F',
+            zenblue: '#3B82F6',
+            zenpurple: '#8B5CF6',
+          },
+          boxShadow: {
+            glow: '0 0 60px -20px rgba(108, 92, 231, 0.3)',
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .font-brand {
+      font-family: 'Zen Tokyo Zoo', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-dark min-h-screen flex items-center justify-center">
+  <div class="w-[500px] h-[500px] rounded-2xl bg-gradient-to-br from-zenblue to-zenpurple flex items-center justify-center shadow-glow">
+    <span class="font-brand text-white" style="font-size: 320px; line-height: 1;">X</span>
+  </div>
+</body>
+</html>
